@@ -49,7 +49,10 @@ class PasswordCollectionRESTView(object):
     @view_config(request_method='GET')
     def get(self):
         user = authorize_user(self.request)
-        return list(self.passwords_manager.retrieve(user))
+        passwords = list(self.passwords_manager.retrieve(user))
+        for p in passwords:
+            p['id'] = p['_id']
+        return {"passwords": passwords}
 
     @view_config(request_method='POST')
     def post(self):
@@ -62,7 +65,9 @@ class PasswordCollectionRESTView(object):
             return HTTPBadRequest(body=json.dumps(result),
                                   content_type='application/json')
 
-        return self.passwords_manager.create(user, password)
+        result = self.passwords_manager.create(user, password)
+        result['id'] = result['_id']
+        return {'password': result}
 
 
 @view_defaults(route_name='password_view', renderer='json')
@@ -94,7 +99,8 @@ class PasswordRESTView(object):
         if password is None:
             return password_not_found()
         else:
-            return password
+            password['id'] = password['_id']
+            return {'password': password}
 
     @view_config(request_method='PUT')
     def put(self):
@@ -117,7 +123,8 @@ class PasswordRESTView(object):
         if result is None:
             return password_not_found()
         else:
-            return result
+            result['id'] = result['_id']
+            return {'password': result}
 
     @view_config(request_method='DELETE')
     def delete(self):
