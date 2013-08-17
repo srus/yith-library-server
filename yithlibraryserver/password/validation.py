@@ -25,7 +25,7 @@ def validate_password(rawdata, encoding='utf-8', _id=None):
     errors = []
 
     try:
-        data = json.loads(rawdata.decode(encoding))
+        data = json.loads(rawdata.decode(encoding))['password']
     except ValueError:
         errors.append('No JSON object could be decoded')
 
@@ -34,16 +34,6 @@ def validate_password(rawdata, encoding='utf-8', _id=None):
         return {}, errors
 
     password = {}
-
-    # check the password id is the same as in the URL
-    if _id is not None:
-        if '_id' not in data:
-            errors.append('The password id must be in the body')
-        else:
-            if data['_id'] != str(_id):
-                errors.append('The password id does not match the URL')
-            else:
-                password['_id'] = _id
 
     # white list submission attributes ignoring anything else
     # first required attributes
