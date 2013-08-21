@@ -58,7 +58,7 @@ class ViewTests(testing.TestCase):
     def test_password_collection_get(self):
         res = self.testapp.get('/passwords', headers=self.auth_header)
         self.assertEqual(res.status, '200 OK')
-        self.assertEqual(res.body, b'[]')
+        self.assertEqual(res.body, b'{"passwords": []}')
 
     def test_password_collection_post(self):
         res = self.testapp.post('/passwords', '', headers=self.auth_header,
@@ -68,7 +68,7 @@ class ViewTests(testing.TestCase):
                          b'{"message": "No JSON object could be decoded"}')
 
         res = self.testapp.post('/passwords',
-                                '{"secret": "s3cr3t", "service": "myservice"}',
+                                '{"password": {"secret": "s3cr3t", "service": "myservice"}}',
                                 headers=self.auth_header)
 
         self.assertEqual(res.status, '200 OK')
@@ -105,11 +105,14 @@ class ViewTests(testing.TestCase):
                                headers=self.auth_header)
         self.assertEqual(res.status, '200 OK')
         self.assertEqual(res.json, {
+            'password': {
                 'service': 'testing',
                 'secret': 's3cr3t',
                 'owner': str(self.user_id),
                 '_id': str(password_id),
-                })
+                'id': str(password_id),
+            },
+        })
 
     def test_password_put(self):
         res = self.testapp.put('/passwords/123456', headers=self.auth_header,
@@ -129,11 +132,12 @@ class ViewTests(testing.TestCase):
                 'secret': 's3cr3t',
                 'owner': self.user_id,
                 }, safe=True)
-        data = '{"service": "testing2", "secret": "sup3rs3cr3t", "_id": "%s"}' % str(password_id)
+        data = '{"password": {"service": "testing2", "secret": "sup3rs3cr3t", "_id": "%s"}}' % str(password_id)
         res = self.testapp.put('/passwords/%s' % str(password_id),
                                data, headers=self.auth_header)
         self.assertEqual(res.status, '200 OK')
         self.assertEqual(res.json, {
+            'password': {
                 'service': 'testing2',
                 'secret': 'sup3rs3cr3t',
                 'owner': str(self.user_id),
@@ -144,14 +148,16 @@ class ViewTests(testing.TestCase):
                 'notes': None,
                 'tags': None,
                 '_id': str(password_id),
-                })
+                'id': str(password_id),
+            },
+        })
         password = self.db.passwords.find_one(password_id)
         self.assertNotEqual(password, None)
         self.assertEqual(password['service'], 'testing2')
         self.assertEqual(password['secret'], 'sup3rs3cr3t')
         self.assertEqual(password['owner'], self.user_id)
 
-        data = '{"service": "testing2", "secret": "sup3rs3cr3t", "_id": "000000000000000000000000"}'
+        data = '{"password": {"service": "testing2", "secret": "sup3rs3cr3t", "_id": "000000000000000000000000"}}'
         res = self.testapp.put('/passwords/000000000000000000000000',
                                data, headers=self.auth_header, status=404)
         self.assertEqual(res.status, '404 Not Found')

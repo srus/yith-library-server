@@ -25,9 +25,12 @@ def validate_password(rawdata, encoding='utf-8', _id=None):
     errors = []
 
     try:
-        data = json.loads(rawdata.decode(encoding))['password']
+        json_data = json.loads(rawdata.decode(encoding))
+        data = json_data['password']
     except ValueError:
         errors.append('No JSON object could be decoded')
+    except KeyError:
+        errors.append('There must be only one toplevel element called "password"')
 
     # if we have errors here, we can't proceed
     if errors:
