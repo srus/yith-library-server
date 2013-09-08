@@ -135,6 +135,6 @@ class PasswordRESTView(object):
             return invalid_password_id()
 
         if self.passwords_manager.delete(user, _id):
-            return ''
+            return {'password': {'id': _id}}
         else:
             return password_not_found()
