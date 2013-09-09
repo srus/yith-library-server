@@ -184,8 +184,9 @@ class ViewTests(testing.TestCase):
         _id = self.db.passwords.insert(password, safe=True)
         count = self.db.passwords.count()
 
-        res = self.testapp.delete('/passwords/' + str(_id),
+        _id_str = str(_id)
+        res = self.testapp.delete('/passwords/' + _id_str,
                                   headers=self.auth_header)
         self.assertEqual(res.status, '200 OK')
-        self.assertEqual(res.body, b'""')
+        self.assertEqual(res.body, b'{"password": {"id": "%s"}}' % _id_str)
         self.assertEqual(self.db.passwords.count(), count - 1)
