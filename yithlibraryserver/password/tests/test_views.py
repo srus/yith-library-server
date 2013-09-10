@@ -19,6 +19,7 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 from yithlibraryserver import testing
+from yithlibraryserver.compat import text_type
 
 
 class ViewTests(testing.TestCase):
@@ -184,9 +185,10 @@ class ViewTests(testing.TestCase):
         _id = self.db.passwords.insert(password, safe=True)
         count = self.db.passwords.count()
 
-        _id_str = str(_id)
-        res = self.testapp.delete('/passwords/' + _id_str,
+        res = self.testapp.delete('/passwords/%s' % str(_id),
                                   headers=self.auth_header)
         self.assertEqual(res.status, '200 OK')
-        self.assertEqual(res.body, b'{"password": {"id": "%s"}}' % _id_str)
+        self.assertEqual(res.body, (b'{"password": {"id": "'
+                                    + text_type(_id).encode('ascii')
+                                    + b'"}}'))
         self.assertEqual(self.db.passwords.count(), count - 1)
