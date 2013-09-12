@@ -24,7 +24,7 @@ In *development mode* you execute these commands instead:
 .. code-block:: text
 
    $ cd env
-   $ git clone git://github.com/Yaco-Sistemas/yith-library-server.git
+   $ git clone git://github.com/lorenzogil/yith-library-server.git
    $ cd yith-library-server
    $ ../bin/python setup.py develop
 

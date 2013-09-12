@@ -117,7 +117,7 @@
         </tbody>
       </table>
 
-      <p i18n:translate=""><a href="https://github.com/Yaco-Sistemas/yith-library-server/blob/master/yithlibraryserver/locale/yithlibraryserver.pot" i18n:name="this-is-the-file" i18n:translate="">This is the file</a> you need to translate. Please <a href="${request.route_path('contact')}" i18n:name="contact-us" i18n:translate="">contact us</a> if you need any help!</p>
+      <p i18n:translate=""><a href="https://github.com/lorenzogil/yith-library-server/blob/master/yithlibraryserver/locale/yithlibraryserver.pot" i18n:name="this-is-the-file" i18n:translate="">This is the file</a> you need to translate. Please <a href="${request.route_path('contact')}" i18n:name="contact-us" i18n:translate="">contact us</a> if you need any help!</p>
     </div>
 
     <div class="span6">
@@ -125,13 +125,13 @@
       <p i18n:translate="">If you know how to program your help will be very much appreciated since there a lot of room for improvement in Yith Library. The source code is on Github and you can read the documentation to get you started.</p>
       <div class="row">
         <div class="span2">
-          <a href="https://github.com/Yaco-Sistemas/yith-library-server" class="thumbnail">
+          <a href="https://github.com/lorenzogil/yith-library-server" class="thumbnail">
             <img src="${request.static_path('yithlibraryserver:static/img/socialite.png')}" width="150" height="125" />
             <p class="caption">Yith Library server</p>
           </a>
         </div>
         <div class="span2">
-          <a href="https://github.com/Yaco-Sistemas/yith-library-webclient" class="thumbnail">
+          <a href="https://github.com/ablanco/yith-library-web-client" class="thumbnail">
             <img src="${request.static_path('yithlibraryserver:static/img/baracktocat.png')}" width="150" height="125" />
             <p class="caption">Yith Library web client</p>
           </a>

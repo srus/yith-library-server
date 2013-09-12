@@ -10,7 +10,7 @@
 
 <tal:block metal:fill-slot="content">
 
-  <a href="https://github.com/Yaco-Sistemas/yith-library-server" class="ribbon" target="_blank">
+  <a href="https://github.com/lorenzogil/yith-library-server" class="ribbon" target="_blank">
     <img src="${request.static_path('yithlibraryserver:static/img/forkme_right_gray_6d6d6d.png')}" alt="Fork us on GitHub!" i18n:attributes="alt" />
   </a>
 
@@ -100,7 +100,7 @@
 	      <ul class="unstyled">
 	        <li i18n:translate="">You can use it any way you want</li>
 	        <li i18n:translate="">You can run your own server or clients</li>
-	        <li><a href="https://github.com/Yaco-Sistemas/yith-library-server" target="_blank" i18n:translate="">You can modify it</a></li>
+	        <li><a href="https://github.com/lorenzogil/yith-library-server" target="_blank" i18n:translate="">You can modify it</a></li>
 	        <li i18n:translate="">You can distribute it</li>
 	        <li i18n:translate="">We are happy with all of this</li>
 	      </ul>

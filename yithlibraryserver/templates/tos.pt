@@ -32,14 +32,14 @@
 	    <li i18n:translate="">The freedom to study how the program works, and
           change it so it does your computing as you wish (freedom 1). Access
           to the
-          <a href="https://github.com/Yaco-Sistemas/yith-library-server" i18n:name="github-url" i18n:translate="">
+          <a href="https://github.com/lorenzogil/yith-library-server" i18n:name="github-url" i18n:translate="">
             source code</a> is a precondition for this.</li>
 	    <li i18n:translate="">The freedom to redistribute copies so you can
           help your neighbor (freedom 2).</li>
 	    <li i18n:translate="">The freedom to distribute copies of your modified
           versions to others (freedom 3). By doing this you can give the whole
           community a chance to benefit from your changes. Access to the
-	      <a href="https://github.com/Yaco-Sistemas/yith-library-server" i18n:name="github-url" i18n:translate="">
+	      <a href="https://github.com/lorenzogil/yith-library-server" i18n:name="github-url" i18n:translate="">
             source code</a> is a precondition for this.</li>
       </ul>
 
