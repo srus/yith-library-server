@@ -37,7 +37,6 @@ class PayPalPayload(dict):
         self['PAYMENTREQUEST_0_DESC'] = 'Donation'
         self['L_PAYMENTREQUEST_0_NAME0'] = 'Donation of $%d' % amount
         self['L_PAYMENTREQUEST_0_AMT0'] = amount
-        self['L_PAYMENTREQUEST_0_ITEMCATEGORY0'] = 'Digital'
         self['PAYMENTREQUEST_0_CURRENCYCODE'] = 'USD'
         self['PAYMENTREQUEST_0_PAYMENTACTION'] = 'Sale'
         self['LOCALECODE'] = 'EN'
