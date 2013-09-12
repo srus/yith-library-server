@@ -79,7 +79,6 @@ class TestViews(TestCase):
                     'PAYMENTREQUEST_0_DESC': 'Donation',
                     'L_PAYMENTREQUEST_0_NAME0': 'Donation of $5',
                     'L_PAYMENTREQUEST_0_AMT0': 5,
-                    'L_PAYMENTREQUEST_0_ITEMCATEGORY0': 'Digital',
                     'BRANDNAME': 'Yith Library',
                     'RETURNURL': 'http://localhost/contribute/paypal-success-callback',
                     'CANCELURL': 'http://localhost/contribute/paypal-cancel-callback',
@@ -189,7 +188,6 @@ class TestViews(TestCase):
                     'PAYMENTREQUEST_0_DESC': 'Donation',
                     'L_PAYMENTREQUEST_0_NAME0': 'Donation of $5',
                     'L_PAYMENTREQUEST_0_AMT0': 5,
-                    'L_PAYMENTREQUEST_0_ITEMCATEGORY0': 'Digital',
                     'BRANDNAME': 'Yith Library',
                     })
 

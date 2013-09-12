@@ -69,7 +69,6 @@ class PayPalPayloadTests(unittest.TestCase):
                 'LOCALECODE': 'EN',
                 'L_PAYMENTREQUEST_0_NAME0': 'Donation of $10',
                 'L_PAYMENTREQUEST_0_AMT0': 10,
-                'L_PAYMENTREQUEST_0_ITEMCATEGORY0': 'Digital',
                 'BRANDNAME': 'Yith Library',
                 })
 
@@ -143,7 +142,6 @@ class PayPalExpressCheckoutTests(unittest.TestCase):
                     'PAYMENTREQUEST_0_DESC': 'Donation',
                     'L_PAYMENTREQUEST_0_NAME0': 'Donation of $5',
                     'L_PAYMENTREQUEST_0_AMT0': 5,
-                    'L_PAYMENTREQUEST_0_ITEMCATEGORY0': 'Digital',
                     'BRANDNAME': 'Yith Library',
                     'RETURNURL': 'http://example.com/contribute/paypal-success-callback',
                     'CANCELURL': 'http://example.com/contribute/paypal-cancel-callback',
@@ -213,7 +211,6 @@ class PayPalExpressCheckoutTests(unittest.TestCase):
                     'PAYMENTREQUEST_0_DESC': 'Donation',
                     'L_PAYMENTREQUEST_0_NAME0': 'Donation of $5',
                     'L_PAYMENTREQUEST_0_AMT0': 5,
-                    'L_PAYMENTREQUEST_0_ITEMCATEGORY0': 'Digital',
                     'BRANDNAME': 'Yith Library',
                     })
             self.assertTrue(result)
