@@ -66,7 +66,11 @@ class PayPalPayloadTests(unittest.TestCase):
                 'PAYMENTREQUEST_0_DESC': 'Donation',
                 'PAYMENTREQUEST_0_CURRENCYCODE': 'USD',
                 'PAYMENTREQUEST_0_PAYMENTACTION': 'Sale',
-                'LOCALECODE': 'ES',
+                'LOCALECODE': 'EN',
+                'L_PAYMENTREQUEST_0_NAME0': 'Donation of $10',
+                'L_PAYMENTREQUEST_0_AMT0': 10,
+                'L_PAYMENTREQUEST_0_ITEMCATEGORY0': 'Digital',
+                'BRANDNAME': 'Yith Library',
                 })
 
     def test_callbacks(self):
@@ -131,12 +135,16 @@ class PayPalExpressCheckoutTests(unittest.TestCase):
                     'USER': 'paypal_user',
                     'PWD': 'paypal_password',
                     'SIGNATURE': 'paypal_signature',
-                    'LOCALECODE': 'ES',
+                    'LOCALECODE': 'EN',
                     'PAYMENTREQUEST_0_ITEMAMT': 5,
                     'PAYMENTREQUEST_0_PAYMENTACTION': 'Sale',
                     'PAYMENTREQUEST_0_CURRENCYCODE': 'USD',
                     'PAYMENTREQUEST_0_AMT': 5,
                     'PAYMENTREQUEST_0_DESC': 'Donation',
+                    'L_PAYMENTREQUEST_0_NAME0': 'Donation of $5',
+                    'L_PAYMENTREQUEST_0_AMT0': 5,
+                    'L_PAYMENTREQUEST_0_ITEMCATEGORY0': 'Digital',
+                    'BRANDNAME': 'Yith Library',
                     'RETURNURL': 'http://example.com/contribute/paypal-success-callback',
                     'CANCELURL': 'http://example.com/contribute/paypal-cancel-callback',
                     })
@@ -197,12 +205,16 @@ class PayPalExpressCheckoutTests(unittest.TestCase):
                     'SIGNATURE': 'paypal_signature',
                     'TOKEN': '123',
                     'PAYERID': '456',
-                    'LOCALECODE': 'ES',
+                    'LOCALECODE': 'EN',
                     'PAYMENTREQUEST_0_ITEMAMT': 5,
                     'PAYMENTREQUEST_0_PAYMENTACTION': 'Sale',
                     'PAYMENTREQUEST_0_CURRENCYCODE': 'USD',
                     'PAYMENTREQUEST_0_AMT': 5,
                     'PAYMENTREQUEST_0_DESC': 'Donation',
+                    'L_PAYMENTREQUEST_0_NAME0': 'Donation of $5',
+                    'L_PAYMENTREQUEST_0_AMT0': 5,
+                    'L_PAYMENTREQUEST_0_ITEMCATEGORY0': 'Digital',
+                    'BRANDNAME': 'Yith Library',
                     })
             self.assertTrue(result)
 
