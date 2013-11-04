@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: yith-library-server 0.2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-04-21 20:32+0200\n"
+"POT-Creation-Date: 2013-11-03 19:15-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -220,7 +220,7 @@ msgid "Small 2"
 msgstr ""
 
 #: yithlibraryserver/contributions/templates/contributions_index.pt:46
-#: yithlibraryserver/contributions/templates/contributions_index.pt:194
+#: yithlibraryserver/contributions/templates/contributions_index.pt:195
 msgid "Medium"
 msgstr ""
 
@@ -382,21 +382,39 @@ msgstr ""
 msgid "A personal thank you from the yithians"
 msgstr ""
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:195
+#: yithlibraryserver/contributions/templates/contributions_index.pt:187
+msgid "Donate $1"
+msgstr ""
+
+#: yithlibraryserver/contributions/templates/contributions_index.pt:188
+#: yithlibraryserver/contributions/templates/contributions_index.pt:201
+#: yithlibraryserver/contributions/templates/contributions_index.pt:214
+msgid "Donate via PayPal"
+msgstr ""
+
+#: yithlibraryserver/contributions/templates/contributions_index.pt:196
 msgid "A cool Yith Library sticker and a personal thank you from the yithians"
 msgstr ""
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:206
+#: yithlibraryserver/contributions/templates/contributions_index.pt:200
+msgid "Donate $5"
+msgstr ""
+
+#: yithlibraryserver/contributions/templates/contributions_index.pt:208
 msgid "Big"
 msgstr ""
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:207
+#: yithlibraryserver/contributions/templates/contributions_index.pt:209
 msgid ""
 "A cool Yith Library sticker, a personal thank you from the yithians and daily"
 " backups of your passwords if you want them"
 msgstr ""
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:221
+#: yithlibraryserver/contributions/templates/contributions_index.pt:213
+msgid "Donate $10"
+msgstr ""
+
+#: yithlibraryserver/contributions/templates/contributions_index.pt:224
 msgid "Stickers"
 msgstr ""
 

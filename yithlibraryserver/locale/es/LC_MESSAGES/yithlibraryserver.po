@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: yith-library-server 0.0\n"
 "Report-Msgid-Bugs-To: lorenzo.gil.sanchez@gmail.com\n"
-"POT-Creation-Date: 2013-04-21 20:32+0200\n"
-"PO-Revision-Date: 2013-04-21 20:33+0200\n"
+"POT-Creation-Date: 2013-11-03 19:15-0800\n"
+"PO-Revision-Date: 2013-11-03 19:16-0800\n"
 "Last-Translator: Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>\n"
 "Language-Team: es <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -242,7 +242,7 @@ msgid "Small 2"
 msgstr "Pequeño 2"
 
 #: yithlibraryserver/contributions/templates/contributions_index.pt:46
-#: yithlibraryserver/contributions/templates/contributions_index.pt:194
+#: yithlibraryserver/contributions/templates/contributions_index.pt:195
 msgid "Medium"
 msgstr "Mediano"
 
@@ -452,17 +452,31 @@ msgstr "Pequeño"
 msgid "A personal thank you from the yithians"
 msgstr "Un agradecimiento personal de los yithians"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:195
+#: yithlibraryserver/contributions/templates/contributions_index.pt:187
+msgid "Donate $1"
+msgstr "Dona $1"
+
+#: yithlibraryserver/contributions/templates/contributions_index.pt:188
+#: yithlibraryserver/contributions/templates/contributions_index.pt:201
+#: yithlibraryserver/contributions/templates/contributions_index.pt:214
+msgid "Donate via PayPal"
+msgstr "Dona via PayPal"
+
+#: yithlibraryserver/contributions/templates/contributions_index.pt:196
 msgid "A cool Yith Library sticker and a personal thank you from the yithians"
 msgstr ""
 "Una pegatina chula de Yith Library y un agradecimiento personal de los "
 "yithians"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:206
+#: yithlibraryserver/contributions/templates/contributions_index.pt:200
+msgid "Donate $5"
+msgstr "Dona $5"
+
+#: yithlibraryserver/contributions/templates/contributions_index.pt:208
 msgid "Big"
 msgstr "Grande"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:207
+#: yithlibraryserver/contributions/templates/contributions_index.pt:209
 msgid ""
 "A cool Yith Library sticker, a personal thank you from the yithians and "
 "daily backups of your passwords if you want them"
@@ -471,7 +485,11 @@ msgstr ""
 "yithians\n"
 "y copias de seguridad de tus contraseñas diarias si así lo quieres"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:221
+#: yithlibraryserver/contributions/templates/contributions_index.pt:213
+msgid "Donate $10"
+msgstr "Dona $10"
+
+#: yithlibraryserver/contributions/templates/contributions_index.pt:224
 msgid "Stickers"
 msgstr "Pegatinas"
 

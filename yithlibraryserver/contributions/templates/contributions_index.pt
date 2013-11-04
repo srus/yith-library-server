@@ -184,7 +184,8 @@
 
             <form method="post" action="${request.route_path('contributions_donate')}">
               <input type="hidden" name="amount" value="1" />
-              <input class="btn btn-primary" type="submit" name="submit" value="Donate $1" />
+              <input class="btn btn-primary" type="submit" name="submit" value="Donate $1" i18n:attributes="value" />
+              <img src="${request.static_path('yithlibraryserver:static/img/paypal.png')}" alt="Donate via PayPal" title="Donate via PayPal" i18n:attributes="alt;title" width="37" height="24" />
             </form>
           </div>
         </div>
@@ -196,7 +197,8 @@
 
             <form method="post" action="${request.route_path('contributions_donate')}">
               <input type="hidden" name="amount" value="5" />
-              <input class="btn btn-primary" type="submit" name="submit" value="Donate $5" />
+              <input class="btn btn-primary" type="submit" name="submit" value="Donate $5" i18n:attributes="value" />
+              <img src="${request.static_path('yithlibraryserver:static/img/paypal.png')}" alt="Donate via PayPal" title="Donate via PayPal" i18n:attributes="alt;title" width="37" height="24" />
             </form>
           </div>
         </div>
@@ -208,7 +210,8 @@
 
             <form method="post" action="${request.route_path('contributions_donate')}">
               <input type="hidden" name="amount" value="10" />
-              <input class="btn btn-primary" type="submit" name="submit" value="Donate $10" />
+              <input class="btn btn-primary" type="submit" name="submit" value="Donate $10" i18n:attributes="value" />
+              <img src="${request.static_path('yithlibraryserver:static/img/paypal.png')}" alt="Donate via PayPal" title="Donate via PayPal" i18n:attributes="alt;title" width="37" height="24" />
             </form>
           </div>
         </div>
