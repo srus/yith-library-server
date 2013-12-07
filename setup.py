@@ -59,6 +59,7 @@ requires = [
     'raven==3.3.4',
     'requests==1.2.0',
     'waitress==0.8.2',
+    'newrelic==2.6.0.5',
     ]
 
 if sys.version_info[0] < 3:

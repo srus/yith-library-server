@@ -15,6 +15,7 @@ deform==0.9.5
 docutils==0.10
 lingua==1.4
 mock==1.0.1
+newrelic==2.6.0.5
 nose==1.2.1
 peppercorn==0.4
 polib==1.0.3
