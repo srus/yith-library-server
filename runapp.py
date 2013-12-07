@@ -22,6 +22,7 @@ import os
 
 from paste.deploy import loadapp
 from pyramid.paster import setup_logging
+from newrelic import agent
 from raven.middleware import Sentry
 from waitress import serve
 
@@ -30,5 +31,6 @@ if __name__ == "__main__":
     scheme = os.environ.get("SCHEME", "https")
     setup_logging('yithlibraryserver/config-templates/production.ini')
     app = loadapp('config:production.ini', relative_to='yithlibraryserver/config-templates')
-
-    serve(Sentry(app), host='0.0.0.0', port=port, url_scheme=scheme)
+    app = Sentry(app)
+    app = agent.WSGIApplicationWrapper(app)
+    serve(app, host='0.0.0.0', port=port, url_scheme=scheme)
