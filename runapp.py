@@ -20,9 +20,11 @@
 
 import os
 
+from newrelic import agent
+agent.initialize()
+
 from paste.deploy import loadapp
 from pyramid.paster import setup_logging
-from newrelic import agent
 from raven.middleware import Sentry
 from waitress import serve
 
