@@ -33,4 +33,4 @@ def includeme(config):
     config.add_view('.views.persona_login',
                     route_name='persona_login', renderer='string')
 
-    config.add_identity_provider('persona')
+    config.add_identity_provider('Persona')

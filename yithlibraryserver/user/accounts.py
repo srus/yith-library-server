@@ -24,7 +24,7 @@ from yithlibraryserver.email import send_email_to_admins
 
 
 def get_available_providers():
-    return ('facebook', 'google', 'twitter', 'persona')
+    return ('facebook', 'google', 'twitter', 'persona', 'liveconnect')
 
 
 def get_provider_key(provider):

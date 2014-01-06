@@ -82,11 +82,12 @@ def main(global_config, **settings):
     settings['public_url_root'] = read_setting_from_env(
         settings, 'public_url_root', 'http://localhost:6543/')
 
-    # Google and Facebook settings for pyramid_sna
+    # Google, Facebook and Microsoft Live Connect settings for pyramid_sna
     settings['google_scope'] = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'
     settings['google_callback'] = 'yithlibraryserver.sna_callbacks.google_callback'
     settings['facebook_scope'] = 'email'
     settings['facebook_callback'] = 'yithlibraryserver.sna_callbacks.facebook_callback'
+    settings['liveconnect_callback'] = 'yithlibraryserver.sna_callbacks.liveconnect_callback'
 
     # main config object
     config = Configurator(
@@ -144,10 +145,13 @@ def main(global_config, **settings):
     config.include('yithlibraryserver.twitter')
 
     if config.registry.settings['facebook_auth_enabled']:
-        config.add_identity_provider('facebook')
+        config.add_identity_provider('Facebook')
 
     if config.registry.settings['google_auth_enabled']:
-        config.add_identity_provider('google')
+        config.add_identity_provider('Google')
+
+    if config.registry.settings['liveconnect_auth_enabled']:
+        config.add_identity_provider('Live Connect')
 
     config.include('yithlibraryserver.persona')
 

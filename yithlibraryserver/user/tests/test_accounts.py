@@ -47,7 +47,7 @@ class AccountTests(unittest.TestCase):
         self.db.drop_collection('passwords')
 
     def test_get_available_providers(self):
-        self.assertEqual(('facebook', 'google', 'twitter', 'persona'),
+        self.assertEqual(('facebook', 'google', 'twitter', 'persona', 'liveconnect'),
                          get_available_providers())
 
     def test_get_providers(self):

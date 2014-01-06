@@ -27,3 +27,8 @@ def facebook_callback(request, user_id, info):
 def google_callback(request, user_id, new_info):
     return register_or_update(request, 'google', user_id, new_info,
                               request.route_path('home'))
+
+
+def liveconnect_callback(request, user_id, info):
+    return register_or_update(request, 'liveconnect', user_id, info,
+                              request.route_path('home'))

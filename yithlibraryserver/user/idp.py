@@ -27,18 +27,19 @@ class IdentityProvider(object):
 
     def __init__(self, name):
         self.name = name
+        self.slug = self.name.replace(' ', '').lower()
 
     @property
     def route_path(self):
-        return '%s_login' % self.name
+        return '%s_login' % self.slug
 
     @property
     def image_path(self):
-        return 'yithlibraryserver:static/img/%s-logo.png' % self.name
+        return 'yithlibraryserver:static/img/%s-logo.png' % self.slug
 
     @property
     def message(self):
-        return _('Log in with ${idp}', mapping={'idp': self.name.capitalize()})
+        return _('Log in with ${idp}', mapping={'idp': self.name})
 
 
 def add_identity_provider(config, name):
