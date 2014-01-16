@@ -37,7 +37,7 @@ class EmailVerificationCode(object):
     def store(self, db, user):
         result = db.users.update({'_id': user['_id']}, {
                 '$set': {'email_verification_code': self.code},
-                }, safe=True)
+                })
         return result['n'] == 1
 
     def remove(self, db, email, verified):
@@ -47,7 +47,7 @@ class EmailVerificationCode(object):
                 }, {
                 '$unset': {'email_verification_code': 1},
                 '$set': {'email_verified': verified},
-                }, safe=True)
+                })
         return result['n'] == 1
 
     def verify(self, db, email):

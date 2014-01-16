@@ -78,7 +78,7 @@ class AuthorizationTests(testing.TestCase):
         self.assertTrue(isinstance(authorizator.access_codes,
                                    AccessCodes))
         user = {'name': 'John Doe', 'authorized_apps': []}
-        self.db.users.insert(user, safe=True)
+        self.db.users.insert(user)
 
         self.assertFalse(authorizator.is_app_authorized(user))
 

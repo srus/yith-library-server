@@ -35,17 +35,17 @@ class ViewTests(testing.TestCase):
                 'provider_user_id': 'user1',
                 'screen_name': 'User 1',
                 'authorized_apps': [],
-                }, safe=True)
+                })
         self.db.applications.insert({
                 'name': 'test-app',
                 'client_id': 'client1',
-                }, safe=True)
+                })
         self.db.access_codes.insert({
                 'code': self.access_code,
                 'scope': None,
                 'user': self.user_id,
                 'client_id': 'client1',
-                }, safe=True)
+                })
 
     def test_password_collection_options(self):
         res = self.testapp.options('/passwords')
@@ -66,7 +66,7 @@ class ViewTests(testing.TestCase):
                 'service': 'testing',
                 'secret': 's3cr3t',
                 'owner': self.user_id,
-                }, safe=True)
+                })
 
         res = self.testapp.get('/passwords', headers=self.auth_header)
         self.assertEqual(res.status, '200 OK')
@@ -122,7 +122,7 @@ class ViewTests(testing.TestCase):
                 'service': 'testing',
                 'secret': 's3cr3t',
                 'owner': self.user_id,
-                }, safe=True)
+                })
         res = self.testapp.get('/passwords/%s' % str(password_id),
                                headers=self.auth_header)
         self.assertEqual(res.status, '200 OK')
@@ -153,7 +153,7 @@ class ViewTests(testing.TestCase):
                 'service': 'testing',
                 'secret': 's3cr3t',
                 'owner': self.user_id,
-                }, safe=True)
+                })
         data = '{"password": {"service": "testing2", "secret": "sup3rs3cr3t", "_id": "%s"}}' % str(password_id)
         res = self.testapp.put('/passwords/%s' % str(password_id),
                                data, headers=self.auth_header)
@@ -203,7 +203,7 @@ class ViewTests(testing.TestCase):
             'service': 'myservice',
             'owner': self.user_id,
             }
-        _id = self.db.passwords.insert(password, safe=True)
+        _id = self.db.passwords.insert(password)
         count = self.db.passwords.count()
 
         res = self.testapp.delete('/passwords/%s' % str(_id),

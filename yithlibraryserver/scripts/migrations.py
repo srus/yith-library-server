@@ -38,7 +38,6 @@ def add_attribute(collection, obj, obj_repr, attribute, value):
         collection.update(
             {'_id': obj['_id']},
             {'$set': {attribute: value}},
-            safe=True,
             )
 
 

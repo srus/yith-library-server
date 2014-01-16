@@ -62,7 +62,7 @@ class CORSManagerTests(testing.TestCase):
                 'name': 'test-app',
                 'client_id': 'client1',
                 'authorized_origins': ['http://localhost'],
-                }, safe=True)
+                })
 
         request = DummyRequest(headers={'Origin': 'http://localhost'},
                                params={'client_id': 'client2'})
@@ -83,7 +83,7 @@ class CORSManagerTests(testing.TestCase):
                 'name': 'test-app',
                 'client_id': 'client1',
                 'authorized_origins': ['http://localhost'],
-                }, safe=True)
+                })
 
         request = DummyRequest(headers={'Origin': 'http://localhost'},
                                params={'client_id': 'client1'})

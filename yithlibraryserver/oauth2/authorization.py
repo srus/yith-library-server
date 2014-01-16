@@ -41,8 +41,8 @@ class Codes(object):
         old_obj = dict(kwargs)  # make a copy
         old_obj['user'] = user_id
 
-        self.collection.remove(old_obj, safe=True)
-        self.collection.insert(new_obj, safe=True)
+        self.collection.remove(old_obj)
+        self.collection.insert(new_obj)
 
         return code
 
@@ -50,7 +50,7 @@ class Codes(object):
         return self.collection.find_one({'code': code})
 
     def remove(self, code_obj):
-        self.collection.remove(code_obj, safe=True)
+        self.collection.remove(code_obj)
 
 
 class AuthorizationCodes(Codes):
@@ -94,12 +94,10 @@ class Authorizator(object):
         self.db.users.update(
             {'_id': user['_id']},
             {'$addToSet': {'authorized_apps': self.app['_id']}},
-            safe=True,
             )
 
     def remove_user_authorization(self, user):
         self.db.users.update(
             {'_id': user['_id']},
             {'$pull': {'authorized_apps': self.app['_id']}},
-            safe=True,
             )

@@ -32,7 +32,7 @@ class UtilsTests(TestCase):
         user_id = self.db.users.insert({
                 'first_name': 'John',
                 'last_name': 'Doe',
-                }, safe=True)
+                })
         user = self.db.users.find_one({'_id': user_id})
 
         self.assertEqual(get_user_passwords(self.db, user), [])

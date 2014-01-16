@@ -49,7 +49,7 @@ class AuthorizationTests(testing.TestCase):
         access_code_id = self.db.access_codes.insert({
                 'code': '1234',
                 'user': 'user1',
-                }, safe=True)
+                })
         request = testing.FakeRequest(headers={
                 'Authorization': 'Bearer 1234',
                 }, db=self.db)
@@ -58,10 +58,10 @@ class AuthorizationTests(testing.TestCase):
 
         user_id = self.db.users.insert({
                 'username': 'user1',
-                }, safe=True)
+                })
         self.db.access_codes.update({'_id': access_code_id}, {
                 '$set': {'user': user_id},
-                }, safe=True)
+                })
         request = testing.FakeRequest(headers={
                 'Authorization': 'Bearer 1234',
                 }, db=self.db)

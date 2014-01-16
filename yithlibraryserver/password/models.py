@@ -38,7 +38,7 @@ class PasswordsManager(object):
             if password:
                 new_password = dict(password)  # copy since we are changing this object
                 new_password['owner'] = user['_id']
-                _id = self.db.passwords.insert(new_password, safe=True)
+                _id = self.db.passwords.insert(new_password)
                 new_password['_id'] = _id
                 return new_password
         else:
@@ -51,7 +51,7 @@ class PasswordsManager(object):
 
             if new_passwords:
 
-                _ids = self.db.passwords.insert(new_passwords, safe=True)
+                _ids = self.db.passwords.insert(new_passwords)
 
                 for i in range(len(new_passwords)):
                     new_passwords[i]['_id'] = _ids[i]
@@ -83,7 +83,7 @@ class PasswordsManager(object):
         result = self.db.passwords.update({
                 '_id': _id,
                 'owner': user['_id'],
-                }, new_password, safe=True)
+                }, new_password)
         new_password['_id'] = _id
 
         # result['n'] is the number of documents updated
@@ -102,5 +102,5 @@ class PasswordsManager(object):
         if _id is not None:
             query['_id'] = _id
 
-        result = self.db.passwords.remove(query, safe=True)
+        result = self.db.passwords.remove(query)
         return result['n'] > 0

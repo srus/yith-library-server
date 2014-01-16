@@ -120,7 +120,7 @@ def register_new_user(request):
             user_attrs[analytics.USER_ATTR] = allow_analytics
             request.google_analytics.clean_session()
 
-        _id = request.db.users.insert(user_attrs, safe=True)
+        _id = request.db.users.insert(user_attrs)
 
         if not email_verified and appstruct['email'] != '':
             evc = EmailVerificationCode()
@@ -244,8 +244,7 @@ def user_information(request):
             changes['email_verified'] = False
 
         result = request.db.users.update({'_id': request.user['_id']},
-                                         {'$set': changes},
-                                         safe=True)
+                                         {'$set': changes})
 
         if result['n'] == 1:
             request.session.flash(
@@ -315,8 +314,7 @@ def preferences(request):
                     )])
 
         result = request.db.users.update({'_id': request.user['_id']},
-                                         {'$set': changes},
-                                         safe=True)
+                                         {'$set': changes})
 
         if result['n'] == 1:
             request.session.flash(
@@ -459,8 +457,7 @@ def google_analytics_preference(request):
     else:
         changes = request.google_analytics.get_user_attr(allow)
         request.db.users.update({'_id': request.user['_id']},
-                                {'$set': changes},
-                                safe=True)
+                                {'$set': changes})
 
     return {'allow': allow}
 

@@ -323,7 +323,7 @@ class ViewTests(TestCase):
                 'authorized_apps': [],
                 'date_joined': date,
                 'last_login': date,
-                }, safe=True)
+                })
         self.set_user_cookie(str(user_id))
 
         res = self.testapp.get('/profile')
@@ -387,7 +387,7 @@ class ViewTests(TestCase):
                     'date_joined': date,
                     'last_login': date,
                     'allow_google_analytics': False,
-                    }, safe=True)
+                    })
             day = get_day_to_send({'_id': user_id}, 28)
             # we want a user with a different day from 1
             # since that's a special case and does not
@@ -398,7 +398,7 @@ class ViewTests(TestCase):
 
             # In most cases day will be != 1 so this line
             # only get executed with very low probability
-            self.db.users.remove(user_id, safe=True)  # pragma: no cover
+            self.db.users.remove(user_id)  # pragma: no cover
 
         self.set_user_cookie(str(user_id))
 
@@ -473,7 +473,7 @@ class ViewTests(TestCase):
                 'last_name': 'Doe',
                 'email': '',
                 'authorized_apps': [],
-                }, safe=True)
+                })
         self.set_user_cookie(str(user_id))
 
         res = self.testapp.get('/destroy')
@@ -533,7 +533,7 @@ class ViewTests(TestCase):
                 'last_name': 'Doe',
                 'email': '',
                 'authorized_apps': [],
-                }, safe=True)
+                })
         self.set_user_cookie(str(user_id))
 
         # the user has no email so an error is expected
@@ -546,8 +546,7 @@ class ViewTests(TestCase):
 
         # let's give the user an email
         self.db.users.update({'_id': user_id},
-                             {'$set': {'email': 'john@example.com'}},
-                             safe=True)
+                             {'$set': {'email': 'john@example.com'}})
 
         # the request must be a post
         res = self.testapp.get('/send-email-verification-code')
@@ -606,7 +605,7 @@ class ViewTests(TestCase):
                 'email': 'john@example.com',
                 'email_verification_code': '1234',
                 'authorized_apps': [],
-                }, safe=True)
+                })
 
         res = self.testapp.get('/verify-email?code=1234&email=john@example.com')
         self.assertEqual(res.status, '200 OK')
@@ -631,7 +630,7 @@ class ViewTests(TestCase):
                 'email': 'john@example.com',
                 'email_verified': True,
                 'authorized_apps': ['app1', 'app2'],
-                }, safe=True)
+                })
         self.set_user_cookie(str(user1_id))
         self.db.passwords.insert({
                 'owner': user1_id,
@@ -654,7 +653,7 @@ class ViewTests(TestCase):
                 'email': 'john@example.com',
                 'email_verified': True,
                 'authorized_apps': ['app2', 'app3'],
-                }, safe=True)
+                })
         self.db.passwords.insert({
                 'owner': user2_id,
                 'password': 'secret2',
@@ -678,9 +677,9 @@ class ViewTests(TestCase):
         self.assertEqual(res.location, 'http://localhost/identity-providers')
         self.assertEqual(2, self.db.users.count())
         self.assertEqual(1, self.db.passwords.find(
-                {'owner': user1_id}, safe=True).count())
+                {'owner': user1_id}).count())
         self.assertEqual(1, self.db.passwords.find(
-                {'owner': user2_id}, safe=True).count())
+                {'owner': user2_id}).count())
 
         # let's merge them
         res = self.testapp.post('/identity-providers', {
@@ -693,16 +692,16 @@ class ViewTests(TestCase):
 
         # the accounts have been merged
         self.assertEqual(1, self.db.users.count())
-        user1_refreshed = self.db.users.find_one({'_id': user1_id}, safe=True)
+        user1_refreshed = self.db.users.find_one({'_id': user1_id})
         self.assertEqual(user1_refreshed['google_id'], 'google1')
         self.assertEqual(user1_refreshed['authorized_apps'],
                          ['app1', 'app2', 'app3'])
 
-        user2_refreshed = self.db.users.find_one({'_id': user2_id}, safe=True)
+        user2_refreshed = self.db.users.find_one({'_id': user2_id})
         self.assertEqual(user2_refreshed, None)
 
         self.assertEqual(2, self.db.passwords.find(
-                {'owner': user1_id}, safe=True).count())
+                {'owner': user1_id}).count())
 
     def test_google_analytics_preference(self):
         res = self.testapp.post('/google-analytics-preference', status=400)
@@ -730,19 +729,19 @@ class ViewTests(TestCase):
                 'email': 'john@example.com',
                 'email_verified': True,
                 'authorized_apps': ['app1', 'app2'],
-                }, safe=True)
+                })
         self.set_user_cookie(str(user_id))
 
         res = self.testapp.post('/google-analytics-preference', {'yes': 'Yes'})
         self.assertEqual(res.status, '200 OK')
         self.assertEqual(res.json, {'allow': True})
-        user_refreshed = self.db.users.find_one({'_id': user_id}, safe=True)
+        user_refreshed = self.db.users.find_one({'_id': user_id})
         self.assertEqual(user_refreshed[USER_ATTR], True)
 
         res = self.testapp.post('/google-analytics-preference', {'no': 'No'})
         self.assertEqual(res.status, '200 OK')
         self.assertEqual(res.json, {'allow': False})
-        user_refreshed = self.db.users.find_one({'_id': user_id}, safe=True)
+        user_refreshed = self.db.users.find_one({'_id': user_id})
         self.assertEqual(user_refreshed[USER_ATTR], False)
 
 
@@ -767,17 +766,17 @@ class RESTViewTests(TestCase):
                 'authorized_apps': [],
                 'date_joined': date,
                 'last_login': date,
-                }, safe=True)
+                })
         self.db.applications.insert({
                 'name': 'test-app',
                 'client_id': 'client1',
-                }, safe=True)
+                })
         self.db.access_codes.insert({
                 'code': self.access_code,
                 'scope': None,
                 'user': self.user_id,
                 'client_id': 'client1',
-                }, safe=True)
+                })
 
     def test_user_options(self):
         res = self.testapp.options('/user')

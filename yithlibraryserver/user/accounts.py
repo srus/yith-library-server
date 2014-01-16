@@ -46,7 +46,7 @@ def get_providers(user, current):
 def get_n_passwords(db, user):
     return db.passwords.find({
             'owner': user.get('_id', None),
-            }, safe=True).count()
+            }).count()
 
 
 def get_accounts(db, current_user, current_provider):
@@ -54,7 +54,7 @@ def get_accounts(db, current_user, current_provider):
     results = db.users.find({
             'email': email,
             '_id': {'$ne': current_user.get('_id', None)},
-            }, safe=True)
+            })
 
     if current_user:
         results = [current_user] + list(results)
@@ -81,7 +81,7 @@ def merge_accounts(db, master_user, accounts):
         if master_user['_id'] == user_id:
             continue
 
-        current_user = db.users.find_one({'_id': user_id}, safe=True)
+        current_user = db.users.find_one({'_id': user_id})
         if current_user is None:
             continue
 
@@ -98,7 +98,7 @@ def merge_users(db, user1, user2):
             '$set': {
                 'owner': user1['_id'],
                 },
-            }, multi=True, safe=True)
+            }, multi=True)
 
     # copy authorized_apps from user2 to user1
     updates = {
@@ -116,7 +116,7 @@ def merge_users(db, user1, user2):
             sets = updates.setdefault('$set', {})
             sets[key] = user2[key]
 
-    db.users.update({'_id': user1['_id']}, updates, safe=True)
+    db.users.update({'_id': user1['_id']}, updates)
 
     # remove user2
     db.users.remove(user2['_id'])

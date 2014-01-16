@@ -44,7 +44,7 @@ class ViewTests(testing.TestCase):
                 'last_name': 'Doe',
                 'email': 'john@example.com',
                 'authorized_apps': [],
-                }, safe=True)
+                })
         self.set_user_cookie(str(user_id))
 
         # 1. test incorrect requests
@@ -80,7 +80,7 @@ class ViewTests(testing.TestCase):
                 'last_name': 'Doe',
                 'email': 'alice@example.com',
                 'authorized_apps': [],
-                }, safe=True)
+                })
         app_id = self.db.applications.insert({
                 'owner': owner_id,
                 'client_id': '123456',
@@ -89,7 +89,7 @@ class ViewTests(testing.TestCase):
                 'callback_url': 'https://example.com/callback',
                 'image_url': 'https://example.com/logo.png',
                 'description': 'Example description',
-                }, safe=True)
+                })
 
         res = self.testapp.get('/oauth2/endpoints/authorization', {
                 'response_type': 'code',
@@ -184,7 +184,7 @@ class ViewTests(testing.TestCase):
                 'callback_url': 'https://example.com/callback',
                 'name': 'Example',
                 'main_url': 'https://example.com',
-                }, safe=True)
+                })
 
         res = self.testapp.post('/oauth2/endpoints/token', {}, headers=headers, status=400)
         self.assertEqual(res.status, '400 Bad Request')
@@ -217,7 +217,7 @@ class ViewTests(testing.TestCase):
                 'first_name': 'John',
                 'last_name': 'Doe',
                 'authorized_apps': [app_id],
-                }, safe=True)
+                })
         self.set_user_cookie(str(user_id))
         res = self.testapp.get('/oauth2/endpoints/authorization', {
                 'response_type': 'code',
@@ -267,7 +267,7 @@ class ViewTests(testing.TestCase):
                 'callback_url': 'https://example.com/callback',
                 'name': 'Example',
                 'main_url': 'https://example.com',
-                }, safe=True)
+                })
 
         app_id2 = self.db.applications.insert({
                 'client_id': '98765',
@@ -275,7 +275,7 @@ class ViewTests(testing.TestCase):
                 'callback_url': 'https://example.com/callback2',
                 'name': 'Example2',
                 'main_url': 'https://example.com',
-                }, safe=True)
+                })
 
         user_id = self.db.users.insert({
                 'twitter_id': 'twitter1',
@@ -283,7 +283,7 @@ class ViewTests(testing.TestCase):
                 'first_name': 'John',
                 'last_name': 'Doe',
                 'authorized_apps': [app_id, app_id2],
-                }, safe=True)
+                })
         self.set_user_cookie(str(user_id))
         self.testapp.get('/oauth2/endpoints/authorization', {
                 'response_type': 'code',
@@ -320,7 +320,7 @@ class ViewTests(testing.TestCase):
                 'last_name': 'Doe',
                 'email': 'john@example.com',
                 'authorized_apps': [],
-                }, safe=True)
+                })
         self.set_user_cookie(str(user_id))
 
         res = self.testapp.get('/oauth2/applications')
@@ -346,7 +346,7 @@ class ViewTests(testing.TestCase):
                 'last_name': 'Doe',
                 'email': 'john@example.com',
                 'authorized_apps': [],
-                }, safe=True)
+                })
         self.set_user_cookie(str(user_id))
 
         res = self.testapp.get('/oauth2/applications/new')
@@ -421,7 +421,7 @@ https://example.com''',
                 'last_name': 'Doe',
                 'email': 'john@example.com',
                 'authorized_apps': [],
-                }, safe=True)
+                })
         self.set_user_cookie(str(user_id))
 
         res = self.testapp.get('/oauth2/applications/xxx/delete',
@@ -440,7 +440,7 @@ https://example.com''',
                 'client_id': '123456',
                 'callback_url': 'https://example.com/callback',
                 'production_ready': False,
-                }, safe=True)
+                })
 
         res = self.testapp.get('/oauth2/applications/%s/delete' % str(app_id),
                                status=401)
@@ -448,7 +448,7 @@ https://example.com''',
 
         self.db.applications.update({'_id': app_id}, {
                 '$set': {'owner': user_id},
-                }, safe=True)
+                })
         res = self.testapp.get('/oauth2/applications/%s/delete' % str(app_id))
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Delete Application <span>Test Application</span>')
@@ -479,7 +479,7 @@ https://example.com''',
                 'last_name': 'Doe',
                 'email': 'john@example.com',
                 'authorized_apps': [],
-                }, safe=True)
+                })
         self.set_user_cookie(str(user_id))
 
         res = self.testapp.get('/oauth2/applications/xxx/edit',
@@ -505,7 +505,7 @@ https://example.com''',
                 'description': 'example description',
                 'client_id': '123456',
                 'client_secret': 'secret',
-                }, safe=True)
+                })
 
         res = self.testapp.get('/oauth2/applications/%s/edit' % str(app_id),
                                status=401)
@@ -513,7 +513,7 @@ https://example.com''',
 
         self.db.applications.update({'_id': app_id}, {
                 '$set': {'owner': user_id},
-                }, safe=True)
+                })
         res = self.testapp.get('/oauth2/applications/%s/edit' % str(app_id))
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Edit application <span>Test Application</span>')
@@ -609,7 +609,7 @@ https://example.com""")
                 'last_name': 'Doe',
                 'email': 'john@example.com',
                 'authorized_apps': [],
-                }, safe=True)
+                })
         self.set_user_cookie(str(user_id))
 
         res = self.testapp.get('/oauth2/authorized-applications')
@@ -630,7 +630,7 @@ https://example.com""")
                 'last_name': 'Doe',
                 'email': 'john@example.com',
                 'authorized_apps': [],
-                }, safe=True)
+                })
         self.set_user_cookie(str(user_id))
 
         res = self.testapp.get('/oauth2/applications/xxx/revoke',
@@ -651,7 +651,7 @@ https://example.com""")
                 'callback_url': 'http://example.com/callback',
                 'client_id': '123456',
                 'client_secret': 'secret',
-                }, safe=True)
+                })
 
         res = self.testapp.get('/oauth2/applications/%s/revoke' % str(app_id),
                                status=401)
@@ -659,7 +659,7 @@ https://example.com""")
 
         self.db.users.update({'_id': user_id}, {
                 '$set': {'authorized_apps': [app_id]},
-                }, safe=True)
+                })
 
         res = self.testapp.get('/oauth2/applications/%s/revoke' % str(app_id))
         self.assertEqual(res.status, '200 OK')
@@ -687,14 +687,14 @@ https://example.com""")
                 'production_ready': True,
                 'image_url': 'https://example.com/image.png',
                 'description': 'example description',
-                }, safe=True)
+                })
         self.db.applications.insert({
                 'client_id': '654321',
                 'name': 'Example app 2',
                 'main_url': 'https://2.example.com',
                 'callback_url': 'https://2.example.com/callback',
                 'production_ready': False,
-                }, safe=True)
+                })
 
         res = self.testapp.get('/oauth2/clients')
         self.assertEqual(res.status, '200 OK')

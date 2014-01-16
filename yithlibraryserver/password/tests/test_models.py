@@ -34,8 +34,8 @@ class PasswordsManagerTests(unittest.TestCase):
         mdb = MongoDB(MONGO_URI)
         self.db = mdb.get_database()
         self.pm = PasswordsManager(self.db)
-        self.user_id = self.db.users.insert({'name': 'John'}, safe=True)
-        self.user = self.db.users.find_one({'_id': self.user_id}, safe=True)
+        self.user_id = self.db.users.insert({'name': 'John'})
+        self.user = self.db.users.find_one({'_id': self.user_id})
 
     def tearDown(self):
         testing.tearDown()
@@ -82,7 +82,7 @@ class PasswordsManagerTests(unittest.TestCase):
         p1 = self.db.passwords.insert({
                 'secret': 'secret1',
                 'owner': self.user_id,
-                }, safe=True)
+                })
 
         password = self.pm.retrieve(self.user, p1)
         self.assertEqual(password, {
@@ -94,7 +94,7 @@ class PasswordsManagerTests(unittest.TestCase):
         p2 = self.db.passwords.insert({
                 'secret': 'secret2',
                 'owner': self.user_id,
-                }, safe=True)
+                })
         passwords = self.pm.retrieve(self.user)
         self.assertEqual(list(passwords), [{
                     'secret': 'secret1',
@@ -110,7 +110,7 @@ class PasswordsManagerTests(unittest.TestCase):
         p1 = self.db.passwords.insert({
                 'secret': 'secret1',
                 'owner': self.user_id,
-                }, safe=True)
+                })
         new_password = {'secret': 'new secret'}
         updated_password = self.pm.update(self.user, p1, new_password)
         self.assertEqual(updated_password, {
@@ -128,26 +128,26 @@ class PasswordsManagerTests(unittest.TestCase):
         p1 = self.db.passwords.insert({
                 'secret': 'secret1',
                 'owner': self.user_id,
-                }, safe=True)
+                })
         n_passwords = self.db.passwords.count()
 
         self.assertTrue(self.pm.delete(self.user, p1))
         self.assertEqual(n_passwords - 1, self.db.passwords.count())
-        password = self.db.passwords.find_one({'_id': p1}, safe=True)
+        password = self.db.passwords.find_one({'_id': p1})
         self.assertEqual(None, password)
 
         p1 = self.db.passwords.insert({
                 'secret': 'secret1',
                 'owner': self.user_id,
-                }, safe=True)
+                })
         p2 = self.db.passwords.insert({
                 'secret': 'secret2',
                 'owner': self.user_id,
-                }, safe=True)
+                })
         n_passwords = self.db.passwords.count()
         self.assertTrue(self.pm.delete(self.user))
         self.assertEqual(n_passwords - 2, self.db.passwords.count())
-        password1 = self.db.passwords.find_one({'_id': p1}, safe=True)
+        password1 = self.db.passwords.find_one({'_id': p1})
         self.assertEqual(None, password1)
-        password2 = self.db.passwords.find_one({'_id': p2}, safe=True)
+        password2 = self.db.passwords.find_one({'_id': p2})
         self.assertEqual(None, password2)

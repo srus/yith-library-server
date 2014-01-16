@@ -52,7 +52,7 @@ class SecurityTests(unittest.TestCase):
         self.config.testing_securitypolicy(userid='john')
         self.assertEqual(None, get_user(request))
 
-        user_id = self.db.users.insert({'screen_name': 'John Doe'}, safe=True)
+        user_id = self.db.users.insert({'screen_name': 'John Doe'})
         self.config.testing_securitypolicy(userid=str(user_id))
         self.assertEqual(get_user(request), {
                 '_id': user_id,
@@ -71,7 +71,7 @@ class SecurityTests(unittest.TestCase):
         except HTTPFound as exp:
             self.assertEqual(exp.location, '/register')
 
-        user_id = self.db.users.insert({'screen_name': 'John Doe'}, safe=True)
+        user_id = self.db.users.insert({'screen_name': 'John Doe'})
 
         self.config.testing_securitypolicy(userid=str(user_id))
         res = assert_authenticated_user_is_registered(request)

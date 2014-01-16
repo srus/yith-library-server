@@ -82,7 +82,7 @@ class SendPasswordsTests(TestCase):
                 'first_name': 'John',
                 'last_name': 'Doe',
                 'email': 'john@example.com',
-                }, safe=True)
+                })
         user = self.db.users.find_one({'_id': user_id})
 
         request = DummyRequest()

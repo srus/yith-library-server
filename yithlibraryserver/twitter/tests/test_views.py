@@ -135,7 +135,7 @@ class ViewTests(testing.TestCase):
         user_id = self.db.users.insert({
                 'twitter_id': 'user1',
                 'screen_name': 'Johnny',
-                }, safe=True)
+                })
         with patch('requests.post') as fake:
             response = fake.return_value
             response.status_code = 200
@@ -158,7 +158,7 @@ class ViewTests(testing.TestCase):
 
                 # even if the response from twitter included a different
                 # screen_name, our user will not be updated
-                new_user = self.db.users.find_one({'_id': user_id}, safe=True)
+                new_user = self.db.users.find_one({'_id': user_id})
                 self.assertEqual(new_user['screen_name'], 'Johnny')
 
         # good request, existing user, remember next_url

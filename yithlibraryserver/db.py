@@ -34,7 +34,7 @@ class MongoDB(object):
     """Simple wrapper to get pymongo real objects from the settings uri"""
 
     def __init__(self, db_uri=DEFAULT_MONGODB_URI,
-                 connection_factory=pymongo.Connection):
+                 connection_factory=pymongo.MongoClient):
         self.db_uri = urlparse.urlparse(db_uri)
         self.connection = connection_factory(
             host=self.db_uri.hostname or DEFAULT_MONGODB_HOST,

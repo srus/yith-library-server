@@ -59,7 +59,7 @@ class ViewTests(TestCase):
                 'authorized_apps': [],
                 'date_joined': date,
                 'last_login': date,
-                }, safe=True)
+                })
         self.set_user_cookie(str(user_id))
 
         res = self.testapp.get('/backup')
@@ -83,7 +83,7 @@ class ViewTests(TestCase):
                 'authorized_apps': [],
                 'date_joined': date,
                 'last_login': date,
-                }, safe=True)
+                })
         self.set_user_cookie(str(user_id))
 
         os.environ['YITH_FAKE_DATE'] = '2012-1-10'
@@ -137,7 +137,7 @@ class ViewTests(TestCase):
                 'authorized_apps': [],
                 'date_joined': date,
                 'last_login': date,
-                }, safe=True)
+                })
         self.set_user_cookie(str(user_id))
 
         # no file to upload

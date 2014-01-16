@@ -60,11 +60,11 @@ class UtilsTests(unittest.TestCase):
                 'screen_name': 'John Doe',
                 'first_name': 'John',
                 'last_name': '',
-                }, safe=True)
-        user = self.db.users.find_one({'_id': user_id}, safe=True)
+                })
+        user = self.db.users.find_one({'_id': user_id})
         n_users = self.db.users.count()
         self.assertTrue(delete_user(self.db, user))
-        refreshed_user = self.db.users.find_one({'_id': user_id}, safe=True)
+        refreshed_user = self.db.users.find_one({'_id': user_id})
         self.assertEqual(None, refreshed_user)
         self.assertEqual(n_users - 1, self.db.users.count())
 
@@ -73,7 +73,7 @@ class UtilsTests(unittest.TestCase):
                 'screen_name': 'John Doe',
                 'first_name': 'John',
                 'last_name': '',
-                }, safe=True)
+                })
         user = self.db.users.find_one({'_id': user_id})
         update_user(self.db, user, {}, {})
 
@@ -139,7 +139,7 @@ class UtilsTests(unittest.TestCase):
                 'screen_name': 'JohnDoe',
                 'first_name': 'John',
                 'last_name': '',
-                }, safe=True)
+                })
 
         request = testing.DummyRequest()
         request.db = self.db

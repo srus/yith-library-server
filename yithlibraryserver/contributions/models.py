@@ -45,6 +45,6 @@ def create_donation(request, data):
     else:
         donation['user'] = None
 
-    _id = request.db.donations.insert(donation, safe=True)
+    _id = request.db.donations.insert(donation)
     donation['_id'] = _id
     return donation

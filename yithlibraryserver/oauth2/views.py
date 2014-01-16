@@ -89,7 +89,7 @@ def developer_application_new(request):
               mapping={'app': appstruct['name']}),
             'success')
 
-        request.db.applications.insert(application, safe=True)
+        request.db.applications.insert(application)
         return HTTPFound(
             location=request.route_path('oauth2_developer_applications'))
     elif 'cancel' in request.POST:
@@ -149,7 +149,7 @@ def developer_application_edit(request):
             }
 
         request.db.applications.update({'_id': app['_id']},
-                                       application, safe=True)
+                                       application)
 
         request.session.flash(_('The changes were saved successfully'),
                               'success')
@@ -186,7 +186,7 @@ def developer_application_delete(request):
         return HTTPUnauthorized()
 
     if 'submit' in request.POST:
-        request.db.applications.remove(app_id, safe=True)
+        request.db.applications.remove(app_id)
         request.session.flash(
             _('The application ${app} was deleted successfully',
               mapping={'app': app['name']}),

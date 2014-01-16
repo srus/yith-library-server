@@ -37,7 +37,7 @@ def split_name(name):
 
 
 def delete_user(db, user):
-    result = db.users.remove(user['_id'], safe=True)
+    result = db.users.remove(user['_id'])
     return result['n'] == 1
 
 
@@ -54,7 +54,7 @@ def update_user(db, user, user_info, other_changes):
 
     changes.update(other_changes)
 
-    db.users.update({'_id': user['_id']}, {'$set': changes}, safe=True)
+    db.users.update({'_id': user['_id']}, {'$set': changes})
 
 
 def user_from_provider_id(db, provider, user_id):
