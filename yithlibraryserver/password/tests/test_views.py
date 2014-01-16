@@ -70,11 +70,17 @@ class ViewTests(testing.TestCase):
 
         res = self.testapp.get('/passwords', headers=self.auth_header)
         self.assertEqual(res.status, '200 OK')
-        self.assertEqual(
-            res.body,
-            b'{"passwords": [{"owner": "%s", "secret": "s3cr3t", "_id": "%s", "id": "%s", "service": "testing"}]}' %
-            (self.user_id, password_id, password_id)
-        )
+        self.assertEqual(res.json, {
+            "passwords": [
+                {
+                    "owner": str(self.user_id),
+                    "secret": "s3cr3t",
+                    "_id": str(password_id),
+                    "id": str(password_id),
+                    "service": "testing",
+                },
+            ],
+        })
 
     def test_password_collection_post(self):
         res = self.testapp.post('/passwords', '', headers=self.auth_header,
