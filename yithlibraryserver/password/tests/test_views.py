@@ -56,10 +56,25 @@ class ViewTests(testing.TestCase):
         self.assertEqual(res.headers['Access-Control-Allow-Headers'],
                          'Origin, Content-Type, Accept, Authorization')
 
-    def test_password_collection_get(self):
+    def test_password_collection_get_empty(self):
         res = self.testapp.get('/passwords', headers=self.auth_header)
         self.assertEqual(res.status, '200 OK')
         self.assertEqual(res.body, b'{"passwords": []}')
+
+    def test_password_collection_get_non_empty(self):
+        password_id = self.db.passwords.insert({
+                'service': 'testing',
+                'secret': 's3cr3t',
+                'owner': self.user_id,
+                }, safe=True)
+
+        res = self.testapp.get('/passwords', headers=self.auth_header)
+        self.assertEqual(res.status, '200 OK')
+        self.assertEqual(
+            res.body,
+            b'{"passwords": [{"owner": "%s", "secret": "s3cr3t", "_id": "%s", "id": "%s", "service": "testing"}]}' %
+            (self.user_id, password_id, password_id)
+        )
 
     def test_password_collection_post(self):
         res = self.testapp.post('/passwords', '', headers=self.auth_header,

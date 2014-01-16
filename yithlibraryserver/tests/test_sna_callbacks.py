@@ -21,7 +21,11 @@ import unittest
 from pyramid import testing
 
 from yithlibraryserver.db import MongoDB
-from yithlibraryserver.sna_callbacks import facebook_callback, google_callback
+from yithlibraryserver.sna_callbacks import (
+    facebook_callback,
+    google_callback,
+    liveconnect_callback,
+)
 from yithlibraryserver.testing import MONGO_URI
 
 
@@ -61,3 +65,12 @@ class SNACallbackTests(unittest.TestCase):
         self.assertEqual(result.status, '302 Found')
         self.assertEqual(result.location, '/register')
 
+    def test_liveconnect_callback(self):
+        result = liveconnect_callback(self.request, '123', {
+            'screen_name': 'John Doe',
+            'email': 'john@example.com',
+            'first_name': 'John',
+            'last_name': 'Doe',
+        })
+        self.assertEqual(result.status, '302 Found')
+        self.assertEqual(result.location, '/register')

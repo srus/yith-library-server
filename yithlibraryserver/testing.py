@@ -54,6 +54,8 @@ class TestCase(unittest.TestCase):
             'facebook_app_secret': 'secret',
             'google_client_id': 'id',
             'google_client_secret': 'secret',
+            'liveconnect_client_id': 'id',
+            'liveconnect_client_secret': 'secret',
             'paypal_user': 'sdk-three_api1.sdk.com',
             'paypal_password': 'QFZCWN5HZM8VBG7Q',
             'paypal_signature': 'A-IzJhZZjhg29XQ2qnhapuwxIDzyAZQ92FRP5dqBzVesOkzbdUONzmOU',
