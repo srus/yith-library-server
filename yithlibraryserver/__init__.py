@@ -35,7 +35,6 @@ from yithlibraryserver.db import MongoDB
 from yithlibraryserver.jsonrenderer import json_renderer
 from yithlibraryserver.i18n import deform_translator, locale_negotiator
 from yithlibraryserver.security import RootFactory
-from yithlibraryserver.testing import test_login, test_add_to_session
 
 
 def main(global_config, **settings):
@@ -115,6 +114,8 @@ def main(global_config, **settings):
 
         # add test only views to make it easy to login and add
         # things to the session during the tests
+        from yithlibraryserver.testing import test_login, test_add_to_session
+
         config.add_route('test_login', '/__login/{user}')
         config.add_view(test_login, route_name='test_login')
         config.add_route('test_add_to_session', '/__session')
