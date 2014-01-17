@@ -20,10 +20,12 @@
 
 import unittest
 
-from webtest import TestApp, TestRequest
+from webtest import TestApp
 
+from pyramid.httpexceptions import HTTPFound
 from pyramid.interfaces import ISessionFactory
 from pyramid.security import remember
+from pyramid.settings import asbool
 from pyramid.testing import DummyRequest
 
 from yithlibraryserver import main
@@ -87,3 +89,38 @@ class TestCase(unittest.TestCase):
             request.environ['HTTP_COOKIE'] = response.headers['Set-Cookie']
 
         return session_factory(request)
+
+
+def test_login(request):
+    """Log in a user.
+
+    This view is only registered in testing mode
+    """
+    return HTTPFound(location='/',
+                     headers=remember(request, request.matchdict['user']))
+
+
+def test_add_to_session(request):
+    """Add data to the user session via a POST
+
+    If a key in the POST dict has a '__' substring, it will be
+    handled as a nested dict.
+
+    This view is only registered in testing mode
+    """
+    items = {}
+    for key, value in request.POST.items():
+        if '__' in key:
+            subkey1, subkey2 = key.split('__')
+            if subkey1 not in items:
+                items[subkey1] = {}
+            items[subkey1][subkey2] = value
+        else:
+            items[key] = value
+
+    for key, value in items.items():
+        if value in ('True', 'False'):
+            value = asbool(value)
+        request.session[key] = value
+
+    return HTTPFound(location='/')
