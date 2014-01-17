@@ -37,7 +37,7 @@ class ViewTests(testing.TestCase):
                 'email': 'john@example.com',
                 'email_verified': True,
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
         res = self.testapp.get('/')
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Get your passwords', no='Start using it today')
@@ -86,10 +86,11 @@ class ViewTests(testing.TestCase):
                 'email': 'john@example.com',
                 'email_verified': True,
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/contact')
         self.assertEqual(res.status, '200 OK')
+
         res.mustcontain('John')
         res.mustcontain('john@example.com')
 

@@ -82,17 +82,15 @@ class ViewTests(TestCase):
         self.assertEqual(res.status, '400 Bad Request')
         res.mustcontain('Missing user info in the session')
 
-        self.add_to_session({
-                'next_url': 'http://localhost/foo/bar',
-                'user_info': {
-                    'provider': 'myprovider',
-                    'myprovider_id': '1234',
-                    'screen_name': 'John Doe',
-                    'first_name': 'John',
-                    'last_name': 'Doe',
-                    'email': 'john@example.com',
-                    },
-                })
+        self.testapp.post('/__session', {
+            'next_url': 'http://localhost/foo/bar',
+            'user_info__provider': 'myprovider',
+            'user_info__myprovider_id': '1234',
+            'user_info__screen_name': 'John Doe',
+            'user_info__first_name': 'John',
+            'user_info__last_name': 'Doe',
+            'user_info__email': 'john@example.com',
+        }, status=302)
 
         res = self.testapp.get('/register')
         self.assertEqual(res.status, '200 OK')
@@ -122,17 +120,15 @@ class ViewTests(TestCase):
         self.assertEqual(user['send_passwords_periodically'], False)
 
         # the next_url and user_info keys are cleared at this point
-        self.add_to_session({
-                'next_url': 'http://localhost/foo/bar',
-                'user_info': {
-                    'provider': 'myprovider',
-                    'myprovider_id': '1234',
-                    'screen_name': 'John Doe',
-                    'first_name': 'John',
-                    'last_name': 'Doe',
-                    'email': 'john@example.com',
-                    },
-                })
+        self.testapp.post('/__session', {
+            'next_url': 'http://localhost/foo/bar',
+            'user_info__provider': 'myprovider',
+            'user_info__myprovider_id': '1234',
+            'user_info__screen_name': 'John Doe',
+            'user_info__first_name': 'John',
+            'user_info__last_name': 'Doe',
+            'user_info__email': 'john@example.com',
+        }, status=302)
 
         # if no email is provided at registration, the email is
         # not verified
@@ -155,17 +151,15 @@ class ViewTests(TestCase):
         self.assertEqual(user['send_passwords_periodically'], False)
 
         # the next_url and user_info keys are cleared at this point
-        self.add_to_session({
-                'next_url': 'http://localhost/foo/bar',
-                'user_info': {
-                    'provider': 'myprovider',
-                    'myprovider_id': '1234',
-                    'screen_name': 'John Doe',
-                    'first_name': 'John',
-                    'last_name': 'Doe',
-                    'email': '',
-                    },
-                })
+        self.testapp.post('/__session', {
+            'next_url': 'http://localhost/foo/bar',
+            'user_info__provider': 'myprovider',
+            'user_info__myprovider_id': '1234',
+            'user_info__screen_name': 'John Doe',
+            'user_info__first_name': 'John',
+            'user_info__last_name': 'Doe',
+            'user_info__email': '',
+        }, status=302)
 
         # if an email is provided at registration, but
         # there is no email in the session (the provider
@@ -200,18 +194,16 @@ class ViewTests(TestCase):
 
 
         # the next_url and user_info keys are cleared at this point
-        self.add_to_session({
-                'next_url': 'http://localhost/foo/bar',
-                'user_info': {
-                    'provider': 'myprovider',
-                    'myprovider_id': '1234',
-                    'screen_name': 'John Doe',
-                    'first_name': 'John',
-                    'last_name': 'Doe',
-                    'email': '',
-                    },
-                USER_ATTR: True,
-                })
+        self.testapp.post('/__session', {
+            'next_url': 'http://localhost/foo/bar',
+            'user_info__provider': 'myprovider',
+            'user_info__myprovider_id': '1234',
+            'user_info__screen_name': 'John Doe',
+            'user_info__first_name': 'John',
+            'user_info__last_name': 'Doe',
+            'user_info__email': '',
+            USER_ATTR: True,
+        }, status=302)
 
         # The user want the Google Analytics cookie
         res = self.testapp.post('/register', {
@@ -234,17 +226,15 @@ class ViewTests(TestCase):
         self.assertEqual(user['send_passwords_periodically'], False)
 
         # the next_url and user_info keys are cleared at this point
-        self.add_to_session({
-                'next_url': 'http://localhost/foo/bar',
-                'user_info': {
-                    'provider': 'myprovider',
-                    'myprovider_id': '1234',
-                    'screen_name': 'John Doe',
-                    'first_name': 'John',
-                    'last_name': 'Doe',
-                    'email': 'john@example.com',
-                    },
-                })
+        self.testapp.post('/__session', {
+            'next_url': 'http://localhost/foo/bar',
+            'user_info__provider': 'myprovider',
+            'user_info__myprovider_id': '1234',
+            'user_info__screen_name': 'John Doe',
+            'user_info__first_name': 'John',
+            'user_info__last_name': 'Doe',
+            'user_info__email': 'john@example.com',
+        }, status=302)
 
         # simulate a cancel
         res = self.testapp.post('/register', {
@@ -254,16 +244,15 @@ class ViewTests(TestCase):
         self.assertEqual(res.location, 'http://localhost/foo/bar')
 
         # same thing but no next_url in the session
-        self.add_to_session({
-                'user_info': {
-                    'provider': 'myprovider',
-                    'myprovider_id': '1234',
-                    'screen_name': 'John Doe',
-                    'first_name': 'John',
-                    'last_name': 'Doe',
-                    'email': 'john@example.com',
-                    },
-                })
+        self.testapp.post('/__session', {
+            'user_info__provider': 'myprovider',
+            'user_info__myprovider_id': '1234',
+            'user_info__screen_name': 'John Doe',
+            'user_info__first_name': 'John',
+            'user_info__last_name': 'Doe',
+            'user_info__email': 'john@example.com',
+        }, status=302)
+
         res = self.testapp.post('/register', {
                 'cancel': 'Cancel',
                 }, status=302)
@@ -271,16 +260,14 @@ class ViewTests(TestCase):
         self.assertEqual(res.location, 'http://localhost/oauth2/clients')
 
         # make the form fail
-        self.add_to_session({
-                'user_info': {
-                    'provider': 'myprovider',
-                    'myprovider_id': '1234',
-                    'screen_name': 'John Doe',
-                    'first_name': 'John',
-                    'last_name': 'Doe',
-                    'email': 'john@example.com',
-                    },
-                })
+        self.testapp.post('/__session', {
+            'user_info__provider': 'myprovider',
+            'user_info__myprovider_id': '1234',
+            'user_info__screen_name': 'John Doe',
+            'user_info__first_name': 'John',
+            'user_info__last_name': 'Doe',
+            'user_info__email': 'john@example.com',
+        }, status=302)
 
         with patch('deform.Form.validate') as fake:
             fake.side_effect = DummyValidationFailure('f', 'c', 'e')
@@ -293,10 +280,10 @@ class ViewTests(TestCase):
 
     def test_logout(self):
         # Log in
-        self.set_user_cookie('twitter1')
-        self.add_to_session({
-                'current_provider': 'twitter',
-                })
+        self.testapp.get('/__login/twitter1')
+        self.testapp.post('/__session', {
+            'current_provider': 'twitter',
+        }, status=302)
 
         res = self.testapp.get('/logout', status=302)
         self.assertEqual(res.status, '302 Found')
@@ -324,7 +311,7 @@ class ViewTests(TestCase):
                 'date_joined': date,
                 'last_login': date,
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/profile')
         self.assertEqual(res.status, '200 OK')
@@ -400,7 +387,7 @@ class ViewTests(TestCase):
             # only get executed with very low probability
             self.db.users.remove(user_id)  # pragma: no cover
 
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
 
         os.environ['YITH_FAKE_DATE'] = '2012-10-30'
         res = self.testapp.get('/preferences')
@@ -474,7 +461,7 @@ class ViewTests(TestCase):
                 'email': '',
                 'authorized_apps': [],
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/destroy')
         res.mustcontain('Destroy account')
@@ -534,7 +521,7 @@ class ViewTests(TestCase):
                 'email': '',
                 'authorized_apps': [],
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
 
         # the user has no email so an error is expected
         res = self.testapp.get('/send-email-verification-code')
@@ -631,7 +618,7 @@ class ViewTests(TestCase):
                 'email_verified': True,
                 'authorized_apps': ['app1', 'app2'],
                 })
-        self.set_user_cookie(str(user1_id))
+        self.testapp.get('/__login/' + str(user1_id))
         self.db.passwords.insert({
                 'owner': user1_id,
                 'password': 'secret1',
@@ -730,7 +717,7 @@ class ViewTests(TestCase):
                 'email_verified': True,
                 'authorized_apps': ['app1', 'app2'],
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.post('/google-analytics-preference', {'yes': 'Yes'})
         self.assertEqual(res.status, '200 OK')

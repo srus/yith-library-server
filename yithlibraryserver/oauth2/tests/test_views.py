@@ -45,7 +45,7 @@ class ViewTests(testing.TestCase):
                 'email': 'john@example.com',
                 'authorized_apps': [],
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
 
         # 1. test incorrect requests
         res = self.testapp.get('/oauth2/endpoints/authorization',
@@ -218,7 +218,8 @@ class ViewTests(testing.TestCase):
                 'last_name': 'Doe',
                 'authorized_apps': [app_id],
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
+
         res = self.testapp.get('/oauth2/endpoints/authorization', {
                 'response_type': 'code',
                 'client_id': '123456',
@@ -284,7 +285,8 @@ class ViewTests(testing.TestCase):
                 'last_name': 'Doe',
                 'authorized_apps': [app_id, app_id2],
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
+
         self.testapp.get('/oauth2/endpoints/authorization', {
                 'response_type': 'code',
                 'client_id': '123456',
@@ -321,7 +323,7 @@ class ViewTests(testing.TestCase):
                 'email': 'john@example.com',
                 'authorized_apps': [],
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/oauth2/applications')
         self.assertEqual(res.status, '200 OK')
@@ -347,7 +349,7 @@ class ViewTests(testing.TestCase):
                 'email': 'john@example.com',
                 'authorized_apps': [],
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/oauth2/applications/new')
         self.assertEqual(res.status, '200 OK')
@@ -422,7 +424,7 @@ https://example.com''',
                 'email': 'john@example.com',
                 'authorized_apps': [],
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/oauth2/applications/xxx/delete',
                                status=400)
@@ -480,7 +482,7 @@ https://example.com''',
                 'email': 'john@example.com',
                 'authorized_apps': [],
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/oauth2/applications/xxx/edit',
                                status=400)
@@ -610,7 +612,7 @@ https://example.com""")
                 'email': 'john@example.com',
                 'authorized_apps': [],
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/oauth2/authorized-applications')
         self.assertEqual(res.status, '200 OK')
@@ -631,7 +633,7 @@ https://example.com""")
                 'email': 'john@example.com',
                 'authorized_apps': [],
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/oauth2/applications/xxx/revoke',
                                status=400)

@@ -60,7 +60,7 @@ class ViewTests(TestCase):
                 'date_joined': date,
                 'last_login': date,
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/backup')
         self.assertEqual(res.status, '200 OK')
@@ -84,7 +84,7 @@ class ViewTests(TestCase):
                 'date_joined': date,
                 'last_login': date,
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
 
         os.environ['YITH_FAKE_DATE'] = '2012-1-10'
 
@@ -138,7 +138,7 @@ class ViewTests(TestCase):
                 'date_joined': date,
                 'last_login': date,
                 })
-        self.set_user_cookie(str(user_id))
+        self.testapp.get('/__login/' + str(user_id))
 
         # no file to upload
         res = self.testapp.post('/backup/import', status=302)

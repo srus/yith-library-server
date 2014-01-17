@@ -111,6 +111,36 @@ def main(global_config, **settings):
     if 'testing' in settings and asbool(settings['testing']):
         config.include('pyramid_mailer.testing')
         config.include('yithlibraryserver.datetimeservice.testing')
+
+        from pyramid.httpexceptions import HTTPFound
+        def test_login(request):
+            from pyramid.security import remember
+            return HTTPFound(location='/',
+                             headers=remember(request, request.matchdict['user']))
+
+        def test_add_to_session(request):
+            items = {}
+            for key, value in request.POST.items():
+                if '__' in key:
+                    subkey1, subkey2 = key.split('__')
+                    if subkey1 not in items:
+                        items[subkey1] = {}
+                    items[subkey1][subkey2] = value
+                else:
+                    items[key] = value
+
+            for key, value in items.items():
+                if value in ('True', 'False'):
+                    value = asbool(value)
+                request.session[key] = value
+
+            return HTTPFound(location='/')
+
+        config.add_route('test_login', '/__login/{user}')
+        config.add_view(test_login, route_name='test_login')
+        config.add_route('test_add_to_session', '/__session')
+        config.add_view(test_add_to_session, route_name='test_add_to_session')
+
     else:  # pragma: no cover
         config.include('pyramid_mailer')
         config.include('yithlibraryserver.datetimeservice')

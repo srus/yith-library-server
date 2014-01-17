@@ -75,23 +75,6 @@ class TestCase(unittest.TestCase):
 
         self.testapp.reset()
 
-    def set_user_cookie(self, user_id):
-        request = TestRequest.blank('', {})
-        request.registry = self.testapp.app.registry
-        remember_headers = remember(request, user_id)
-        cookie_value = remember_headers[0][1].split('"')[1]
-        self.testapp.cookies['auth_tkt'] = cookie_value
-
-    def add_to_session(self, data):
-        queryUtility = self.testapp.app.registry.queryUtility
-        session_factory = queryUtility(ISessionFactory)
-        request = DummyRequest()
-        session = session_factory(request)
-        for key, value in data.items():
-            session[key] = value
-        session.persist()
-        self.testapp.cookies['beaker.session.id'] = session._sess.id
-
     def get_session(self, response):
         queryUtility = self.testapp.app.registry.queryUtility
         session_factory = queryUtility(ISessionFactory)
