@@ -32,7 +32,7 @@ class EmailWidget(TextInputWidget):
         email_output = super(EmailWidget, self).serialize(
             field,
             cstruct.get('email', ''),
-            readonly,
+            readonly=readonly,
             )
 
         pstruct = field.schema.deserialize(cstruct)
