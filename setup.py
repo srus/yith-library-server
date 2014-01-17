@@ -31,34 +31,34 @@ requires = [
     # indirect dependencies
     'Beaker==1.6.4',            # required by pyramid_beaker
     'colander==1.0a2',          # required by deform
-    'Chameleon==2.11',          # required by deform, pyramid
+    'Chameleon==2.14',          # required by deform, pyramid
     'Mako==0.7.3',              # required by pyramid
     'MarkupSafe==0.15',         # required by Mako
     'nose==1.2.1',              # required by pymongo
-    'PasteDeploy==1.5.0',       # required by pyramid
+    'PasteDeploy==1.5.2',       # required by pyramid
     'peppercorn==0.4',          # required by deform
     'Pygments==1.6',            # required by pyramid_debugtoolbar
     'repoze.lru==0.6',          # required by pyramid
-    'repoze.sendmail==3.2',     # required by pyramid_mailer
+    'repoze.sendmail==4.1',     # required by pyramid_mailer
     'transaction==1.4.1',       # required by pyramid_mailer
     'translationstring==1.1',   # required by deform, pyramid
     'venusian==1.0a8',          # required by pyramid
-    'WebOb==1.2.3',             # required by pyramid
-    'zope.deprecation==4.0.2',  # required by deform
+    'WebOb==1.3.1',             # required by pyramid
+    'zope.deprecation==4.1.0',  # required by deform
     'zope.interface==4.0.5',    # required by pyramid
 
     # direct dependencies
-    'deform==0.9.5',
+    'deform==0.9.9',
     'pymongo==2.6.3',
-    'pyramid==1.4',
-    'pyramid_beaker==0.7',
-    'pyramid_debugtoolbar==1.0.4',
-    'pyramid_mailer==0.11',
+    'pyramid==1.4.5',
+    'pyramid_beaker==0.8',
+    'pyramid_debugtoolbar==1.0.7',
+    'pyramid_mailer==0.13',
     'pyramid_tm==0.7',
-    'pyramid_sna==0.3',
+    'pyramid_sna==0.3.1',
     'raven==3.3.4',
-    'requests==1.2.0',
-    'waitress==0.8.2',
+    'requests==1.2.3',
+    'waitress==0.8.8',
     'newrelic==2.6.0.5',
     ]
 
@@ -73,7 +73,7 @@ if sys.version_info[0] < 3:
     requires.append('lingua==1.4')
 
 test_requires = [
-    'WebTest==1.4.3',
+    'WebTest==2.0.6',
     'mock==1.0.1',
     ]
 
@@ -85,7 +85,7 @@ docs_extras = [
 
 testing_extras = test_requires + [
     'nose==1.2.1',
-    'coverage==3.6',
+    'coverage==3.7.1',
     ]
 
 
