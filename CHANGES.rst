@@ -1,3 +1,10 @@
+0.3 (unreleased)
+----------------
+- New features:
+
+  - Reused package dependencies information between requirements.txt
+    and setup.py (Fidel Ramos)
+
 0.2 (2013-02-03)
 ----------------
 - New features:
