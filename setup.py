@@ -27,66 +27,62 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
-requires = [
-    # indirect dependencies
-    'Beaker==1.6.4',            # required by pyramid_beaker
-    'colander==1.0a2',          # required by deform
-    'Chameleon==2.14',          # required by deform, pyramid
-    'Mako==0.7.3',              # required by pyramid
-    'MarkupSafe==0.15',         # required by Mako
-    'nose==1.2.1',              # required by pymongo
-    'PasteDeploy==1.5.2',       # required by pyramid
-    'peppercorn==0.4',          # required by deform
-    'Pygments==1.6',            # required by pyramid_debugtoolbar
-    'repoze.lru==0.6',          # required by pyramid
-    'repoze.sendmail==4.1',     # required by pyramid_mailer
-    'transaction==1.4.1',       # required by pyramid_mailer
-    'translationstring==1.1',   # required by deform, pyramid
-    'venusian==1.0a8',          # required by pyramid
-    'WebOb==1.3.1',             # required by pyramid
-    'zope.deprecation==4.1.0',  # required by deform
-    'zope.interface==4.0.5',    # required by pyramid
 
-    # direct dependencies
-    'deform==0.9.9',
-    'pymongo==2.6.3',
-    'pyramid==1.4.5',
-    'pyramid_beaker==0.8',
-    'pyramid_debugtoolbar==1.0.7',
-    'pyramid_mailer==0.13',
-    'pyramid_tm==0.7',
-    'pyramid_sna==0.3.1',
-    'raven==3.3.4',
-    'requests==1.2.3',
-    'waitress==0.8.8',
-    'newrelic==2.6.0.5',
-    ]
+def parse_requirements():
+    """Parses requirements.txt file into a dictionary.
+
+    requirements.txt should be structuctured in sections. Each section
+    should begin with a comment and the name of the section. E.g.:
+
+    # base #
+    package1
+    package2==1.0
+
+    # other #
+    package3<=4.2
+
+    Then the packages per section can be accessed like this:
+
+    >>> requirements = parse_requirements()
+    >>> requirements['base']
+    ['package1', 'package2==1.0']
+    >>> requirements['other']
+    ['package3<=4.2']
+    >>> requirements['all']
+    ['package1', 'package2==1.0', 'package3<=4.2']
+
+    """
+    requirements = {}
+    all_requirements = []
+
+    with open('requirements.txt', 'r') as requirements_file:
+        current_section = None
+        for line in requirements_file:
+            line = line.strip()
+            if line.startswith('#') and line.endswith('#'):
+                current_section = line.strip('#').strip()
+                requirements[current_section] = []
+                continue
+
+            # remove inline comments
+            if '#' in line:
+                line = line[:line.index('#')]
+                line = line.strip()
+
+            if line:
+                if current_section is not None:
+                    requirements[current_section].append(line)
+                all_requirements.append(line)
+
+    requirements['all'] = all_requirements
+
+    return requirements
+
+requirements = parse_requirements()
 
 if sys.version_info[0] < 3:
-    # Babel does not work with Python 3
-    requires.append('Babel==0.9.6')
-
-    requires.append('polib==1.0.3')  # required by lingua
-    requires.append('xlwt==0.7.4')   # required by lingua
-    requires.append('xlrd==0.9.0')   # required by lingua
-
-    requires.append('lingua==1.4')
-
-test_requires = [
-    'WebTest==2.0.6',
-    'mock==1.0.1',
-    ]
-
-docs_extras = [
-    'docutils==0.10',  # required by Sphinx
-    'Jinja2==2.6',     # required by Sphinx
-    'Sphinx==1.1.3',
-    ]
-
-testing_extras = test_requires + [
-    'nose==1.2.1',
-    'coverage==3.7.1',
-    ]
+    # packages that only work in Python 2.x
+    requirements['base'].extend(requirements['python2'])
 
 
 setup(name='yith-library-server',
@@ -116,12 +112,12 @@ setup(name='yith-library-server',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      install_requires=requires,
-      tests_require=requires + test_requires,
+      install_requires=requirements['base'],
+      tests_require=requirements['base'] + requirements['test support'],
       extras_require = {
-        'testing': testing_extras,
-        'docs': docs_extras,
-        },
+          'testing': requirements['testing'],
+          'docs': requirements['docs'],
+      },
       test_suite="yithlibraryserver",
       entry_points = """\
       [paste.app_factory]
