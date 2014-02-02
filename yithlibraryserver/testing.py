@@ -91,7 +91,7 @@ class TestCase(unittest.TestCase):
         return session_factory(request)
 
 
-def test_login(request):
+def view_test_login(request):
     """Log in a user.
 
     This view is only registered in testing mode
@@ -100,7 +100,7 @@ def test_login(request):
                      headers=remember(request, request.matchdict['user']))
 
 
-def test_add_to_session(request):
+def view_test_add_to_session(request):
     """Add data to the user session via a POST
 
     If a key in the POST dict has a '__' substring, it will be

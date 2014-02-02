@@ -114,12 +114,15 @@ def main(global_config, **settings):
 
         # add test only views to make it easy to login and add
         # things to the session during the tests
-        from yithlibraryserver.testing import test_login, test_add_to_session
+        from yithlibraryserver.testing import view_test_login
+        from yithlibraryserver.testing import view_test_add_to_session
 
         config.add_route('test_login', '/__login/{user}')
-        config.add_view(test_login, route_name='test_login')
+        config.add_view(view_test_login,
+                        route_name='test_login')
         config.add_route('test_add_to_session', '/__session')
-        config.add_view(test_add_to_session, route_name='test_add_to_session')
+        config.add_view(view_test_add_to_session,
+                        route_name='test_add_to_session')
 
     else:  # pragma: no cover
         config.include('pyramid_mailer')
