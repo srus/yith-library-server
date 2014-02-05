@@ -4,7 +4,13 @@ python:
   - "2.7"
   - "3.2"
   - "3.3"
-install: python setup.py develop
-script: python setup.py test
+install:
+  - python setup.py develop
+  - python setup.py testing
+  - pip install coveralls
+script:
+  - nosetests --nocapture --with-coverage --cover-package=yithlibraryserver
+after_success
+  - coveralls
 services:
   - mongodb
