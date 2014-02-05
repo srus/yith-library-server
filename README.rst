@@ -2,6 +2,10 @@ Yith Library server
 ===================
 
 .. image:: https://secure.travis-ci.org/lorenzogil/yith-library-server.png
+  :target: https://travis-ci.org/lorenzogil/yith-library-server
+
+.. image:: https://coveralls.io/repos/lorenzogil/yith-library-server/badge.png
+  :target: https://coveralls.io/r/lorenzogil/yith-library-server
 
 Yith Library is a password storage server.
 
