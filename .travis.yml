@@ -6,10 +6,9 @@ python:
   - "3.3"
 install:
   - python setup.py develop
-  - python setup.py testing
   - pip install coveralls
 script:
-  - nosetests --nocapture --with-coverage --cover-package=yithlibraryserver
+  - coverage run --source=yithlibraryserver setup.py test
 after_success:
   - coveralls
 services:
