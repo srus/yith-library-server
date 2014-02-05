@@ -115,7 +115,7 @@ setup(name='yith-library-server',
       install_requires=requirements['base'],
       tests_require=requirements['base'] + requirements['test support'],
       extras_require = {
-          'testing': requirements['testing'],
+          'testing': requirements['testing'] + requirements['test support'],
           'docs': requirements['docs'],
       },
       test_suite="yithlibraryserver",
