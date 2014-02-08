@@ -13,7 +13,7 @@
   <h1 i18n:translate="">Log in</h1>
   <ul class="thumbnails">
 
-    <li id="${idp.name}" class="span3" tal:repeat="idp identity_providers">
+    <li id="${idp.slug}" class="span3" tal:repeat="idp identity_providers">
       <div class="thumbnail">
 	    <a href="${request.route_path(idp.route_path)}?next_url=${next_url}">
 	      <img src="${request.static_path(idp.image_path)}" alt="" />
