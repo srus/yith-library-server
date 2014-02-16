@@ -29,7 +29,7 @@ from yithlibraryserver.backups.email import get_day_to_send
 from yithlibraryserver.compat import url_quote
 from yithlibraryserver.i18n import translation_domain
 from yithlibraryserver.i18n import TranslationString as _
-from yithlibraryserver.oauth2.authorization import authorize_user
+from yithlibraryserver.oauth2.decorators import protected_method
 from yithlibraryserver.password.models import PasswordsManager
 from yithlibraryserver.user import analytics
 from yithlibraryserver.user.accounts import get_accounts, merge_accounts
@@ -477,6 +477,6 @@ class UserRESTView(object):
         return ''
 
     @view_config(request_method='GET')
+    @protected_method(['read-userinfo'])
     def get(self):
-        user = authorize_user(self.request, ['read-userinfo'])
-        return user
+        return self.request.user

@@ -110,7 +110,7 @@ class Authorizator(object):
             )
 
 
-def authorize_user(request, scopes):
+def verify_request(request, scopes):
     validator = RequestValidator(request.db, request.datetime_service)
     server = Server(validator)
 
