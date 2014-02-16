@@ -21,24 +21,33 @@
 import bson
 from deform import Button, Form, ValidationFailure
 
-from pyramid.httpexceptions import HTTPBadRequest, HTTPFound, HTTPNotFound
-from pyramid.httpexceptions import HTTPNotImplemented, HTTPUnauthorized
+from pyramid.httpexceptions import (
+    HTTPBadRequest,
+    HTTPFound,
+    HTTPNotFound,
+)
+from pyramid.httpexceptions import HTTPUnauthorized
 from pyramid.view import view_config
+
+from oauthlib.oauth2 import (
+    AccessDeniedError,
+    FatalClientError,
+    OAuth2Error,
+    Server,
+)
 
 from yithlibraryserver.i18n import TranslationString as _
 from yithlibraryserver.oauth2.application import create_client_id_and_secret
-from yithlibraryserver.oauth2.authentication import authenticate_client
 from yithlibraryserver.oauth2.authorization import Authorizator
 from yithlibraryserver.oauth2.schemas import ApplicationSchema
 from yithlibraryserver.oauth2.schemas import FullApplicationSchema
+from yithlibraryserver.oauth2.utils import (
+    create_response,
+    extract_params,
+    response_from_error,
+)
+from yithlibraryserver.oauth2.validator import RequestValidator
 from yithlibraryserver.user.security import assert_authenticated_user_is_registered
-
-
-DEFAULT_SCOPE = 'passwords'
-
-SCOPE_NAMES = {
-    'passwords': _('Access your passwords'),
-    }
 
 
 @view_config(route_name='oauth2_developer_applications',
@@ -202,61 +211,21 @@ def developer_application_delete(request):
              renderer='templates/application_authorization.pt',
              permission='add-authorized-app')
 def authorization_endpoint(request):
-    response_type = request.params.get('response_type')
-    if response_type is None:
-        return HTTPBadRequest('Missing required response_type')
 
-    if response_type != 'code':
-        return HTTPNotImplemented('Only code is supported')
+    validator = RequestValidator(request.db, request.datetime_service)
+    server = Server(validator)
 
-    client_id = request.params.get('client_id')
-    if client_id is None:
-        return HTTPBadRequest('Missing required client_type')
+    uri, http_method, body, headers = extract_params(request)
 
-    app = request.db.applications.find_one({'client_id': client_id})
-    if app is None:
-        return HTTPNotFound()
+    if request.method == 'GET':
+        try:
+            scopes, credentials = server.validate_authorization_request(
+                uri, http_method, body, headers,
+            )
 
-    redirect_uri = request.params.get('redirect_uri')
-    if redirect_uri is None:
-        redirect_uri = app['callback_url']
-    else:
-        if redirect_uri != app['callback_url']:
-            return HTTPBadRequest(
-                'Redirect URI does not match registered callback URL')
-
-    scope = request.params.get('scope', DEFAULT_SCOPE)
-
-    state = request.params.get('state')
-
-    user = assert_authenticated_user_is_registered(request)
-
-    authorizator = Authorizator(request.db, app)
-
-    if 'submit' in request.POST:
-        if not authorizator.is_app_authorized(request.user):
-            authorizator.store_user_authorization(request.user)
-
-        code = authorizator.auth_codes.create(
-            request.user['_id'], app['client_id'], scope)
-        url = authorizator.auth_codes.get_redirect_url(
-            code, redirect_uri, state)
-        return HTTPFound(location=url)
-
-    elif 'cancel' in request.POST:
-        return HTTPFound(app['main_url'])
-
-    else:
-        if authorizator.is_app_authorized(user):
-            code = authorizator.auth_codes.create(
-                user['_id'], app['client_id'], scope)
-            url = authorizator.auth_codes.get_redirect_url(
-                code, redirect_uri, state)
-            return HTTPFound(location=url)
-
-        else:
+            app = validator.get_client(credentials['client_id'])
             authorship_information = ''
-            owner_id = app.get('owner', None)
+            owner_id = app._client.get('owner', None)
             if owner_id is not None:
                 owner = request.db.users.find_one({'_id': owner_id})
                 if owner:
@@ -265,60 +234,65 @@ def authorization_endpoint(request):
                         authorship_information = _('By ${owner}',
                                                    mapping={'owner': email})
 
-            scopes = [SCOPE_NAMES.get(scope, scope)
-                      for scope in scope.split(' ')]
+            pretty_scopes = validator.get_pretty_scopes(scopes)
             return {
-                'response_type': response_type,
-                'client_id': client_id,
-                'redirect_uri': redirect_uri,
-                'scope': scope,
-                'state': state,
-                'app': app,
-                'scopes': scopes,
+                'response_type': credentials['response_type'],
+                'client_id': credentials['client_id'],
+                'redirect_uri': credentials['redirect_uri'],
+                'state': credentials['state'],
+                'scope': ' '.join(scopes),
+                'app': app._client,
+                'scopes': pretty_scopes,
                 'authorship_information': authorship_information,
                 }
+        except FatalClientError as e:
+            return response_from_error(e)
+
+        except OAuth2Error as e:
+            return HTTPFound(e.in_uri(e.redirect_uri))
+
+    if request.method == 'POST':
+        redirect_uri = request.POST.get('redirect_uri', None)
+        if 'submit' in request.POST:
+            scope = request.POST.get('scope', '')
+            scopes = scope.split()
+            credentials = {
+                'client_id': request.POST.get('client_id'),
+                'redirect_uri': redirect_uri,
+                'response_type': request.POST.get('response_type', None),
+                'state': request.POST.get('state', None),
+                'user': request.user,
+            }
+            try:
+                headers, body, status = server.create_authorization_response(
+                    uri, http_method, body, headers, scopes, credentials,
+                )
+                return create_response(status, headers, body)
+            except FatalClientError as e:
+                return response_from_error(e)
+            except OAuth2Error as e:
+                return HTTPFound(e.in_uri(redirect_uri))
+
+        elif 'cancel' in request.POST:
+            e = AccessDeniedError()
+            return HTTPFound(e.in_uri(redirect_uri))
 
 
 @view_config(route_name='oauth2_token_endpoint',
              renderer='json')
 def token_endpoint(request):
-    app = authenticate_client(request)
+    validator = RequestValidator(request.db, request.datetime_service)
+    server = Server(validator)
 
-    grant_type = request.POST.get('grant_type')
-    if grant_type is None:
-        return HTTPBadRequest('Missing required grant_type')
-
-    if grant_type != 'authorization_code':
-        return HTTPNotImplemented('Only authorization_code is supported')
-
-    code = request.POST.get('code')
-    if code is None:
-        return HTTPBadRequest('Missing required code')
-
-    authorizator = Authorizator(request.db, app)
-
-    grant = authorizator.auth_codes.find(code)
-    if grant is None:
-        return HTTPUnauthorized()
-
-    # TODO: check if the grant is rotten
-
-    if app['client_id'] != grant['client_id']:
-        return HTTPUnauthorized()
-
-    authorizator.auth_codes.remove(grant)
-
-    request.response.headers['Cache-Control'] = 'no-store'
-    request.response.headers['Pragma'] = 'no-cache'
-
-    access_code = authorizator.access_codes.create(grant['user'], grant)
-
-    return {
-        'access_code': access_code,
-        'token_type': 'bearer',
-        'expires_in': 3600,
-        'scope': grant['scope'],
-        }
+    uri, http_method, body, headers = extract_params(request)
+    try:
+        credentials = {}
+        headers, body, status = server.create_token_response(
+            uri, http_method, body, headers, credentials,
+        )
+        return create_response(status, headers, body)
+    except FatalClientError as e:
+        return response_from_error(e)
 
 
 @view_config(route_name='oauth2_authorized_applications',

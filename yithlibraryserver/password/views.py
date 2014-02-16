@@ -26,7 +26,7 @@ from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.view import view_config, view_defaults
 
 from yithlibraryserver.errors import password_not_found, invalid_password_id
-from yithlibraryserver.security import authorize_user
+from yithlibraryserver.oauth2.authorization import authorize_user
 from yithlibraryserver.password.models import PasswordsManager
 from yithlibraryserver.password.validation import validate_password
 
@@ -48,7 +48,7 @@ class PasswordCollectionRESTView(object):
 
     @view_config(request_method='GET')
     def get(self):
-        user = authorize_user(self.request)
+        user = authorize_user(self.request, ['read-passwords'])
         passwords = list(self.passwords_manager.retrieve(user))
         for p in passwords:
             p['id'] = p['_id']
@@ -56,7 +56,7 @@ class PasswordCollectionRESTView(object):
 
     @view_config(request_method='POST')
     def post(self):
-        user = authorize_user(self.request)
+        user = authorize_user(self.request, ['write-passwords'])
         password, errors = validate_password(self.request.body,
                                              self.request.charset)
 
@@ -88,7 +88,7 @@ class PasswordRESTView(object):
 
     @view_config(request_method='GET')
     def get(self):
-        user = authorize_user(self.request)
+        user = authorize_user(self.request, ['read-passwords'])
         try:
             _id = bson.ObjectId(self.password_id)
         except bson.errors.InvalidId:
@@ -104,7 +104,7 @@ class PasswordRESTView(object):
 
     @view_config(request_method='PUT')
     def put(self):
-        user = authorize_user(self.request)
+        user = authorize_user(self.request, ['write-passwords'])
         try:
             _id = bson.ObjectId(self.password_id)
         except bson.errors.InvalidId:
@@ -128,7 +128,7 @@ class PasswordRESTView(object):
 
     @view_config(request_method='DELETE')
     def delete(self):
-        user = authorize_user(self.request)
+        user = authorize_user(self.request, ['read-passwords'])
         try:
             _id = bson.ObjectId(self.password_id)
         except bson.errors.InvalidId:

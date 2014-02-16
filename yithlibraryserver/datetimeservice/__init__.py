@@ -18,6 +18,8 @@
 
 import datetime
 
+from bson.tz_util import utc
+
 
 class DateService(object):
 
@@ -34,7 +36,7 @@ class DatetimeService(object):
         self.request = request
 
     def utcnow(self):
-        return datetime.datetime.utcnow()
+        return datetime.datetime.now(tz=utc)
 
 
 def get_date(request):

@@ -20,6 +20,13 @@
 
 import uuid
 
+from oauthlib.oauth2 import Server
+
+from pyramid.httpexceptions import HTTPUnauthorized
+
+from yithlibraryserver.oauth2.utils import extract_params
+from yithlibraryserver.oauth2.validator import RequestValidator
+
 
 class Codes(object):
 
@@ -101,3 +108,23 @@ class Authorizator(object):
             {'_id': user['_id']},
             {'$pull': {'authorized_apps': self.app['_id']}},
             )
+
+
+def authorize_user(request, scopes):
+    validator = RequestValidator(request.db, request.datetime_service)
+    server = Server(validator)
+
+    uri, http_method, body, headers = extract_params(request)
+
+    valid, r = server.verify_request(
+        uri, http_method, body, headers, scopes,
+    )
+
+    if not valid:
+        raise HTTPUnauthorized()
+
+    user = request.db.users.find_one(r.user)
+    if user is None:
+        raise HTTPUnauthorized()
+
+    return user
