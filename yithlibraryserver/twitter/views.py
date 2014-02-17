@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -111,7 +111,7 @@ def twitter_callback(request):
         # fetch Twitter info only if this is the first time for
         # the user sice Twitter has very strong limits for using
         # its APIs
-        twitter_info = get_user_info(settings, user_id, oauth_token)
+        twitter_info = get_user_info(settings, user_id)
         first_name, last_name = split_name(twitter_info['name'])
         info = {
             'screen_name': screen_name,

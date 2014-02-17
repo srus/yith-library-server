@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -28,25 +28,51 @@ from yithlibraryserver.twitter.information import get_user_info
 
 class InformationTests(unittest.TestCase):
 
-    def test_get_user_info(self):
-        settings = {
+    def setUp(self):
+        super(InformationTests, self).setUp()
+        self.settings = {
             'twitter_consumer_key': 'key',
             'twitter_consumer_secret': 'secret',
-            'twitter_user_info_url': 'https://api.twitter.com/1/users/show.json'
+            'twitter_bearer_token_url': 'https://api.twitter.com/oauth2/token',
+            'twitter_user_info_url': 'https://api.twitter.com/1.1/users/show.json'
             }
 
-        with patch('requests.get') as fake:
+    def test_get_user_info(self):
+        with patch('requests.post') as fake:
             response = fake.return_value
-            response.status_code = 200
-            response.json = lambda: {'screen_name': 'John Doe'}
+            response.ok = True
+            response.json = lambda: {
+                'token_type': 'bearer',
+                'access_token': '1234567890',
+            }
+            with patch('requests.get') as fake2:
+                response2 = fake2.return_value
+                response2.ok = True
+                response2.json = lambda: {
+                    'screen_name': 'John Doe',
+                }
+                info = get_user_info(self.settings, '1234')
+                self.assertEqual(info, {'screen_name': 'John Doe'})
 
-            info = get_user_info(settings, '1234', 'token')
-            self.assertEqual(info, {'screen_name': 'John Doe'})
-
-        with patch('requests.get') as fake:
+    def test_get_user_info_non_authorized(self):
+        with patch('requests.post') as fake:
             response = fake.return_value
-            response.status_code = 400
-            response.json = lambda: {'screen_name': 'John Doe'}
+            response.ok = False
 
             self.assertRaises(HTTPUnauthorized,
-                              get_user_info, settings, '1234', 'token')
+                              get_user_info, self.settings, '1234')
+
+    def test_get_user_info_non_authorized2(self):
+        with patch('requests.post') as fake:
+            response = fake.return_value
+            response.ok = True
+            response.json = lambda: {
+                'token_type': 'bearer',
+                'access_token': '1234567890',
+            }
+            with patch('requests.get') as fake2:
+                response2 = fake2.return_value
+                response2.ok = False
+
+                self.assertRaises(HTTPUnauthorized,
+                                  get_user_info, self.settings, '1234')
