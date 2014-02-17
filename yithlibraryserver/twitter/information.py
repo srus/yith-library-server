@@ -24,18 +24,22 @@ import requests
 
 from pyramid.httpexceptions import HTTPUnauthorized
 
+from yithlibraryserver.compat import text_type
+
 
 def get_user_info(settings, user_id):
     # Get a bearer token
     token_url = settings['twitter_bearer_token_url']
     key = settings['twitter_consumer_key']
     secret = settings['twitter_consumer_secret']
-    auth = 'Basic ' + binascii.b2a_base64(key + ':' + secret)[:-1]
+    auth = key + ':' + secret
+    auth = 'Basic ' + text_type(binascii.b2a_base64(auth.encode('ascii'))[:-1],
+                                'ascii')
 
     response = requests.post(
         token_url,
         headers={
-            'Authorization': auth,
+            'Authorization': auth.encode('ascii'),
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
         },
         data='grant_type=client_credentials',
