@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -20,6 +20,7 @@
 
 import os
 
+import mock
 from mock import patch
 
 from yithlibraryserver import testing
@@ -29,13 +30,17 @@ class ViewTests(testing.TestCase):
 
     clean_collections = ('users', )
 
-    def test_twitter_login(self):
+    def setUp(self):
+        super(ViewTests, self).setUp()
         settings = self.testapp.app.registry.settings
         # these are invalid Twitter tokens taken from the examples
-        settings['twitter_request_token_url'] = 'https://api.twitter.com/oauth/request_token'
         settings['twitter_consumer_key'] = 'cChZNFj6T5R0TigYB9yd1w'
         settings['twitter_consumer_secret'] = 'L8qq9PZyRg6ieKGEKhZolGC0vJWLw8iEJ88DRdyOg'
         settings['twitter_authenticate_url'] = 'https://api.twitter.com/oauth/authenticate'
+        settings['twitter_request_token_url'] = 'https://api.twitter.com/oauth/request_token'
+        settings['twitter_access_token_url'] = 'https://api.twitter.com/oauth/access_token'
+
+    def test_twitter_login(self):
         with patch('requests.post') as fake:
             response = fake.return_value
             response.status_code = 200
@@ -61,16 +66,7 @@ class ViewTests(testing.TestCase):
             self.assertEqual(res.status, '401 Unauthorized')
             res.mustcontain('oauth_callback_confirmed is not true')
 
-    def test_twitter_callback(self):
-        settings = self.testapp.app.registry.settings
-        settings['twitter_request_token_url'] = 'https://api.twitter.com/oauth/request_token'
-        settings['twitter_access_token_url'] = 'https://api.twitter.com/oauth/access_token'
-        settings['twitter_consumer_key'] = 'cChZNFj6T5R0TigYB9yd1w'
-        settings['twitter_consumer_secret'] = 'L8qq9PZyRg6ieKGEKhZolGC0vJWLw8iEJ88DRdyOg'
-        settings['twitter_authenticate_url'] = 'https://api.twitter.com/oauth/authenticate'
-
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
-
+    def test_twitter_callback_failures(self):
         res = self.testapp.get('/twitter/callback', status=400)
         self.assertEqual(res.status, '400 Bad Request')
         res.mustcontain('Missing required oauth_token')
@@ -111,75 +107,129 @@ class ViewTests(testing.TestCase):
             self.assertEqual(res.status, '401 Unauthorized')
             res.mustcontain('Invalid token')
 
+    @mock.patch('requests.get')
+    @mock.patch('requests.post')
+    def test_twitter_callback_new_user(self, post_mock, get_mock):
         # good request, twitter is happy now. New user
-        with patch('requests.post') as fake:
-            response = fake.return_value
-            response.status_code = 200
-            response.text = 'oauth_callback_confirmed=true&oauth_token=123456789'
-            self.testapp.get('/twitter/login')
+        mock0 = mock.Mock()
+        mock0.status_code = 200
+        mock0.text = 'oauth_callback_confirmed=true&oauth_token=123456789'
 
-            response = fake.return_value
-            response.status_code = 200
-            response.text = 'oauth_token=xyz&user_id=user1&screen_name=JohnDoe'
+        mock1 = mock.Mock()
+        mock1.status_code = 200
+        mock1.text = 'oauth_token=xyz&user_id=user1&screen_name=JohnDoe'
 
-            with patch('requests.get') as fake2:
-                response2 = fake2.return_value
-                response2.status_code = 200
-                response2.json = lambda: {'name': 'John Doe'}
+        mock2 = mock.Mock()
+        mock2.ok = True
+        mock2.json = lambda: {
+            'token_type': 'bearer',
+            'access_token': '1234567890',
+        }
 
-                res = self.testapp.get(good_url, status=302)
-                self.assertEqual(res.status, '302 Found')
-                self.assertEqual(res.location, 'http://localhost/register')
+        post_mock.side_effect = [mock0, mock1, mock2]
 
+        get_response = get_mock.return_value
+        get_response.ok = True
+        get_response.json = lambda: {
+            'name': 'John Doe',
+        }
+
+        self.testapp.get('/twitter/login')
+
+        good_url = '/twitter/callback?oauth_token=123456789&oauth_verifier=abc'
+        res = self.testapp.get(good_url, status=302)
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/register')
+
+    @mock.patch('requests.get')
+    @mock.patch('requests.post')
+    def test_twitter_callback_existing_user(self, post_mock, get_mock):
         # good request, twitter is happy now. Existing user
+        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
+
         user_id = self.db.users.insert({
-                'twitter_id': 'user1',
-                'screen_name': 'Johnny',
-                })
-        with patch('requests.post') as fake:
-            response = fake.return_value
-            response.status_code = 200
-            response.text = 'oauth_callback_confirmed=true&oauth_token=123456789'
-            self.testapp.get('/twitter/login')
+            'twitter_id': 'user1',
+            'screen_name': 'Johnny',
+        })
 
-            response = fake.return_value
-            response.status_code = 200
-            response.text = 'oauth_token=xyz&user_id=user1&screen_name=JohnDoe'
+        mock0 = mock.Mock()
+        mock0.status_code = 200
+        mock0.text = 'oauth_callback_confirmed=true&oauth_token=123456789'
 
-            with patch('requests.get') as fake2:
-                response2 = fake2.return_value
-                response2.status_code = 200
-                response2.json = lambda: {'name': 'John Doe'}
+        mock1 = mock.Mock()
+        mock1.status_code = 200
+        mock1.text = 'oauth_token=xyz&user_id=user1&screen_name=JohnDoe'
 
-                res = self.testapp.get(good_url, status=302)
-                self.assertEqual(res.status, '302 Found')
-                self.assertEqual(res.location, 'http://localhost/')
-                self.assertTrue('Set-Cookie' in res.headers)
+        mock2 = mock.Mock()
+        mock2.ok = True
+        mock2.json = lambda: {
+            'token_type': 'bearer',
+            'access_token': '1234567890',
+        }
 
-                # even if the response from twitter included a different
-                # screen_name, our user will not be updated
-                new_user = self.db.users.find_one({'_id': user_id})
-                self.assertEqual(new_user['screen_name'], 'Johnny')
+        post_mock.side_effect = [mock0, mock1, mock2]
 
+        get_response = get_mock.return_value
+        get_response.ok = True
+        get_response.json = lambda: {
+            'name': 'John Doe',
+        }
+
+        self.testapp.get('/twitter/login')
+
+        good_url = '/twitter/callback?oauth_token=123456789&oauth_verifier=abc'
+        res = self.testapp.get(good_url, status=302)
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/')
+        self.assertTrue('Set-Cookie' in res.headers)
+
+        # even if the response from twitter included a different
+        # screen_name, our user will not be updated
+        new_user = self.db.users.find_one({'_id': user_id})
+        self.assertEqual(new_user['screen_name'], 'Johnny')
+
+        del os.environ['YITH_FAKE_DATETIME']
+
+    @mock.patch('requests.get')
+    @mock.patch('requests.post')
+    def test_twitter_callback_existing_user_remember_url(self, post_mock, get_mock):
         # good request, existing user, remember next_url
-        with patch('requests.post') as fake:
-            response = fake.return_value
-            response.status_code = 200
-            response.text = 'oauth_callback_confirmed=true&oauth_token=123456789'
-            self.testapp.get('/twitter/login?next_url=http://localhost/foo/bar')
+        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
 
-            response = fake.return_value
-            response.status_code = 200
-            response.text = 'oauth_token=xyz&user_id=user1&screen_name=JohnDoe'
+        self.db.users.insert({
+            'twitter_id': 'user1',
+            'screen_name': 'Johnny',
+        })
 
-            with patch('requests.get') as fake2:
-                response2 = fake2.return_value
-                response2.status_code = 200
-                response2.json = lambda: {'name': 'John Doe'}
+        mock0 = mock.Mock()
+        mock0.status_code = 200
+        mock0.text = 'oauth_callback_confirmed=true&oauth_token=123456789'
 
-                res = self.testapp.get(good_url, status=302)
-                self.assertEqual(res.status, '302 Found')
-                self.assertEqual(res.location, 'http://localhost/foo/bar')
-                self.assertTrue('Set-Cookie' in res.headers)
+        mock1 = mock.Mock()
+        mock1.status_code = 200
+        mock1.text = 'oauth_token=xyz&user_id=user1&screen_name=JohnDoe'
+
+        mock2 = mock.Mock()
+        mock2.ok = True
+        mock2.json = lambda: {
+            'token_type': 'bearer',
+            'access_token': '1234567890',
+        }
+
+        post_mock.side_effect = [mock0, mock1, mock2]
+
+        get_response = get_mock.return_value
+        get_response.ok = True
+        get_response.json = lambda: {
+            'name': 'John Doe',
+        }
+
+        self.testapp.get('/twitter/login?next_url=http://localhost/foo/bar')
+
+        good_url = '/twitter/callback?oauth_token=123456789&oauth_verifier=abc'
+        res = self.testapp.get(good_url, status=302)
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/foo/bar')
+        self.assertTrue('Set-Cookie' in res.headers)
 
         del os.environ['YITH_FAKE_DATETIME']
