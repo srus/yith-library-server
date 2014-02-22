@@ -211,39 +211,56 @@ def developer_application_delete(request):
              renderer='templates/application_authorization.pt',
              permission='add-authorized-app')
 def authorization_endpoint(request):
-
     validator = RequestValidator(request.db, request.datetime_service)
     server = Server(validator)
+    authorizator = Authorizator(request.db)
 
     uri, http_method, body, headers = extract_params(request)
+
+    def authorization_response(scopes, credentials, store=False):
+        try:
+            r_headers, r_body, r_status = server.create_authorization_response(
+                uri, http_method, body, headers, scopes, credentials,
+            )
+            if store:
+                authorizator.store_user_authorization(scopes, credentials)
+            return create_response(r_status, r_headers, r_body)
+        except FatalClientError as e:
+            return response_from_error(e)
+        except OAuth2Error as e:
+            return HTTPFound(e.in_uri(redirect_uri))
 
     if request.method == 'GET':
         try:
             scopes, credentials = server.validate_authorization_request(
                 uri, http_method, body, headers,
             )
+            credentials['user'] = request.user
 
-            app = validator.get_client(credentials['client_id'])
-            authorship_information = ''
-            owner_id = app._client.get('owner', None)
-            if owner_id is not None:
-                owner = request.db.users.find_one({'_id': owner_id})
-                if owner:
-                    email = owner.get('email', None)
-                    if email:
-                        authorship_information = _('By ${owner}',
-                                                   mapping={'owner': email})
+            if authorizator.is_app_authorized(scopes, credentials):
+                return authorization_response(scopes, credentials)
+            else:
+                app = validator.get_client(credentials['client_id'])
+                authorship_information = ''
+                owner_id = app._client.get('owner', None)
+                if owner_id is not None:
+                    owner = request.db.users.find_one({'_id': owner_id})
+                    if owner:
+                        email = owner.get('email', None)
+                        if email:
+                            authorship_information = _('By ${owner}',
+                                                       mapping={'owner': email})
 
-            pretty_scopes = validator.get_pretty_scopes(scopes)
-            return {
-                'response_type': credentials['response_type'],
-                'client_id': credentials['client_id'],
-                'redirect_uri': credentials['redirect_uri'],
-                'state': credentials['state'],
-                'scope': ' '.join(scopes),
-                'app': app._client,
-                'scopes': pretty_scopes,
-                'authorship_information': authorship_information,
+                pretty_scopes = validator.get_pretty_scopes(scopes)
+                return {
+                    'response_type': credentials['response_type'],
+                    'client_id': credentials['client_id'],
+                    'redirect_uri': credentials['redirect_uri'],
+                    'state': credentials['state'],
+                    'scope': ' '.join(scopes),
+                    'app': app._client,
+                    'scopes': pretty_scopes,
+                    'authorship_information': authorship_information,
                 }
         except FatalClientError as e:
             return response_from_error(e)
@@ -263,16 +280,7 @@ def authorization_endpoint(request):
                 'state': request.POST.get('state', None),
                 'user': request.user,
             }
-            try:
-                headers, body, status = server.create_authorization_response(
-                    uri, http_method, body, headers, scopes, credentials,
-                )
-                return create_response(status, headers, body)
-            except FatalClientError as e:
-                return response_from_error(e)
-            except OAuth2Error as e:
-                return HTTPFound(e.in_uri(redirect_uri))
-
+            return authorization_response(scopes, credentials, store=True)
         elif 'cancel' in request.POST:
             e = AccessDeniedError()
             return HTTPFound(e.in_uri(redirect_uri))
@@ -300,8 +308,14 @@ def token_endpoint(request):
              permission='view-applications')
 def authorized_applications(request):
     assert_authenticated_user_is_registered(request)
-    authorized_apps_filter = {'_id': {'$in': request.user['authorized_apps']}}
-    authorized_apps = request.db.applications.find(authorized_apps_filter)
+    authorizator = Authorizator(request.db)
+    authorized_apps = []
+    for authorization in authorizator.get_user_authorizations(request.user):
+        app = request.db.applications.find_one({
+            'client_id': authorization['client_id'],
+        })
+        if app is not None:
+            authorized_apps.append(app)
     return {'authorized_apps': authorized_apps}
 
 
@@ -320,13 +334,10 @@ def revoke_application(request):
     if app is None:
         return HTTPNotFound()
 
-    authorizator = Authorizator(request.db, app)
-
-    if not authorizator.is_app_authorized(request.user):
-        return HTTPUnauthorized()
+    authorizator = Authorizator(request.db)
 
     if 'submit' in request.POST:
-        authorizator.remove_user_authorization(request.user)
+        authorizator.remove_user_authorization(request.user, app['client_id'])
 
         request.session.flash(
             _('The access to application ${app} has been revoked',

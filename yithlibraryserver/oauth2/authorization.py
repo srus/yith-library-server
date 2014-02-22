@@ -18,8 +18,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-import uuid
-
 from oauthlib.oauth2 import Server
 
 from pyramid.httpexceptions import HTTPUnauthorized
@@ -28,86 +26,37 @@ from yithlibraryserver.oauth2.utils import extract_params
 from yithlibraryserver.oauth2.validator import RequestValidator
 
 
-class Codes(object):
-
-    collection_name = ''
+class Authorizator(object):
 
     def __init__(self, db):
         self.db = db
-        self.collection = self.db[self.collection_name]
 
-    def create(self, user_id, **kwargs):
-        code = str(uuid.uuid4())
+    def _get_record(self, scopes, credentials):
+        return {
+            'client_id': credentials['client_id'],
+            'user': credentials['user']['_id'],
+            'redirect_uri': credentials['redirect_uri'],
+            'response_type': credentials['response_type'],
+            'scope': ' '.join(scopes),
+        }
 
-        new_obj = {
-            'code': code,
-            'user': user_id,
-            }
-        new_obj.update(kwargs)
+    def is_app_authorized(self, scopes, credentials):
+        record = self._get_record(scopes, credentials)
+        return self.db.authorized_apps.find_one(record) is not None
 
-        old_obj = dict(kwargs)  # make a copy
-        old_obj['user'] = user_id
+    def store_user_authorization(self, scopes, credentials):
+        record = self._get_record(scopes, credentials)
+        self.db.authorized_apps.remove(record)
+        self.db.authorized_apps.insert(record)
 
-        self.collection.remove(old_obj)
-        self.collection.insert(new_obj)
+    def get_user_authorizations(self, user):
+        return self.db.authorized_apps.find({'user': user['_id']})
 
-        return code
-
-    def find(self, code):
-        return self.collection.find_one({'code': code})
-
-    def remove(self, code_obj):
-        self.collection.remove(code_obj)
-
-
-class AuthorizationCodes(Codes):
-
-    collection_name = 'authorization_codes'
-
-    def get_redirect_url(self, code, uri, state=None):
-        parameters = ['code=%s' % code]
-        if state:
-            parameters.append('state=%s' % state)
-        return '%s?%s' % (uri, '&'.join(parameters))
-
-    def create(self, user_id, client_id, scope):
-        return super(AuthorizationCodes, self).create(user_id,
-                                                      scope=scope,
-                                                      client_id=client_id)
-
-
-class AccessCodes(Codes):
-
-    collection_name = 'access_codes'
-
-    def create(self, user_id, grant):
-        return super(AccessCodes, self).create(user_id,
-                                               scope=grant['scope'],
-                                               client_id=grant['client_id'])
-
-
-class Authorizator(object):
-
-    def __init__(self, db, app):
-        self.db = db
-        self.app = app
-        self.auth_codes = AuthorizationCodes(db)
-        self.access_codes = AccessCodes(db)
-
-    def is_app_authorized(self, user):
-        return self.app['_id'] in user['authorized_apps']
-
-    def store_user_authorization(self, user):
-        self.db.users.update(
-            {'_id': user['_id']},
-            {'$addToSet': {'authorized_apps': self.app['_id']}},
-            )
-
-    def remove_user_authorization(self, user):
-        self.db.users.update(
-            {'_id': user['_id']},
-            {'$pull': {'authorized_apps': self.app['_id']}},
-            )
+    def remove_user_authorization(self, user, client_id):
+        self.db.authorized_apps.remove({
+            'client_id': client_id,
+            'user': user['_id'],
+        })
 
 
 def verify_request(request, scopes):
