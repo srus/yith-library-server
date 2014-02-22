@@ -19,77 +19,235 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 from yithlibraryserver import testing
-from yithlibraryserver.oauth2.authorization import AuthorizationCodes
-from yithlibraryserver.oauth2.authorization import AccessCodes
 from yithlibraryserver.oauth2.authorization import Authorizator
 
 
 class AuthorizationTests(testing.TestCase):
 
-    clean_collections = ('authorization_codes', 'access_codes', 'users')
+    clean_collections = ('authorized_apps', 'users')
 
-    def test_authorization_codes(self):
-        codes = AuthorizationCodes(self.db)
-        url = codes.get_redirect_url('1234', 'http://example.com', 'test')
-        self.assertEqual(url, 'http://example.com?code=1234&state=test')
-        url = codes.get_redirect_url('1234', 'http://example.com')
-        self.assertEqual(url, 'http://example.com?code=1234')
+    def setUp(self):
+        super(AuthorizationTests, self).setUp()
+        self.authorizator = Authorizator(self.db)
 
-        self.assertEqual(self.db.authorization_codes.count(), 0)
-        code1 = codes.create('user1', 'client1', 'passwords')
-        self.assertEqual(self.db.authorization_codes.count(), 1)
+    def test_is_app_authorized_no_authorized_apps(self):
+        self.assertFalse(self.authorizator.is_app_authorized([
+            'scope1', 'scope2',
+        ], {
+            'client_id': 1,
+            'user': {'_id': 1},
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+        }))
 
-        # creating a code with same arguments replace the old one
-        code2 = codes.create('user1', 'client1', 'passwords')
-        self.assertEqual(self.db.authorization_codes.count(), 1)
+    def test_is_app_authorized_different_client_id(self):
+        self.db.authorized_apps.insert({
+            'client_id': 1,
+            'user': 1,
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+            'scope': 'scope1 scope2',
+        })
+        self.assertFalse(self.authorizator.is_app_authorized([
+            'scope1', 'scope2',
+        ], {
+            'client_id': 2,
+            'user': {'_id': 1},
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+        }))
 
-        self.assertNotEqual(code1, code2)
+    def test_is_app_authorized_different_user(self):
+        self.db.authorized_apps.insert({
+            'client_id': 1,
+            'user': 1,
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+            'scope': 'scope1 scope2',
+        })
+        self.assertFalse(self.authorizator.is_app_authorized([
+            'scope1', 'scope2',
+        ], {
+            'client_id': 1,
+            'user': {'_id': 2},
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+        }))
 
-        self.assertNotEqual(None, codes.find(code2))
-        self.assertEqual(None, codes.find(code1))
+    def test_is_app_authorized_different_redirect_uri(self):
+        self.db.authorized_apps.insert({
+            'client_id': 1,
+            'user': 1,
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+            'scope': 'scope1 scope2',
+        })
+        self.assertFalse(self.authorizator.is_app_authorized([
+            'scope1', 'scope2',
+        ], {
+            'client_id': 1,
+            'user': {'_id': 1},
+            'redirect_uri': 'http://example.com/callback-new',
+            'response_type': 'code',
+        }))
 
-        codes.remove(codes.find(code1))
-        self.assertEqual(self.db.authorization_codes.count(), 0)
+    def test_is_app_authorized_different_response_type(self):
+        self.db.authorized_apps.insert({
+            'client_id': 1,
+            'user': 1,
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+            'scope': 'scope1 scope2',
+        })
+        self.assertFalse(self.authorizator.is_app_authorized([
+            'scope1', 'scope2',
+        ], {
+            'client_id': 1,
+            'user': {'_id': 1},
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'token',
+        }))
 
-    def test_access_codes(self):
-        codes = AccessCodes(self.db)
-        self.assertEqual(self.db.access_codes.count(), 0)
-        grant = {'scope': 'passwords', 'client_id': 'client1'}
-        code1 = codes.create('user1', grant)
-        self.assertEqual(self.db.access_codes.count(), 1)
+    def test_is_app_authorized_different_scopes(self):
+        self.db.authorized_apps.insert({
+            'client_id': 1,
+            'user': 1,
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+            'scope': 'scope1 scope2',
+        })
+        self.assertFalse(self.authorizator.is_app_authorized([
+            'scope1', 'scope2', 'scope3',
+        ], {
+            'client_id': 1,
+            'user': {'_id': 1},
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+        }))
 
-        # creating a code with same arguments replace the old one
-        code2 = codes.create('user1', grant)
-        self.assertEqual(self.db.access_codes.count(), 1)
+    def test_is_app_authorized_everything_equal(self):
+        self.db.authorized_apps.insert({
+            'client_id': 1,
+            'user': 1,
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+            'scope': 'scope1 scope2',
+        })
+        self.assertTrue(self.authorizator.is_app_authorized([
+            'scope1', 'scope2',
+        ], {
+            'client_id': 1,
+            'user': {'_id': 1},
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+        }))
 
-        self.assertNotEqual(code1, code2)
+    def test_store_user_authorization_no_previous_authorization(self):
+        self.assertEqual(self.db.authorized_apps.count(), 0)
+        self.authorizator.store_user_authorization([
+            'scope1', 'scope2',
+        ], {
+            'client_id': 1,
+            'user': {'_id': 1},
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+        })
+        self.assertEqual(self.db.authorized_apps.count(), 1)
 
-        self.assertNotEqual(None, codes.find(code2))
-        self.assertEqual(None, codes.find(code1))
+    def test_store_user_authorization_previous_authorization(self):
+        self.assertEqual(self.db.authorized_apps.count(), 0)
+        self.authorizator.store_user_authorization([
+            'scope1', 'scope2',
+        ], {
+            'client_id': 1,
+            'user': {'_id': 1},
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+        })
+        self.assertEqual(self.db.authorized_apps.count(), 1)
 
-        codes.remove(codes.find(code1))
-        self.assertEqual(self.db.access_codes.count(), 0)
+        # Store the same authorization again
+        self.authorizator.store_user_authorization([
+            'scope1', 'scope2',
+        ], {
+            'client_id': 1,
+            'user': {'_id': 1},
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+        })
+        # still only one record
+        self.assertEqual(self.db.authorized_apps.count(), 1)
 
-    def test_authorizator(self):
-        app = {'_id': 'app1'}
-        authorizator = Authorizator(self.db, app)
-        self.assertTrue(isinstance(authorizator.auth_codes,
-                                   AuthorizationCodes))
-        self.assertTrue(isinstance(authorizator.access_codes,
-                                   AccessCodes))
-        user = {'name': 'John Doe', 'authorized_apps': []}
-        self.db.users.insert(user)
+    def test_get_user_authorizations_empty(self):
+        auths = self.authorizator.get_user_authorizations({'_id': 1})
+        self.assertEqual(auths.count(), 0)
 
-        self.assertFalse(authorizator.is_app_authorized(user))
+    def test_get_user_authorizations_one_authorization(self):
+        self.authorizator.store_user_authorization([
+            'scope1', 'scope2',
+        ], {
+            'client_id': 1,
+            'user': {'_id': 1},
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+        })
+        auths = self.authorizator.get_user_authorizations({'_id': 1})
+        self.assertEqual(auths.count(), 1)
+        self.assertEqual(auths[0]['client_id'], 1)
+        self.assertEqual(auths[0]['redirect_uri'], 'http://example.com/callback')
+        self.assertEqual(auths[0]['response_type'], 'code')
+        self.assertEqual(auths[0]['scope'], 'scope1 scope2')
 
-        authorizator.store_user_authorization(user)
-        user = self.db.users.find_one({'name': 'John Doe'})
+    def test_get_user_authorizations_two_authorization(self):
+        self.authorizator.store_user_authorization([
+            'scope1', 'scope2',
+        ], {
+            'client_id': 1,
+            'user': {'_id': 1},
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+        })
+        self.authorizator.store_user_authorization([
+            'scope1', 'scope2',
+        ], {
+            'client_id': 2,
+            'user': {'_id': 1},
+            'redirect_uri': 'http://example.com/callback2',
+            'response_type': 'code',
+        })
+        self.authorizator.store_user_authorization([
+            'scope1', 'scope2',
+        ], {
+            'client_id': 2,
+            'user': {'_id': 2},
+            'redirect_uri': 'http://example.com/callback2',
+            'response_type': 'code',
+        })
+        auths = self.authorizator.get_user_authorizations({'_id': 1})
+        self.assertEqual(auths.count(), 2)
+        self.assertEqual(auths[0]['client_id'], 1)
+        self.assertEqual(auths[0]['redirect_uri'], 'http://example.com/callback')
+        self.assertEqual(auths[0]['response_type'], 'code')
+        self.assertEqual(auths[0]['scope'], 'scope1 scope2')
 
-        self.assertTrue(authorizator.is_app_authorized(user))
-        self.assertEqual(user['authorized_apps'], ['app1'])
+        self.assertEqual(auths[1]['client_id'], 2)
+        self.assertEqual(auths[1]['redirect_uri'], 'http://example.com/callback2')
+        self.assertEqual(auths[1]['response_type'], 'code')
+        self.assertEqual(auths[1]['scope'], 'scope1 scope2')
 
-        authorizator.remove_user_authorization(user)
-        user = self.db.users.find_one({'name': 'John Doe'})
-
-        self.assertFalse(authorizator.is_app_authorized(user))
-        self.assertFalse('app1' in user['authorized_apps'])
+    def test_remove_user_authorization(self):
+        auths = self.authorizator.get_user_authorizations({'_id': 1})
+        self.assertEqual(auths.count(), 0)
+        self.authorizator.store_user_authorization([
+            'scope1', 'scope2',
+        ], {
+            'client_id': 1,
+            'user': {'_id': 1},
+            'redirect_uri': 'http://example.com/callback',
+            'response_type': 'code',
+        })
+        auths = self.authorizator.get_user_authorizations({'_id': 1})
+        self.assertEqual(auths.count(), 1)
+        self.authorizator.remove_user_authorization({'_id': 1}, 1)
+        auths = self.authorizator.get_user_authorizations({'_id': 1})
+        self.assertEqual(auths.count(), 0)
