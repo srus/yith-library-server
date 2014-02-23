@@ -43,7 +43,7 @@ def create_response(status, headers, body):
 
 def response_from_error(error):
     msg = 'Evil client is unable to send a proper request. Error is: '
-    return HTTPBadRequest(msg + error.description)
+    return HTTPBadRequest(msg + error.error)
 
 
 def to_bytes(text, encoding='utf-8'):

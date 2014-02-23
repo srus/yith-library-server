@@ -18,25 +18,32 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
+
 import bson
 
 from yithlibraryserver import testing
-from yithlibraryserver.oauth2.views import DEFAULT_SCOPE
-from yithlibraryserver.oauth2.authentication import auth_basic_encode
+from yithlibraryserver.compat import encodebytes, encode_header, urlparse
+from yithlibraryserver.oauth2.authorization import Authorizator
 
 
-class ViewTests(testing.TestCase):
+def auth_basic_encode(user, password):
+    value = '%s:%s' % (user, password)
+    value = 'Basic ' + encodebytes(value.encode('utf-8')).decode('utf-8')
+    return encode_header(value)
 
-    clean_collections = ('applications', 'users', 'authorization_codes',
-                         'access_codes')
 
-    def test_authorization_endpoint(self):
-        # this view required authentication
+class AuthorizationEndpointTests(testing.TestCase):
+
+    clean_collections = ('applications', 'users', 'authorization_codes')
+
+    def test_anonymous_user(self):
+        # this view requires authentication
         res = self.testapp.get('/oauth2/endpoints/authorization')
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Log in')
 
-        # Log in
+    def _login(self):
         user_id = self.db.users.insert({
                 'twitter_id': 'twitter1',
                 'screen_name': 'John Doe',
@@ -46,40 +53,15 @@ class ViewTests(testing.TestCase):
                 'authorized_apps': [],
                 })
         self.testapp.get('/__login/' + str(user_id))
+        return user_id
 
-        # 1. test incorrect requests
-        res = self.testapp.get('/oauth2/endpoints/authorization',
-                               status=400)
-        self.assertEqual(res.status, '400 Bad Request')
-        res.mustcontain('Missing required response_type')
-
-        res = self.testapp.get('/oauth2/endpoints/authorization', {
-                'response_type': 'token',
-                }, status=501)
-
-        self.assertEqual(res.status, '501 Not Implemented')
-        res.mustcontain('Only code is supported')
-
-        res = self.testapp.get('/oauth2/endpoints/authorization', {
-                'response_type': 'code',
-                }, status=400)
-        self.assertEqual(res.status, '400 Bad Request')
-        res.mustcontain('Missing required client_type')
-
-        res = self.testapp.get('/oauth2/endpoints/authorization', {
-                'response_type': 'code',
-                'client_id': '1234',
-                }, status=404)
-        self.assertEqual(res.status, '404 Not Found')
-
-        # create a valid app
+    def _create_client(self):
         owner_id = self.db.users.insert({
                 'twitter_id': 'twitter2',
                 'screen_name': 'Administrator',
                 'first_name': 'Alice',
                 'last_name': 'Doe',
                 'email': 'alice@example.com',
-                'authorized_apps': [],
                 })
         app_id = self.db.applications.insert({
                 'owner': owner_id,
@@ -90,81 +72,183 @@ class ViewTests(testing.TestCase):
                 'image_url': 'https://example.com/logo.png',
                 'description': 'Example description',
                 })
+        return owner_id, app_id
 
-        res = self.testapp.get('/oauth2/endpoints/authorization', {
-                'response_type': 'code',
-                'client_id': '123456',
-                'redirect_uri': 'https://example.com/bad-callback',
-                }, status=400)
+    def test_no_client_id(self):
+        self._login()
+        res = self.testapp.get('/oauth2/endpoints/authorization',
+                               status=400)
         self.assertEqual(res.status, '400 Bad Request')
-        res.mustcontain('Redirect URI does not match registered callback URL')
+        res.mustcontain('Error is: invalid_client_id')
 
-        # 2. Valid requests
-        # simulate a cancel action
+    def test_invalid_client_id(self):
+        self._login()
         res = self.testapp.get('/oauth2/endpoints/authorization', {
-                'response_type': 'code',
-                'client_id': '123456',
-                'redirect_uri': 'https://example.com/callback',
-                })
+            'client_id': '1234',
+        }, status=400)
+        self.assertEqual(res.status, '400 Bad Request')
+        res.mustcontain('Error is: invalid_client_id')
+
+    def _assert_error(self, url, error, description=None):
+        query = urlparse.parse_qs(urlparse.urlparse(url).query)
+        expected = {'error': [error]}
+        if description:
+            expected['error_description'] = [description]
+
+        self.assertEqual(query, expected)
+
+    def test_no_response_type(self):
+        self._login()
+        self._create_client()
+        res = self.testapp.get('/oauth2/endpoints/authorization', {
+            'client_id': '123456',
+        }, status=302)
+        self.assertEqual(res.status, '302 Found')
+        self._assert_error(res.location, 'invalid_request',
+                           'Missing response_type parameter.')
+
+    def test_invalid_redirect_callback(self):
+        self._login()
+        self._create_client()
+        res = self.testapp.get('/oauth2/endpoints/authorization', {
+            'client_id': '123456',
+            'response_type': 'code',
+            'redirect_uri': 'https://example.com/bad-callback',
+        }, status=400)
+        self.assertEqual(res.status, '400 Bad Request')
+        res.mustcontain('Error is: mismatching_redirect_uri')
+
+    def test_user_cancel(self):
+        self._login()
+        self._create_client()
+        res = self.testapp.get('/oauth2/endpoints/authorization', {
+            'client_id': '123456',
+            'response_type': 'code',
+            'redirect_uri': 'https://example.com/callback',
+        })
         self.assertEqual(res.status, '200 OK')
 
         res = self.testapp.post('/oauth2/endpoints/authorization', {
-                'cancel': 'No thanks',
-                'response_type': 'code',
-                'client_id': '123456',
-                'redirect_uri': 'https://example.com/callback',
-                })
+            'cancel': 'No thanks',
+            'response_type': 'code',
+            'client_id': '123456',
+            'redirect_uri': 'https://example.com/callback',
+            'scope': 'read-passwords',
+        })
         self.assertEqual(res.status, '302 Found')
-        self.assertEqual(res.location, 'https://example.com')
+        self.assertEqual(res.location,
+                         'https://example.com/callback?error=access_denied')
 
-        # authenticated user who hasn't authorized the app
+    def test_non_authorized_app_yet(self):
+        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
+
+        user_id = self._login()
+        self._create_client()
+
+        authorizator = Authorizator(self.db)
+        auths = authorizator.get_user_authorizations({'_id': user_id})
+        self.assertEqual(auths.count(), 0)
+
         res = self.testapp.get('/oauth2/endpoints/authorization', {
-                'response_type': 'code',
-                'client_id': '123456',
-                'redirect_uri': 'https://example.com/callback',
-                })
+            'response_type': 'code',
+            'client_id': '123456',
+            'redirect_uri': 'https://example.com/callback',
+        })
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('is asking your permission for')
         res.mustcontain('Allow access')
         res.mustcontain('No, thanks')
 
         res = self.testapp.post('/oauth2/endpoints/authorization', {
-                'submit': 'Authorize',
-                'response_type': 'code',
-                'client_id': '123456',
-                'redirect_uri': 'https://example.com/callback',
-                })
+            'submit': 'Authorize',
+            'response_type': 'code',
+            'client_id': '123456',
+            'redirect_uri': 'https://example.com/callback',
+            'scope': 'read-passwords',
+        })
         self.assertEqual(res.status, '302 Found')
-        user = self.db.users.find_one({'_id': user_id})
-        self.assertEqual(user['authorized_apps'], [app_id])
+
+        # Check that the app is authorized now
+        auths = authorizator.get_user_authorizations({'_id': user_id})
+        self.assertEqual(auths.count(), 1)
+        auth = auths[0]
+        self.assertEqual(auth['redirect_uri'], 'https://example.com/callback')
+        self.assertEqual(auth['response_type'], 'code')
+        self.assertEqual(auth['client_id'], '123456')
+        self.assertEqual(auth['scope'], 'read-passwords')
+        self.assertEqual(auth['user'], user_id)
+
+        # Check the right redirect url
         grant = self.db.authorization_codes.find_one({
-                'scope': DEFAULT_SCOPE,
-                'client_id': '123456',
-                'user': user_id,
-                })
+            'client_id': '123456',
+            'user': user_id,
+        })
         self.assertNotEqual(grant, None)
         code = grant['code']
         location = 'https://example.com/callback?code=%s' % code
         self.assertEqual(res.location, location)
 
-        # authenticate user who has already authorize the app
+        del os.environ['YITH_FAKE_DATETIME']
+
+    def test_already_authorized_app(self):
+        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
+
+        user_id = self._login()
+        self._create_client()
+
+        authorizator = Authorizator(self.db)
+        auths = authorizator.get_user_authorizations({'_id': user_id})
+        self.assertEqual(auths.count(), 0)
+
+        # do an initial authorization
         res = self.testapp.get('/oauth2/endpoints/authorization', {
-                'response_type': 'code',
-                'client_id': '123456',
-                'redirect_uri': 'https://example.com/callback',
-                })
+            'response_type': 'code',
+            'client_id': '123456',
+            'redirect_uri': 'https://example.com/callback',
+        })
+        self.assertEqual(res.status, '200 OK')
+
+        res = self.testapp.post('/oauth2/endpoints/authorization', {
+            'submit': 'Authorize',
+            'response_type': 'code',
+            'client_id': '123456',
+            'redirect_uri': 'https://example.com/callback',
+            'scope': 'read-passwords',
+        })
         self.assertEqual(res.status, '302 Found')
-        new_grant = self.db.authorization_codes.find_one({
-                'scope': DEFAULT_SCOPE,
-                'client_id': '123456',
-                'user': user_id,
-                })
-        self.assertNotEqual(new_grant, None)
-        self.assertNotEqual(new_grant['_id'], grant['_id'])
-        self.assertNotEqual(new_grant['code'], grant['code'])
-        code = new_grant['code']
+
+        auths = authorizator.get_user_authorizations({'_id': user_id})
+        self.assertEqual(auths.count(), 1)
+
+        # Now do a second authorization
+        res = self.testapp.get('/oauth2/endpoints/authorization', {
+            'response_type': 'code',
+            'client_id': '123456',
+            'redirect_uri': 'https://example.com/callback',
+        })
+        self.assertEqual(res.status, '302 Found')
+
+        auths = authorizator.get_user_authorizations({'_id': user_id})
+        self.assertEqual(auths.count(), 1)
+
+        grants = self.db.authorization_codes.find({
+            'client_id': '123456',
+            'user': user_id,
+        })
+
+        # There are two grants now
+        self.assertEqual(grants.count(), 2)
+        code = grants[1]['code']
         location = 'https://example.com/callback?code=%s' % code
         self.assertEqual(res.location, location)
+
+        del os.environ['YITH_FAKE_DATETIME']
+
+
+class ViewTests(object):
+
+    clean_collections = ('applications', 'users', 'authorization_codes',
+                         'access_codes')
 
     def test_token_endpoint(self):
         # 1. test incorrect requests
@@ -227,7 +311,6 @@ class ViewTests(testing.TestCase):
                 })
         self.assertEqual(res.status, '302 Found')
         grant = self.db.authorization_codes.find_one({
-                'scope': DEFAULT_SCOPE,
                 'client_id': '123456',
                 'user': user_id,
                 })
@@ -245,7 +328,6 @@ class ViewTests(testing.TestCase):
 
         # the grant code should be removed
         grant = self.db.authorization_codes.find_one({
-                'scope': DEFAULT_SCOPE,
                 'client_id': '123456',
                 'user': user_id,
                 })
@@ -254,7 +336,6 @@ class ViewTests(testing.TestCase):
         # and an access token should be created
         self.assertEqual(res.json['token_type'], 'bearer')
         self.assertEqual(res.json['expires_in'], 3600)
-        self.assertEqual(res.json['scope'], DEFAULT_SCOPE)
 
         access_code = self.db.access_codes.find_one({
                 'code': res.json['access_code'],
@@ -292,7 +373,6 @@ class ViewTests(testing.TestCase):
                 'client_id': '123456',
                 })
         grant = self.db.authorization_codes.find_one({
-                'scope': DEFAULT_SCOPE,
                 'client_id': '123456',
                 'user': user_id,
                 })

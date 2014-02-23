@@ -66,7 +66,7 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
 
     def validate_client_id(self, client_id, request, *args, **kwargs):
         """Simple validity check, does client exist? Not banned?"""
-        client = self.get_client(client_id) is not None
+        client = self.get_client(client_id)
         return client is not None
 
     def validate_redirect_uri(self, client_id, redirect_uri, request, *args, **kwargs):
