@@ -21,6 +21,8 @@
 import datetime
 import os
 
+from bson.tz_util import utc
+
 from deform import ValidationFailure
 
 from mock import patch
@@ -740,30 +742,23 @@ class RESTViewTests(TestCase):
         super(RESTViewTests, self).setUp()
 
         self.access_code = '1234'
-        self.auth_header = {'Authorization': 'Bearer %s' % self.access_code}
         date = datetime.datetime(2012, 12, 12, 12, 12)
         self.user_id = self.db.users.insert({
-                'provider_user_id': 'user1',
-                'screen_name': 'John Doe',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                'email_verified': True,
-                'allow_google_analytics': True,
-                'authorized_apps': [],
-                'date_joined': date,
-                'last_login': date,
-                })
+            'provider_user_id': 'user1',
+            'screen_name': 'John Doe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+            'email_verified': True,
+            'allow_google_analytics': True,
+            'authorized_apps': [],
+            'date_joined': date,
+            'last_login': date,
+        })
         self.db.applications.insert({
-                'name': 'test-app',
-                'client_id': 'client1',
-                })
-        self.db.access_codes.insert({
-                'code': self.access_code,
-                'scope': None,
-                'user': self.user_id,
-                'client_id': 'client1',
-                })
+            'name': 'test-app',
+            'client_id': 'client1',
+        })
 
     def test_user_options(self):
         res = self.testapp.options('/user')
@@ -775,7 +770,21 @@ class RESTViewTests(TestCase):
                          'Origin, Content-Type, Accept, Authorization')
 
     def test_user_get(self):
-        res = self.testapp.get('/user', headers=self.auth_header)
+        os.environ['YITH_FAKE_DATETIME'] = '2014-2-23-08-00-00'
+        expiration = datetime.datetime(2014, 2, 23, 9, 0, tzinfo=utc)
+
+        self.db.access_codes.insert({
+            'access_token': self.access_code,
+            'type': 'Bearer',
+            'expiration': expiration,
+            'user_id': self.user_id,
+            'scope': 'read-userinfo',
+            'client_id': 'client1',
+        })
+
+        auth_header = {'Authorization': 'Bearer %s' % self.access_code}
+
+        res = self.testapp.get('/user', headers=auth_header)
         self.assertEqual(res.status, '200 OK')
         self.assertEqual(res.json, {
                 '_id': str(self.user_id),
@@ -790,3 +799,5 @@ class RESTViewTests(TestCase):
                 'date_joined': '2012-12-12T12:12:00+00:00',
                 'last_login': '2012-12-12T12:12:00+00:00',
                 })
+
+        del os.environ['YITH_FAKE_DATETIME']
