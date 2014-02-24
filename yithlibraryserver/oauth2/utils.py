@@ -37,8 +37,8 @@ def extract_params(request):
 
 
 def create_response(status, headers, body):
-    encoded_headers = [(to_bytes(k), to_bytes(v)) for k, v in headers.items()]
-    return Response(body=body, status=status, headerlist=encoded_headers)
+    headerlist = [(k, v) for k, v in headers.items()]
+    return Response(body=body, status=status, headerlist=headerlist)
 
 
 def response_from_error(error):
