@@ -18,6 +18,11 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
+import os
+
+from bson.tz_util import utc
+
 from yithlibraryserver import testing
 from yithlibraryserver.compat import text_type
 
@@ -32,20 +37,30 @@ class ViewTests(testing.TestCase):
         self.access_code = '1234'
         self.auth_header = {'Authorization': 'Bearer %s' % self.access_code}
         self.user_id = self.db.users.insert({
-                'provider_user_id': 'user1',
-                'screen_name': 'User 1',
-                'authorized_apps': [],
-                })
+            'provider_user_id': 'user1',
+            'screen_name': 'User 1',
+            'authorized_apps': [],
+        })
         self.db.applications.insert({
-                'name': 'test-app',
-                'client_id': 'client1',
-                })
+            'name': 'test-app',
+            'client_id': 'client1',
+        })
+
+        os.environ['YITH_FAKE_DATETIME'] = '2014-2-23-08-00-00'
+        expiration = datetime.datetime(2014, 2, 23, 9, 0, tzinfo=utc)
+
         self.db.access_codes.insert({
-                'code': self.access_code,
-                'scope': None,
-                'user': self.user_id,
-                'client_id': 'client1',
-                })
+            'access_token': self.access_code,
+            'type': 'Bearer',
+            'expiration': expiration,
+            'user_id': self.user_id,
+            'scope': 'read-passwords write-passwords',
+            'client_id': 'client1',
+        })
+
+    def tearDown(self):
+        del os.environ['YITH_FAKE_DATETIME']
+        super(ViewTests, self).tearDown()
 
     def test_password_collection_options(self):
         res = self.testapp.options('/passwords')

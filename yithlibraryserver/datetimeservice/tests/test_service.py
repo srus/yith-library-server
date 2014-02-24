@@ -19,6 +19,8 @@
 import datetime
 import unittest
 
+from bson.tz_util import utc
+
 
 from yithlibraryserver.datetimeservice import DateService, get_date
 from yithlibraryserver.datetimeservice import DatetimeService, get_datetime
@@ -52,7 +54,7 @@ class DatetimeServiceTests(unittest.TestCase):
     def test_datetimeservice(self):
         ds = DatetimeService(None)
         self.assertTrue(isinstance(ds.utcnow(), datetime.datetime))
-        self.assertDatetimeEqual(ds.utcnow(), datetime.datetime.utcnow())
+        self.assertDatetimeEqual(ds.utcnow(), datetime.datetime.now(tz=utc))
 
     def test_get_datetime(self):
         request = object()

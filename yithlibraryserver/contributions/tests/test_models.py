@@ -20,6 +20,8 @@ import datetime
 import os
 import unittest
 
+from bson.tz_util import utc
+
 from pyramid import testing
 
 from yithlibraryserver.datetimeservice.testing import FakeDatetimeService
@@ -76,7 +78,7 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(donation['zip'], '12345678')
         self.assertEqual(donation['email'], 'john@example.com')
         self.assertEqual(donation['creation'],
-                         datetime.datetime(2013, 1, 2, 10, 11, 2))
+                         datetime.datetime(2013, 1, 2, 10, 11, 2, tzinfo=utc))
         self.assertEqual(donation['send_sticker'], False)
         self.assertEqual(donation['user'], None)
 
@@ -104,7 +106,7 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(donation['zip'], '12345678')
         self.assertEqual(donation['email'], 'john@example.com')
         self.assertEqual(donation['creation'],
-                         datetime.datetime(2013, 1, 2, 10, 11, 2))
+                         datetime.datetime(2013, 1, 2, 10, 11, 2, tzinfo=utc))
         self.assertEqual(donation['send_sticker'], True)
         self.assertEqual(donation['user'], None)
 
@@ -132,6 +134,6 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(donation['zip'], '12345678')
         self.assertEqual(donation['email'], 'john@example.com')
         self.assertEqual(donation['creation'],
-                         datetime.datetime(2013, 1, 2, 10, 11, 2))
+                         datetime.datetime(2013, 1, 2, 10, 11, 2, tzinfo=utc))
         self.assertEqual(donation['send_sticker'], True)
         self.assertEqual(donation['user'], 'fake_user_id')

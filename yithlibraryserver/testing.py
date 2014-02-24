@@ -29,6 +29,7 @@ from pyramid.settings import asbool
 from pyramid.testing import DummyRequest
 
 from yithlibraryserver import main
+from yithlibraryserver.datetimeservice.testing import FakeDatetimeService
 
 MONGO_URI = 'mongodb://localhost:27017/test-yith-library'
 
@@ -40,6 +41,8 @@ class FakeRequest(DummyRequest):
         self.authorization = self.headers.get('Authorization', '').split(' ')
         if 'db' in kwargs:
             self.db = kwargs['db']
+
+        self.datetime_service = FakeDatetimeService(self)
 
 
 class TestCase(unittest.TestCase):
