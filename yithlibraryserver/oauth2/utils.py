@@ -42,20 +42,13 @@ def create_response(status, headers, body):
 
 
 def response_from_error(error):
+    response = HTTPBadRequest()
     msg = 'Evil client is unable to send a proper request. Error is: '
-    return HTTPBadRequest(msg + error.error)
-
-
-def to_bytes(text, encoding='utf-8'):
-    """Make sure text is bytes type."""
-    if not text:
-        return text
-    if not isinstance(text, bytes_type):
-        text = text.encode(encoding)
-    return text
-
+    response.text = to_unicode(msg + error.error, 'utf-8')
+    return response
 
 def decode_base64(text, encoding='utf-8'):
     """Decode base64 string."""
-    text = to_bytes(text, encoding)
+    if text and not isinstance(text, bytes_type):
+        text = text.encode(encoding)
     return to_unicode(base64.b64decode(text), encoding)
