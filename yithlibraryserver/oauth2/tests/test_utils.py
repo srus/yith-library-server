@@ -52,16 +52,17 @@ class ExtractParamsTests(unittest.TestCase):
     def test_create_response(self):
         response = create_response(200, {'Content-Type': 'text/html'}, 'body')
         self.assertEqual(response.status, '200 OK')
-        self.assertEqual(response.headers.items(), [
+        self.assertEqual(list(response.headers.items()), [
             ('Content-Type', 'text/html'),
             ('Content-Length', '4'),
         ])
-        self.assertEqual(response.body, 'body')
+        self.assertEqual(response.body, 'body'.encode('utf-8'))
 
     def test_response_from_error(self):
         response = response_from_error(Error('testing error'))
         self.assertEqual(response.status, '400 Bad Request')
-        self.assertEqual(response.body, 'Evil client is unable to send a proper request. Error is: testing error')
+        expected = 'Evil client is unable to send a proper request. Error is: testing error'
+        self.assertEqual(response.body, expected.encode('utf-8'))
 
     def test_decode_base64(self):
         self.assertEqual('foobar', decode_base64('Zm9vYmFy'))
