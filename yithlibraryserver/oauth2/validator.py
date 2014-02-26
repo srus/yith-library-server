@@ -44,20 +44,17 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
     def __init__(self, db, datetime_service, default_scopes=None):
         self.db = db
         self.datetime_service = datetime_service
-        self.cached_client = None
         if default_scopes is None:
             self.default_scopes = ['read-passwords']
         else:
             self.default_scopes = default_scopes
 
     def get_client(self, client_id):
-        if self.cached_client is None:
-            client = self.db.applications.find_one(
-                {'client_id': client_id}
-            )
-            if client:
-                self.cached_client = WrappedClient(client)
-        return self.cached_client
+        client = self.db.applications.find_one(
+            {'client_id': client_id}
+        )
+        if client is not None:
+            return WrappedClient(client)
 
     def get_pretty_scopes(self, scopes):
         return [self.scopes.get(scope) for scope in scopes]
@@ -66,8 +63,8 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
 
     def validate_client_id(self, client_id, request, *args, **kwargs):
         """Simple validity check, does client exist? Not banned?"""
-        client = self.get_client(client_id)
-        return client is not None
+        request.client = self.get_client(client_id)
+        return request.client is not None
 
     def validate_redirect_uri(self, client_id, redirect_uri, request, *args, **kwargs):
         """Is the client allowed to use the supplied redirect_uri?
