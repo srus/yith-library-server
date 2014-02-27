@@ -18,6 +18,8 @@
 
 import base64
 
+from webob.compat import native_
+
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.response import Response
 
@@ -37,7 +39,8 @@ def extract_params(request):
 
 
 def create_response(status, headers, body):
-    headerlist = [(k, v) for k, v in headers.items()]
+    headerlist = [(native_(k), native_(v))
+                  for k, v in headers.items()]
     return Response(body=body, status=status, headerlist=headerlist)
 
 

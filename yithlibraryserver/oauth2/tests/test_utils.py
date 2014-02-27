@@ -18,6 +18,8 @@
 
 import unittest
 
+from webob.compat import native_
+
 from pyramid import testing
 
 from yithlibraryserver.oauth2.utils import (
@@ -52,10 +54,8 @@ class ExtractParamsTests(unittest.TestCase):
     def test_create_response(self):
         response = create_response(200, {'Content-Type': 'text/html'}, 'body')
         self.assertEqual(response.status, '200 OK')
-        self.assertEqual(list(response.headers.items()), [
-            ('Content-Type', 'text/html'),
-            ('Content-Length', '4'),
-        ])
+        self.assertEqual(response.headers[native_('Content-Type')],
+                         native_('text/html'))
         self.assertEqual(response.body, 'body'.encode('utf-8'))
 
     def test_response_from_error(self):

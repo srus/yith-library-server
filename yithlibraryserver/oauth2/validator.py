@@ -118,6 +118,7 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
             'client_id': client_id,
             'user': request.user['_id'],
             'expiration': expiration,
+            'redirect_uri': request.redirect_uri,
         }
         self.db.authorization_codes.insert(new_record)
 
@@ -127,14 +128,18 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         """Whichever authentication method suits you, HTTP Basic might work."""
         auth = request.headers.get('Authorization', None)
         if auth:
-            _, s = auth.split(' ')
+            auth_type, s = auth.split(' ')
+            if auth_type != 'Basic':
+                return False
             client_id, client_secret = decode_base64(s).split(':')
             client_id = to_unicode(client_id, 'utf-8')
             client_secret = to_unicode(client_secret, 'utf-8')
 
         else:
-            client_id = request.client_id
-            client_secret = request.client_secret
+            client_id = getattr(request, 'client_id', None)
+            client_secret = getattr(request, 'client_secret', None)
+            if client_id is None or client_secret is None:
+                return False
 
         client = self.get_client(client_id)
         if not client:
@@ -175,9 +180,19 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         request.scopes = record['scope'].split(' ')
         return True
 
-    def confirm_redirect_uri(self, client_id, code, redirect_url, client, *args, **kwargs):
+    def confirm_redirect_uri(self, client_id, code, redirect_uri, client, *args, **kwargs):
         """You did save the redirect uri with the authorization code right?"""
-        return redirect_url is None
+        if redirect_uri is None:
+            return True
+
+        record = self.db.authorization_codes.find_one({
+            'code': code,
+            'client_id': client_id,
+        })
+        if record is None:
+            return False
+
+        return record['redirect_uri'] == redirect_uri
 
     def validate_grant_type(self, client_id, grant_type, client, request, *args, **kwargs):
         """Clients should only be allowed to use one type of grant.
