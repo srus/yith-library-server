@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2012-2013 Yaco Sistemas
-# Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2014 Yaco Sistemas
+# Copyright (C) 2012-2014 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
+# Copyright (C) 2012-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -21,6 +21,7 @@
 import datetime
 import os
 
+import bson
 from bson.tz_util import utc
 
 from deform import ValidationFailure
@@ -355,98 +356,6 @@ class ViewTests(TestCase):
                     })
             self.assertEqual(res.status, '200 OK')
             res.mustcontain('There were an error while saving your changes')
-
-    def test_user_preferences(self):
-        # this view required authentication
-        res = self.testapp.get('/preferences')
-        self.assertEqual(res.status, '200 OK')
-        res.mustcontain('Log in')
-
-        # Log in
-        date = datetime.datetime(2012, 12, 12, 12, 12)
-        while True:
-            user_id = self.db.users.insert({
-                    'twitter_id': 'twitter1',
-                    'screen_name': 'John Doe',
-                    'first_name': 'John',
-                    'last_name': 'Doe',
-                    'email': '',
-                    'email_verified': False,
-                    'authorized_apps': [],
-                    'date_joined': date,
-                    'last_login': date,
-                    'allow_google_analytics': False,
-                    })
-            day = get_day_to_send({'_id': user_id}, 28)
-            # we want a user with a different day from 1
-            # since that's a special case and does not
-            # allow us to test a future date to send
-            # the passwords
-            if day != 1:
-                break
-
-            # In most cases day will be != 1 so this line
-            # only get executed with very low probability
-            self.db.users.remove(user_id)  # pragma: no cover
-
-        self.testapp.get('/__login/' + str(user_id))
-
-        os.environ['YITH_FAKE_DATE'] = '2012-10-30'
-        res = self.testapp.get('/preferences')
-        self.assertEqual(res.status, '200 OK')
-        res.mustcontain('Preferences',
-                        'Allow statistics cookie',
-                        'You will receive your passwords backup on the day %d of next month' % day,
-                        'Save changes')
-
-        os.environ['YITH_FAKE_DATE'] = '2012-10-%d' % max(1, day - 1)
-        res = self.testapp.get('/preferences')
-        self.assertEqual(res.status, '200 OK')
-        res.mustcontain('Preferences',
-                        'Allow statistics cookie',
-                        'You will receive your passwords backup on the day %d of this month' % day,
-                        'Save changes')
-
-        os.environ['YITH_FAKE_DATE'] = '2012-10-%d' % day
-        res = self.testapp.get('/preferences')
-        self.assertEqual(res.status, '200 OK')
-        res.mustcontain('Preferences',
-                        'Allow statistics cookie',
-                        'You will receive your passwords backup today',
-                        'Save changes')
-
-        res = self.testapp.post('/preferences', {
-                'submit': 'Save changes',
-                'allow_google_analytics': 'true',
-                'send_passwords_periodically': 'false',
-                })
-        self.assertEqual(res.status, '302 Found')
-        self.assertEqual(res.location, 'http://localhost/preferences')
-        # check that the user has changed
-        new_user = self.db.users.find_one({'_id': user_id})
-        self.assertEqual(new_user['allow_google_analytics'], True)
-        self.assertEqual(new_user['send_passwords_periodically'], False)
-
-        # make the form fail
-        with patch('deform.Form.validate') as fake:
-            fake.side_effect = DummyValidationFailure('f', 'c', 'e')
-            res = self.testapp.post('/preferences', {
-                    'submit': 'Save Changes',
-                    })
-            self.assertEqual(res.status, '200 OK')
-
-        # make the db fail
-        with patch('yithlibraryserver.db.MongoDB.get_database') as fake:
-            fake.return_value = BadDB(new_user)
-            res = self.testapp.post('/preferences', {
-                    'submit': 'Save changes',
-                    'allow_google_analytics': 'true',
-                    'send_passwords_periodically': 'false',
-                    })
-            self.assertEqual(res.status, '200 OK')
-            res.mustcontain('There were an error while saving your changes')
-
-        del os.environ['YITH_FAKE_DATE']
 
     def test_destroy(self):
         # this view required authentication
@@ -801,3 +710,125 @@ class RESTViewTests(TestCase):
                 })
 
         del os.environ['YITH_FAKE_DATETIME']
+
+
+class PreferencesTests(TestCase):
+
+    clean_collections = ('users', )
+
+    def test_authentication_required(self):
+        # this view required authentication
+        res = self.testapp.get('/preferences')
+        self.assertEqual(res.status, '200 OK')
+        res.mustcontain('Log in')
+
+    def _login(self):
+        # Log in
+        date = datetime.datetime(2012, 12, 12, 12, 12)
+
+        user_id = self.db.users.insert({
+            # we choose the _id so get_day_to_send returns 26
+            '_id': bson.objectid.ObjectId('00000000000000000000000a'),
+            'twitter_id': 'twitter1',
+            'screen_name': 'John Doe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': '',
+            'email_verified': False,
+            'authorized_apps': [],
+            'date_joined': date,
+            'last_login': date,
+            'allow_google_analytics': False,
+        })
+        day = get_day_to_send({'_id': user_id}, 28)
+        self.assertEqual(day, 26)
+
+        self.testapp.get('/__login/' + str(user_id))
+
+        return user_id
+
+    def test_backup_next_month(self):
+        os.environ['YITH_FAKE_DATE'] = '2012-10-27'
+        self._login()
+        res = self.testapp.get('/preferences')
+        self.assertEqual(res.status, '200 OK')
+        res.mustcontain(
+            'Preferences',
+            'Allow statistics cookie',
+            'You will receive your passwords backup on the day 26 of next month',
+            'Save changes',
+        )
+        del os.environ['YITH_FAKE_DATE']
+
+    def test_backup_this_month(self):
+        os.environ['YITH_FAKE_DATE'] = '2012-10-25'
+        self._login()
+        res = self.testapp.get('/preferences')
+        self.assertEqual(res.status, '200 OK')
+        res.mustcontain(
+            'Preferences',
+            'Allow statistics cookie',
+            'You will receive your passwords backup on the day 26 of this month',
+            'Save changes',
+        )
+        del os.environ['YITH_FAKE_DATE']
+
+    def test_backup_today(self):
+        os.environ['YITH_FAKE_DATE'] = '2012-10-26'
+        self._login()
+        res = self.testapp.get('/preferences')
+        self.assertEqual(res.status, '200 OK')
+        res.mustcontain(
+            'Preferences',
+            'Allow statistics cookie',
+            'You will receive your passwords backup today',
+            'Save changes',
+        )
+        del os.environ['YITH_FAKE_DATE']
+
+    def test_save_changes(self):
+        os.environ['YITH_FAKE_DATE'] = '2012-10-27'
+        user_id = self._login()
+        res = self.testapp.post('/preferences', {
+                'submit': 'Save changes',
+                'allow_google_analytics': 'true',
+                'send_passwords_periodically': 'false',
+                })
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/preferences')
+        # check that the user has changed
+        new_user = self.db.users.find_one({'_id': user_id})
+        self.assertEqual(new_user['allow_google_analytics'], True)
+        self.assertEqual(new_user['send_passwords_periodically'], False)
+
+        del os.environ['YITH_FAKE_DATE']
+
+    def test_form_fail(self):
+        os.environ['YITH_FAKE_DATE'] = '2012-10-27'
+        self._login()
+        # make the form fail
+        with patch('deform.Form.validate') as fake:
+            fake.side_effect = DummyValidationFailure('f', 'c', 'e')
+            res = self.testapp.post('/preferences', {
+                'submit': 'Save Changes',
+            })
+            self.assertEqual(res.status, '200 OK')
+
+        del os.environ['YITH_FAKE_DATE']
+
+    def test_db_fail(self):
+        os.environ['YITH_FAKE_DATE'] = '2012-10-27'
+        user_id = self._login()
+        new_user = self.db.users.find_one({'_id': user_id})
+        # make the db fail
+        with patch('yithlibraryserver.db.MongoDB.get_database') as fake:
+            fake.return_value = BadDB(new_user)
+            res = self.testapp.post('/preferences', {
+                'submit': 'Save changes',
+                'allow_google_analytics': 'true',
+                'send_passwords_periodically': 'false',
+            })
+            self.assertEqual(res.status, '200 OK')
+            res.mustcontain('There were an error while saving your changes')
+
+        del os.environ['YITH_FAKE_DATE']

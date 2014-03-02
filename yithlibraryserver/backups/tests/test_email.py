@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2013-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -36,19 +36,19 @@ class GetDayToSendTests(unittest.TestCase):
     def test_get_day_to_send(self):
         user = {}
         user['_id'] = bson.objectid.ObjectId('000000000000000000000001')
-        self.assertEqual(5, get_day_to_send(user, 28))
-        self.assertEqual(13, get_day_to_send(user, 30))
-        self.assertEqual(6, get_day_to_send(user, 31))
+        self.assertEqual(6, get_day_to_send(user, 28))
+        self.assertEqual(14, get_day_to_send(user, 30))
+        self.assertEqual(7, get_day_to_send(user, 31))
 
         user['_id'] = bson.objectid.ObjectId('100000000000000000000000')
-        self.assertEqual(5, get_day_to_send(user, 28))
-        self.assertEqual(13, get_day_to_send(user, 30))
-        self.assertEqual(6, get_day_to_send(user, 31))
+        self.assertEqual(6, get_day_to_send(user, 28))
+        self.assertEqual(14, get_day_to_send(user, 30))
+        self.assertEqual(7, get_day_to_send(user, 31))
 
         user['_id'] = bson.objectid.ObjectId('00000000000000000000000a')
-        self.assertEqual(25, get_day_to_send(user, 28))
-        self.assertEqual(1, get_day_to_send(user, 30))
-        self.assertEqual(23, get_day_to_send(user, 31))
+        self.assertEqual(26, get_day_to_send(user, 28))
+        self.assertEqual(2, get_day_to_send(user, 30))
+        self.assertEqual(24, get_day_to_send(user, 31))
 
     def test_is_uniform_distribution(self):
 
@@ -58,7 +58,7 @@ class GetDayToSendTests(unittest.TestCase):
             for i in range(iterations):
                 user['_id'] = bson.objectid.ObjectId()
                 day = get_day_to_send(user, days)
-                month[day] += 1
+                month[day - 1] += 1
             return month
 
         month = fill_month(30, 1000)
