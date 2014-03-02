@@ -207,46 +207,45 @@ def developer_application_delete(request):
     return {'app': app}
 
 
-@view_config(route_name='oauth2_authorization_endpoint',
-             renderer='templates/application_authorization.pt',
-             permission='add-authorized-app')
-def authorization_endpoint(request):
-    validator = RequestValidator(request.db, request.datetime_service)
-    server = Server(validator)
-    authorizator = Authorizator(request.db)
+class AuthorizationEndpoint(object):
 
-    uri, http_method, body, headers = extract_params(request)
+    def __init__(self, request):
+        self.request = request
+        self.validator = RequestValidator(request.db, request.datetime_service)
+        self.server = Server(self.validator)
+        self.authorizator = Authorizator(request.db)
 
-    def authorization_response(scopes, credentials, store=False):
-        r_headers, r_body, r_status = server.create_authorization_response(
-            uri, http_method, body, headers, scopes, credentials,
-        )
-        if store:
-            authorizator.store_user_authorization(scopes, credentials)
-        return create_response(r_status, r_headers, r_body)
+    @view_config(route_name='oauth2_authorization_endpoint',
+                 renderer='templates/application_authorization.pt',
+                 permission='add-authorized-app',
+                 request_method='GET')
+    def get(self):
+        uri, http_method, body, headers = extract_params(self.request)
 
-    if request.method == 'GET':
         try:
-            scopes, credentials = server.validate_authorization_request(
+            scopes, credentials = self.server.validate_authorization_request(
                 uri, http_method, body, headers,
             )
-            credentials['user'] = request.user
+            credentials['user'] = self.request.user
 
-            if authorizator.is_app_authorized(scopes, credentials):
-                return authorization_response(scopes, credentials)
+            if self.authorizator.is_app_authorized(scopes, credentials):
+                server_response = self.server.create_authorization_response(
+                    uri, http_method, body, headers, scopes, credentials,
+                )
+                return create_response(*server_response)
             else:
-                app = validator.get_client(credentials['client_id'])
+                app = self.validator.get_client(credentials['client_id'])
                 authorship_information = ''
                 owner_id = app._client.get('owner', None)
                 if owner_id is not None:
-                    owner = request.db.users.find_one({'_id': owner_id})
+                    owner = self.request.db.users.find_one({'_id': owner_id})
                     if owner:
                         email = owner.get('email', None)
                         if email:
                             authorship_information = _('By ${owner}',
                                                        mapping={'owner': email})
 
-                pretty_scopes = validator.get_pretty_scopes(scopes)
+                pretty_scopes = self.validator.get_pretty_scopes(scopes)
                 return {
                     'response_type': credentials['response_type'],
                     'client_id': credentials['client_id'],
@@ -263,24 +262,33 @@ def authorization_endpoint(request):
         except OAuth2Error as e:
             return HTTPFound(e.in_uri(e.redirect_uri))
 
-    if request.method == 'POST':
-        redirect_uri = request.POST.get('redirect_uri', None)
-        if 'submit' in request.POST:
-            scope = request.POST.get('scope', '')
+    @view_config(route_name='oauth2_authorization_endpoint',
+                 permission='add-authorized-app',
+                 request_method='POST')
+    def post(self):
+        uri, http_method, body, headers = extract_params(self.request)
+
+        redirect_uri = self.request.POST.get('redirect_uri')
+        if 'submit' in self.request.POST:
+            scope = self.request.POST.get('scope', '')
             scopes = scope.split()
             credentials = {
-                'client_id': request.POST.get('client_id'),
+                'client_id': self.request.POST.get('client_id'),
                 'redirect_uri': redirect_uri,
-                'response_type': request.POST.get('response_type', None),
-                'state': request.POST.get('state', None),
-                'user': request.user,
+                'response_type': self.request.POST.get('response_type'),
+                'state': self.request.POST.get('state'),
+                'user': self.request.user,
             }
             try:
-                return authorization_response(scopes, credentials, store=True)
+                server_response = self.server.create_authorization_response(
+                    uri, http_method, body, headers, scopes, credentials,
+                )
+                self.authorizator.store_user_authorization(scopes, credentials)
+                return create_response(*server_response)
             except FatalClientError as e:
                 return response_from_error(e)
 
-        elif 'cancel' in request.POST:
+        elif 'cancel' in self.request.POST:
             e = AccessDeniedError()
             return HTTPFound(e.in_uri(redirect_uri))
 
@@ -292,10 +300,10 @@ def token_endpoint(request):
     server = Server(validator)
 
     uri, http_method, body, headers = extract_params(request)
-    headers, body, status = server.create_token_response(
+    server_response = server.create_token_response(
         uri, http_method, body, headers, {},
     )
-    return create_response(status, headers, body)
+    return create_response(*server_response)
 
 
 @view_config(route_name='oauth2_authorized_applications',

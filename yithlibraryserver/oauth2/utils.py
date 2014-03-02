@@ -38,7 +38,7 @@ def extract_params(request):
     return uri, http_method, body, headers
 
 
-def create_response(status, headers, body):
+def create_response(headers, body, status):
     headerlist = [(native_(k), native_(v))
                   for k, v in headers.items()]
     return Response(body=body, status=status, headerlist=headerlist)
@@ -49,6 +49,7 @@ def response_from_error(error):
     msg = 'Evil client is unable to send a proper request. Error is: '
     response.text = to_unicode(msg + error.error, 'utf-8')
     return response
+
 
 def decode_base64(text, encoding='utf-8'):
     """Decode base64 string."""

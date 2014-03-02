@@ -52,7 +52,7 @@ class ExtractParamsTests(unittest.TestCase):
 
 
     def test_create_response(self):
-        response = create_response(200, {'Content-Type': 'text/html'}, 'body')
+        response = create_response({'Content-Type': 'text/html'}, 'body', 200)
         self.assertEqual(response.status, '200 OK')
         self.assertEqual(response.headers[native_('Content-Type')],
                          native_('text/html'))
