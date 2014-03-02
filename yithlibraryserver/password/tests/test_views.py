@@ -29,7 +29,7 @@ from yithlibraryserver.compat import text_type
 
 class ViewTests(testing.TestCase):
 
-    clean_collections = ('passwords', 'access_codes', 'applications', 'users')
+    clean_collections = ('passwords', 'access_codes', 'users')
 
     def setUp(self):
         super(ViewTests, self).setUp()
@@ -39,11 +39,6 @@ class ViewTests(testing.TestCase):
         self.user_id = self.db.users.insert({
             'provider_user_id': 'user1',
             'screen_name': 'User 1',
-            'authorized_apps': [],
-        })
-        self.db.applications.insert({
-            'name': 'test-app',
-            'client_id': 'client1',
         })
 
         os.environ['YITH_FAKE_DATETIME'] = '2014-2-23-08-00-00'
