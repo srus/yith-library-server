@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -52,43 +52,43 @@ class ReportTests(ScriptTests):
 
         # Add some data to the database
         u1_id = self.db.users.insert({
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                })
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+        })
         u2_id = self.db.users.insert({
-                'first_name': 'John2',
-                'last_name': 'Doe2',
-                'email': 'john2@example.com',
-                'email_verified': True,
-                'twitter_id': '1234',
-                })
+            'first_name': 'John2',
+            'last_name': 'Doe2',
+            'email': 'john2@example.com',
+            'email_verified': True,
+            'twitter_id': '1234',
+        })
         self.db.passwords.insert({
-                'service': 'service1',
-                'secret': 's3cr3t',
-                'owner': u2_id,
-                })
+            'service': 'service1',
+            'secret': 's3cr3t',
+            'owner': u2_id,
+        })
         u3_id = self.db.users.insert({
-                'first_name': 'John3',
-                'last_name': 'Doe3',
-                'email': 'john3@example.com',
-                'email_verified': True,
-                'twitter_id': '1234',
-                'facebook_id': '5678',
-                'google_id': 'abcd',
-                'date_joined': datetime.datetime(2012, 12, 12, 12, 12, 12),
-                'last_login': datetime.datetime(2012, 12, 12, 12, 12, 12),
-                })
+            'first_name': 'John3',
+            'last_name': 'Doe3',
+            'email': 'john3@example.com',
+            'email_verified': True,
+            'twitter_id': '1234',
+            'facebook_id': '5678',
+            'google_id': 'abcd',
+            'date_joined': datetime.datetime(2012, 12, 12, 12, 12, 12),
+            'last_login': datetime.datetime(2012, 12, 12, 12, 12, 12),
+        })
         self.db.passwords.insert({
-                'service': 'service1',
-                'secret': 's3cr3t',
-                'owner': u3_id,
-                })
+            'service': 'service1',
+            'secret': 's3cr3t',
+            'owner': u3_id,
+        })
         self.db.passwords.insert({
-                'service': 'service2',
-                'secret': 's3cr3t',
-                'owner': u3_id,
-                })
+            'service': 'service2',
+            'secret': 's3cr3t',
+            'owner': u3_id,
+        })
         sys.argv = ['notused', self.conf_file_path]
         sys.stdout = StringIO()
         result = users()
@@ -147,22 +147,24 @@ John3 Doe3 <john3@example.com> (%s)
 
         # Add some data to the database
         u1_id = self.db.users.insert({
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
                 })
         self.db.applications.insert({
-                'name': 'Test application 1',
-                'owner': u1_id,
-                'main_url': 'http://example.com/',
-                'callback_url': 'http://example.com/callback',
-                })
+            'name': 'Test application 1',
+            'owner': u1_id,
+            'main_url': 'http://example.com/',
+            'callback_url': 'http://example.com/callback',
+            'client_id': '1234',
+        })
         self.db.applications.insert({
-                'name': 'Test application 2',
-                'owner': '000000000000000000000000',
-                'main_url': 'http://2.example.com/',
-                'callback_url': 'http://2.example.com/callback',
-                })
+            'name': 'Test application 2',
+            'owner': '000000000000000000000000',
+            'main_url': 'http://2.example.com/',
+            'callback_url': 'http://2.example.com/callback',
+            'client_id': '5678',
+        })
         sys.argv = ['notused', self.conf_file_path]
         sys.stdout = StringIO()
         result = applications()
@@ -212,92 +214,92 @@ Test application 2
 
         # Add some data to the database
         u1_id = self.db.users.insert({
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                'email_verified': True,
-                'allow_google_analytics': True,
-                'google_id': '1',
-                })
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+            'email_verified': True,
+            'allow_google_analytics': True,
+            'google_id': '1',
+        })
         self.add_passwords(u1_id, 10)
 
         u2_id = self.db.users.insert({
-                'first_name': 'Peter',
-                'last_name': 'Doe',
-                'email': 'peter@example.com',
-                'email_verified': True,
-                'allow_google_analytics': False,
-                'twitter_id': '1',
-                })
+            'first_name': 'Peter',
+            'last_name': 'Doe',
+            'email': 'peter@example.com',
+            'email_verified': True,
+            'allow_google_analytics': False,
+            'twitter_id': '1',
+        })
         self.add_passwords(u2_id, 20)
 
         u3_id = self.db.users.insert({
-                'first_name': 'Susan',
-                'last_name': 'Doe',
-                'email': 'susan@example2.com',
-                'email_verified': True,
-                'allow_google_analytics': False,
-                'facebook_id': '1',
-                })
+            'first_name': 'Susan',
+            'last_name': 'Doe',
+            'email': 'susan@example2.com',
+            'email_verified': True,
+            'allow_google_analytics': False,
+            'facebook_id': '1',
+        })
         self.add_passwords(u3_id, 15)
 
         self.db.users.insert({
-                'first_name': 'Alice',
-                'last_name': 'Doe',
-                'email': '',
-                'email_verified': False,
-                'allow_google_analytics': False,
-                'persona_id': '1',
-                })
+            'first_name': 'Alice',
+            'last_name': 'Doe',
+            'email': '',
+            'email_verified': False,
+            'allow_google_analytics': False,
+            'persona_id': '1',
+        })
 
         self.db.users.insert({
-                'first_name': 'Bob',
-                'last_name': 'Doe',
-                'email': '',
-                'email_verified': False,
-                'allow_google_analytics': False,
-                'google_id': '2',
-                })
+            'first_name': 'Bob',
+            'last_name': 'Doe',
+            'email': '',
+            'email_verified': False,
+            'allow_google_analytics': False,
+            'google_id': '2',
+        })
         self.db.users.insert({
-                'first_name': 'Kevin',
-                'last_name': 'Doe',
-                'email': '',
-                'email_verified': False,
-                'allow_google_analytics': False,
-                'google_id': '3',
-                })
+            'first_name': 'Kevin',
+            'last_name': 'Doe',
+            'email': '',
+            'email_verified': False,
+            'allow_google_analytics': False,
+            'google_id': '3',
+        })
         self.db.users.insert({
-                'first_name': 'Maria',
-                'last_name': 'Doe',
-                'email': '',
-                'email_verified': False,
-                'allow_google_analytics': False,
-                'google_id': '4',
-                })
+            'first_name': 'Maria',
+            'last_name': 'Doe',
+            'email': '',
+            'email_verified': False,
+            'allow_google_analytics': False,
+            'google_id': '4',
+        })
         self.db.users.insert({
-                'first_name': 'Bran',
-                'last_name': 'Doe',
-                'email': '',
-                'email_verified': False,
-                'allow_google_analytics': False,
-                'twitter_id': '2',
-                })
+            'first_name': 'Bran',
+            'last_name': 'Doe',
+            'email': '',
+            'email_verified': False,
+            'allow_google_analytics': False,
+            'twitter_id': '2',
+        })
         self.db.users.insert({
-                'first_name': 'George',
-                'last_name': 'Doe',
-                'email': '',
-                'email_verified': False,
-                'allow_google_analytics': False,
-                'twitter_id': '3',
-                })
+            'first_name': 'George',
+            'last_name': 'Doe',
+            'email': '',
+            'email_verified': False,
+            'allow_google_analytics': False,
+            'twitter_id': '3',
+        })
         self.db.users.insert({
-                'first_name': 'Travis',
-                'last_name': 'Doe',
-                'email': '',
-                'email_verified': False,
-                'allow_google_analytics': False,
-                'persona_id': '2',
-                })
+            'first_name': 'Travis',
+            'last_name': 'Doe',
+            'email': '',
+            'email_verified': False,
+            'allow_google_analytics': False,
+            'persona_id': '2',
+        })
 
         sys.argv = ['notused', self.conf_file_path]
         sys.stdout = StringIO()
