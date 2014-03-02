@@ -25,7 +25,8 @@ from yithlibraryserver.email import send_email
 
 def get_day_to_send(user, days_of_month):
     """Sum the ordinal of each character in user._id % days_of_month"""
-    return sum([ord(chr) for chr in str(user['_id'])]) % days_of_month
+    day = sum([ord(char) for char in str(user['_id'])]) % days_of_month
+    return day + 1
 
 
 def send_passwords(request, user, preferences_link, backups_link):
