@@ -218,17 +218,12 @@ def authorization_endpoint(request):
     uri, http_method, body, headers = extract_params(request)
 
     def authorization_response(scopes, credentials, store=False):
-        try:
-            r_headers, r_body, r_status = server.create_authorization_response(
-                uri, http_method, body, headers, scopes, credentials,
-            )
-            if store:
-                authorizator.store_user_authorization(scopes, credentials)
-            return create_response(r_status, r_headers, r_body)
-        except FatalClientError as e:
-            return response_from_error(e)
-        except OAuth2Error as e:
-            return HTTPFound(e.in_uri(redirect_uri))
+        r_headers, r_body, r_status = server.create_authorization_response(
+            uri, http_method, body, headers, scopes, credentials,
+        )
+        if store:
+            authorizator.store_user_authorization(scopes, credentials)
+        return create_response(r_status, r_headers, r_body)
 
     if request.method == 'GET':
         try:
@@ -280,7 +275,11 @@ def authorization_endpoint(request):
                 'state': request.POST.get('state', None),
                 'user': request.user,
             }
-            return authorization_response(scopes, credentials, store=True)
+            try:
+                return authorization_response(scopes, credentials, store=True)
+            except FatalClientError as e:
+                return response_from_error(e)
+
         elif 'cancel' in request.POST:
             e = AccessDeniedError()
             return HTTPFound(e.in_uri(redirect_uri))

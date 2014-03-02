@@ -247,6 +247,57 @@ class AuthorizationEndpointTests(BaseEndpointTests):
 
         del os.environ['YITH_FAKE_DATETIME']
 
+    def test_invalid_redirect_callback_in_post(self):
+        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
+
+        self._login()
+        self._create_client()
+
+        res = self.testapp.get('/oauth2/endpoints/authorization', {
+            'response_type': 'code',
+            'client_id': '123456',
+            'redirect_uri': 'https://example.com/callback',
+        })
+        self.assertEqual(res.status, '200 OK')
+
+        res = self.testapp.post('/oauth2/endpoints/authorization', {
+            'submit': 'Authorize',
+            'response_type': 'code',
+            'client_id': '123456',
+            'redirect_uri': 'https://example.malicious.com/callback',
+            'scope': 'read-passwords',
+        }, status=400)
+        self.assertEqual(res.status, '400 Bad Request')
+        res.mustcontain('Error is: mismatching_redirect_uri')
+
+        del os.environ['YITH_FAKE_DATETIME']
+
+    def test_no_response_type_in_post(self):
+        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
+
+        self._login()
+        self._create_client()
+
+        res = self.testapp.get('/oauth2/endpoints/authorization', {
+            'response_type': 'code',
+            'client_id': '123456',
+            'redirect_uri': 'https://example.com/callback',
+        })
+        self.assertEqual(res.status, '200 OK')
+
+        res = self.testapp.post('/oauth2/endpoints/authorization', {
+            'submit': 'Authorize',
+            # missing response_type
+            'client_id': '123456',
+            'redirect_uri': 'https://example.com/callback',
+            'scope': 'read-passwords',
+        }, status=302)
+        self.assertEqual(res.status, '302 Found')
+        self._assert_error(res.location, 'invalid_request',
+                           'Missing response_type parameter.')
+
+        del os.environ['YITH_FAKE_DATETIME']
+
 
 class TokenEndpointTests(BaseEndpointTests):
 
