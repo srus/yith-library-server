@@ -695,9 +695,43 @@ https://example.com""")
                 })
         self.testapp.get('/__login/' + str(user_id))
 
+        # let's create a couple of authorized apps
+        self.db.applications.insert({
+            'owner': bson.ObjectId(),
+            'name': 'Test Application 1',
+            'main_url': 'http://example.com/1',
+            'callback_url': 'http://example.com/1/callback',
+            'client_id': '123456',
+            'client_secret': 'secret',
+                })
+        self.db.authorized_apps.insert({
+            'user': user_id,
+            'client_id': '123456',
+            'redirect_uri': 'http://example.com/1/callback',
+            'response_type': 'code',
+            'scope': 'scope1',
+        })
+        self.db.applications.insert({
+            'owner': bson.ObjectId(),
+            'name': 'Test Application 2',
+            'main_url': 'http://example.com/2',
+            'callback_url': 'http://example.com/2/callback',
+            'client_id': '789012',
+            'client_secret': 'secret',
+        })
+        self.db.authorized_apps.insert({
+            'user': user_id,
+            'client_id': '789012',
+            'redirect_uri': 'http://example.com/2/callback',
+            'response_type': 'code',
+            'scope': 'scope1',
+        })
+
         res = self.testapp.get('/oauth2/authorized-applications')
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Authorized Applications')
+        res.mustcontain('Test Application 1')
+        res.mustcontain('Test Application 2')
 
     def test_revoke_application(self):
         # this view required authentication
