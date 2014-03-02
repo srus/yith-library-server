@@ -20,6 +20,8 @@ import datetime
 import os
 import sys
 
+import bson
+
 from yithlibraryserver.backups.email import get_day_to_send
 from yithlibraryserver.compat import StringIO
 from yithlibraryserver.scripts.backups import send_backups_via_email
@@ -37,7 +39,7 @@ class BackupsTests(ScriptTests):
         self.old_args = sys.argv[:]
         self.old_stdout = sys.stdout
 
-        os.environ['YITH_FAKE_DATE'] = '2012-1-10'
+        os.environ['YITH_FAKE_DATE'] = '2012-1-26'
 
     def tearDown(self):
         # Restore sys.values
@@ -70,33 +72,33 @@ class BackupsTests(ScriptTests):
 
     def test_send_specific_user(self):
         self.add_passwords(self.db.users.insert({
-                    'first_name': 'John1',
-                    'last_name': 'Doe',
-                    'email': '',
-                    'email_verified': False,
-                    'send_passwords_periodically': False,
-                    }), 10)
+            'first_name': 'John1',
+            'last_name': 'Doe',
+            'email': '',
+            'email_verified': False,
+            'send_passwords_periodically': False,
+        }), 10)
         self.add_passwords(self.db.users.insert({
-                    'first_name': 'John2',
-                    'last_name': 'Doe',
-                    'email': 'john2@example.com',
-                    'email_verified': True,
-                    'send_passwords_periodically': False,
-                    }), 10)
+            'first_name': 'John2',
+            'last_name': 'Doe',
+            'email': 'john2@example.com',
+            'email_verified': True,
+            'send_passwords_periodically': False,
+        }), 10)
         self.add_passwords(self.db.users.insert({
-                    'first_name': 'John3',
-                    'last_name': 'Doe',
-                    'email': 'john3@example.com',
-                    'email_verified': True,
-                    'send_passwords_periodically': True,
-                    }), 10)
+            'first_name': 'John3',
+            'last_name': 'Doe',
+            'email': 'john3@example.com',
+            'email_verified': True,
+            'send_passwords_periodically': True,
+        }), 10)
         self.add_passwords(self.db.users.insert({
-                    'first_name': 'John4',
-                    'last_name': 'Doe',
-                    'email': 'john4@example.com',
-                    'email_verified': True,
-                    'send_passwords_periodically': True,
-                    }), 10)
+            'first_name': 'John4',
+            'last_name': 'Doe',
+            'email': 'john4@example.com',
+            'email_verified': True,
+            'send_passwords_periodically': True,
+        }), 10)
 
         sys.argv = ['notused', self.conf_file_path, 'john3@example.com']
         sys.stdout = StringIO()
@@ -111,35 +113,43 @@ class BackupsTests(ScriptTests):
         date_joined = datetime.datetime(2012, 12, 12, 12, 12)
         # Add some users
         self.add_passwords(self.db.users.insert({
-                    'first_name': 'John1',
-                    'last_name': 'Doe',
-                    'date_joined': date_joined,
-                    'email': '',
-                    'email_verified': False,
-                    'send_passwords_periodically': False,
-                    }), 10)
+            'first_name': 'John1',
+            'last_name': 'Doe',
+            'date_joined': date_joined,
+            'email': 'john1@example.com',
+            'email_verified': False,
+            'send_passwords_periodically': False,
+        }), 10)
 
-        i = 1
-        while True:
-            user_id = self.add_passwords(self.db.users.insert({
-                        'first_name': 'John%d' % i,
-                        'last_name': 'Doe',
-                        'date_joined': date_joined,
-                        'email': 'john%d@example.com' % i,
-                        'email_verified': True,
-                        'send_passwords_periodically': True,
-                        }), 10)
-            day = get_day_to_send({'_id': user_id}, 28)
-            if day == 10:
-                break
+        user2_id = self.add_passwords(self.db.users.insert({
+            '_id': bson.objectid.ObjectId('100000000000000000000000'),
+            'first_name': 'John2',
+            'last_name': 'Doe',
+            'date_joined': date_joined,
+            'email': 'john2@example.com',
+            'email_verified': True,
+            'send_passwords_periodically': True,
+        }), 10)
+        day = get_day_to_send({'_id': user2_id}, 28)
+        self.assertEqual(day, 6)
 
-            i += 1
+        user3_id = self.add_passwords(self.db.users.insert({
+            '_id': bson.objectid.ObjectId('00000000000000000000000a'),
+            'first_name': 'John3',
+            'last_name': 'Doe',
+            'date_joined': date_joined,
+            'email': 'john3@example.com',
+            'email_verified': True,
+            'send_passwords_periodically': True,
+        }), 10)
+        day = get_day_to_send({'_id': user3_id}, 28)
+        self.assertEqual(day, 26)
 
         sys.argv = ['notused', self.conf_file_path]
         sys.stdout = StringIO()
         result = send_backups_via_email()
         self.assertEqual(result, None)
         stdout = sys.stdout.getvalue()
-        expected_output = """Passwords sent to John%d Doe <john%d@example.com>
-""" % (i, i)
+        expected_output = """Passwords sent to John3 Doe <john3@example.com>
+"""
         self.assertEqual(stdout, expected_output)

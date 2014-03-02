@@ -31,12 +31,13 @@ def get_all_users(request):
             'email_verified': True,
             '$where': '''
 function () {
-    var i, sum;
+    var i, sum, day;
     sum = 0;
     for (i = 0; i < this._id.str.length; i += 1) {
         sum += this._id.str.charCodeAt(i);
     }
-    return sum %% 28 === %d;
+    day = (sum %% 28) + 1;
+    return day === %d;
 }
 ''' % day
             }).sort('date_joined')
