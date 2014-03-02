@@ -293,14 +293,10 @@ def token_endpoint(request):
     server = Server(validator)
 
     uri, http_method, body, headers = extract_params(request)
-    try:
-        credentials = {}
-        headers, body, status = server.create_token_response(
-            uri, http_method, body, headers, credentials,
-        )
-        return create_response(status, headers, body)
-    except FatalClientError as e:
-        return response_from_error(e)
+    headers, body, status = server.create_token_response(
+        uri, http_method, body, headers, {},
+    )
+    return create_response(status, headers, body)
 
 
 @view_config(route_name='oauth2_authorized_applications',
