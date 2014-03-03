@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2012-2013 Yaco Sistemas
-# Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2014 Yaco Sistemas
+# Copyright (C) 2012-2014 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
+# Copyright (C) 2012-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -55,6 +55,11 @@ class Authorizator(object):
     def remove_user_authorization(self, user, client_id):
         self.db.authorized_apps.remove({
             'client_id': client_id,
+            'user': user['_id'],
+        })
+
+    def remove_all_user_authorizations(self, user):
+        self.db.authorized_apps.remove({
             'user': user['_id'],
         })
 

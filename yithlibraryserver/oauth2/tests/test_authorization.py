@@ -1,6 +1,6 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2012-2013 Yaco Sistemas
-# Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
+# Copyright (C) 2012-2014 Yaco Sistemas
+# Copyright (C) 2012-2014 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
 # Copyright (C) 2012-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
@@ -259,6 +259,31 @@ class AuthorizatorTests(testing.TestCase):
         auths = self.authorizator.get_user_authorizations({'_id': 1})
         self.assertEqual(auths.count(), 1)
         self.authorizator.remove_user_authorization({'_id': 1}, 1)
+        auths = self.authorizator.get_user_authorizations({'_id': 1})
+        self.assertEqual(auths.count(), 0)
+
+    def test_remove_all_user_authorizations(self):
+        auths = self.authorizator.get_user_authorizations({'_id': 1})
+        self.assertEqual(auths.count(), 0)
+        self.authorizator.store_user_authorization([
+            'scope1', 'scope2',
+        ], {
+            'client_id': 1,
+            'user': {'_id': 1},
+            'redirect_uri': 'http://example.com/callback/1',
+            'response_type': 'code',
+        })
+        self.authorizator.store_user_authorization([
+            'scope1', 'scope2',
+        ], {
+            'client_id': 2,
+            'user': {'_id': 1},
+            'redirect_uri': 'http://example.com/callback/2',
+            'response_type': 'code',
+        })
+        auths = self.authorizator.get_user_authorizations({'_id': 1})
+        self.assertEqual(auths.count(), 2)
+        self.authorizator.remove_all_user_authorizations({'_id': 1})
         auths = self.authorizator.get_user_authorizations({'_id': 1})
         self.assertEqual(auths.count(), 0)
 
