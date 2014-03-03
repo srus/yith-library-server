@@ -224,7 +224,7 @@ class BaseMergeTests(unittest.TestCase):
     def _add_authorized_app(self, user_id, client_id):
         self.db.authorized_apps.insert({
             'client_id': client_id,
-            'user': {'_id': user_id},
+            'user': user_id,
             'redirect_uri': 'http://example.com/callback',
             'response_type': 'code',
             'scope': 'scope1',
@@ -324,8 +324,8 @@ class MergeUsersTests(BaseMergeTests):
             'email': 'john@example.com',
             'google_id': 4321,
         })
-        self._add_authorized_app(user1_id, 'b')
-        self._add_authorized_app(user1_id, 'c')
+        self._add_authorized_app(user2_id, 'b')
+        self._add_authorized_app(user2_id, 'c')
         self.db.passwords.insert({
             'owner': user2_id,
             'password': 'secret3',
