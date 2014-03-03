@@ -109,7 +109,6 @@ def register_new_user(request):
                 'last_name': appstruct['last_name'],
                 'email': appstruct['email'],
                 'email_verified': email_verified,
-                'authorized_apps': [],
                 'date_joined': now,
                 'last_login': now,
                 'send_passwords_periodically': False,
