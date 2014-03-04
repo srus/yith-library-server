@@ -25,6 +25,8 @@ from yithlibraryserver import testing
 
 class ViewTests(testing.TestCase):
 
+    clean_collections = ('users', )
+
     def test_home(self):
         res = self.testapp.get('/')
         self.assertEqual(res.status, '200 OK')
