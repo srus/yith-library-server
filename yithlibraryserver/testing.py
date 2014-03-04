@@ -32,7 +32,7 @@ from pyramid.testing import DummyRequest
 from yithlibraryserver import main
 from yithlibraryserver.datetimeservice.testing import FakeDatetimeService
 
-PY_VERSION = '%d%d' % (sys.version_info.major, sys.version_info.minor)
+PY_VERSION = '%d%d' % (sys.version_info[0], sys.version_info[1])
 DB_NAME = 'test-yith-library-%s' % PY_VERSION
 MONGO_URI = 'mongodb://localhost:27017/%s' % DB_NAME
 
