@@ -158,12 +158,12 @@ Storing authorized app "app1" for user John2 Doe2 <john2@example.com>
         self.assertEqual(stdout, expected_output)
 
         user1 = self.db.users.find_one({'_id': u1_id})
-        self.assertNotIn('authorized_apps', user1)
+        self.assertFalse('authorized_apps' in user1)
         auths = authorizator.get_user_authorizations({'_id': u1_id})
         self.assertEqual(auths.count(), 2)
 
         user2 = self.db.users.find_one({'_id': u2_id})
-        self.assertNotIn('authorized_apps', user2)
+        self.assertFalse('authorized_apps' in user2)
         auths = authorizator.get_user_authorizations({'_id': u2_id})
         self.assertEqual(auths.count(), 1)
 
