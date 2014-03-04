@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import unittest
 
 from webtest import TestApp
@@ -31,7 +32,9 @@ from pyramid.testing import DummyRequest
 from yithlibraryserver import main
 from yithlibraryserver.datetimeservice.testing import FakeDatetimeService
 
-MONGO_URI = 'mongodb://localhost:27017/test-yith-library'
+PY_VERSION = '%d%d' % (sys.version_info.major, sys.version_info.minor)
+DB_NAME = 'test-yith-library-%s' % PY_VERSION
+MONGO_URI = 'mongodb://localhost:27017/%s' % DB_NAME
 
 
 class FakeRequest(DummyRequest):
@@ -72,7 +75,7 @@ class TestCase(unittest.TestCase):
             }
         app = main({}, **settings)
         self.testapp = TestApp(app)
-        self.db = app.registry.settings['db_conn']['test-yith-library']
+        self.db = app.registry.settings['db_conn'][DB_NAME]
 
     def tearDown(self):
         for col in self.clean_collections:
