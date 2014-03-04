@@ -70,6 +70,10 @@ def new_authorized_apps_collection(db):
                 'response_type': 'code',
             }
             auth.store_user_authorization(scopes, credentials)
+            safe_print('Storing authorized app "%s" for user %s' % (
+                app['client_id'],
+                get_user_display_name(user),
+            ))
 
     # remove the authorized_apps attribute from all users
     db.users.update({}, {'$unset': {'authorized_apps': ''}}, multi=True)
