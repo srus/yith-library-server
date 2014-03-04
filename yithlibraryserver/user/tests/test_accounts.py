@@ -80,8 +80,10 @@ class AccountTests(unittest.TestCase):
         self.db.passwords.insert({'password2': 'secret2', 'owner': 2})
         self.assertEqual(2, get_n_passwords(self.db, {'_id': 1}))
 
-    def test_get_accounts(self):
+    def test_get_accounts_empty_user(self):
         self.assertEqual([], get_accounts(self.db, {}, ''))
+
+    def test_get_accounts_empty_provider(self):
         self.assertEqual([{
             'providers': [],
             'is_current': False,
@@ -93,6 +95,7 @@ class AccountTests(unittest.TestCase):
             '_id': '',
         }, ''))
 
+    def test_get_accounts_one_user_no_provider(self):
         user_id = self.db.users.insert({'email': 'john@example.com'})
         self.assertEqual([{
             'providers': [],
@@ -111,8 +114,10 @@ class AccountTests(unittest.TestCase):
             '_id': '',
         }, ''))
 
-        self.db.users.update({'email': 'john@example.com'}, {
-            '$set': {'twitter_id': 1234},
+    def test_get_accounts_one_user_with_provider(self):
+        user_id = self.db.users.insert({
+            'email': 'john@example.com',
+            'twitter_id': 1234,
         })
         self.assertEqual([{
             'providers': [],
@@ -134,8 +139,11 @@ class AccountTests(unittest.TestCase):
             '_id': '',
         }, ''))
 
-        self.db.users.update({'email': 'john@example.com'}, {
-            '$set': {'email_verified': True},
+    def test_get_accounts_one_user_with_provider_email_verified(self):
+        user_id = self.db.users.insert({
+            'email': 'john@example.com',
+            'twitter_id': 1234,
+            'email_verified': True,
         })
         self.assertEqual([{
             'providers': [],
@@ -157,10 +165,13 @@ class AccountTests(unittest.TestCase):
             '_id': '',
         }, 'twitter'))
 
-        self.db.passwords.insert({'password': 'secret', 'owner': user_id})
-        self.db.users.update({'email': 'john@example.com'}, {
-            '$set': {'twitter_id': 1234},
+    def test_get_accounts_user_with_passwords(self):
+        user_id = self.db.users.insert({
+            'email': 'john@example.com',
+            'twitter_id': 1234,
+            'email_verified': True,
         })
+        self.db.passwords.insert({'password': 'secret', 'owner': user_id})
         self.assertEqual([{
             'providers': [],
             'is_current': False,
@@ -181,9 +192,15 @@ class AccountTests(unittest.TestCase):
             '_id': '',
         }, 'google'))
 
-        self.db.users.update({'email': 'john@example.com'}, {
-            '$set': {'google_id': 4321},
+    def test_get_accounts_user_multiple_providers(self):
+        user_id = self.db.users.insert({
+            'email': 'john@example.com',
+            'twitter_id': 1234,
+            'google_id': 4321,
+            'email_verified': True,
         })
+        self.db.passwords.insert({'password': 'secret', 'owner': user_id})
+
         self.assertEqual([{
             'providers': [],
             'is_current': False,
