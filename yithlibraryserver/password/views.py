@@ -26,7 +26,7 @@ from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.view import view_config, view_defaults
 
 from yithlibraryserver.errors import password_not_found, invalid_password_id
-from yithlibraryserver.security import authorize_user
+from yithlibraryserver.oauth2.decorators import protected_method
 from yithlibraryserver.password.models import PasswordsManager
 from yithlibraryserver.password.validation import validate_password
 
@@ -47,16 +47,16 @@ class PasswordCollectionRESTView(object):
         return ''
 
     @view_config(request_method='GET')
+    @protected_method(['read-passwords'])
     def get(self):
-        user = authorize_user(self.request)
-        passwords = list(self.passwords_manager.retrieve(user))
+        passwords = list(self.passwords_manager.retrieve(self.request.user))
         for p in passwords:
             p['id'] = p['_id']
         return {"passwords": passwords}
 
     @view_config(request_method='POST')
+    @protected_method(['write-passwords'])
     def post(self):
-        user = authorize_user(self.request)
         password, errors = validate_password(self.request.body,
                                              self.request.charset)
 
@@ -65,7 +65,7 @@ class PasswordCollectionRESTView(object):
             return HTTPBadRequest(body=json.dumps(result),
                                   content_type='application/json')
 
-        result = self.passwords_manager.create(user, password)
+        result = self.passwords_manager.create(self.request.user, password)
         result['id'] = result['_id']
         return {'password': result}
 
@@ -87,14 +87,14 @@ class PasswordRESTView(object):
         return ''
 
     @view_config(request_method='GET')
+    @protected_method(['read-passwords'])
     def get(self):
-        user = authorize_user(self.request)
         try:
             _id = bson.ObjectId(self.password_id)
         except bson.errors.InvalidId:
             return invalid_password_id()
 
-        password = self.passwords_manager.retrieve(user, _id)
+        password = self.passwords_manager.retrieve(self.request.user, _id)
 
         if password is None:
             return password_not_found()
@@ -103,8 +103,8 @@ class PasswordRESTView(object):
             return {'password': password}
 
     @view_config(request_method='PUT')
+    @protected_method(['write-passwords'])
     def put(self):
-        user = authorize_user(self.request)
         try:
             _id = bson.ObjectId(self.password_id)
         except bson.errors.InvalidId:
@@ -119,7 +119,8 @@ class PasswordRESTView(object):
             return HTTPBadRequest(body=json.dumps(result),
                                   content_type='application/json')
 
-        result = self.passwords_manager.update(user, _id, password)
+        result = self.passwords_manager.update(self.request.user, _id,
+                                               password)
         if result is None:
             return password_not_found()
         else:
@@ -127,14 +128,14 @@ class PasswordRESTView(object):
             return {'password': result}
 
     @view_config(request_method='DELETE')
+    @protected_method(['write-passwords'])
     def delete(self):
-        user = authorize_user(self.request)
         try:
             _id = bson.ObjectId(self.password_id)
         except bson.errors.InvalidId:
             return invalid_password_id()
 
-        if self.passwords_manager.delete(user, _id):
+        if self.passwords_manager.delete(self.request.user, _id):
             return {'password': {'id': _id}}
         else:
             return password_not_found()

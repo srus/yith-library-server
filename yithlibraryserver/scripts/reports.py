@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -78,10 +78,10 @@ def _get_app_info(db, app):
         'owner': owner,
         'main_url': app['main_url'],
         'callback_url': app['callback_url'],
-        'users': db.users.find({
-                'authorized_apps': {'$in': [app['_id']]},
-                }).count()
-        }
+        'users': db.authorized_apps.find({
+            'client_id': app['client_id'],
+        }).count()
+    }
 
 
 def applications():

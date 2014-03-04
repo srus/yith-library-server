@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -16,38 +16,28 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-import datetime
+import functools
 
-from bson.tz_util import utc
-
-
-class DateService(object):
-
-    def __init__(self, request):
-        self.request = request
-
-    def today(self):
-        return datetime.date.today()
+from yithlibraryserver.oauth2.authorization import verify_request
 
 
-class DatetimeService(object):
+def protected_method(scopes):
+    def decorator(f):
+        @functools.wraps(f)
+        def wrapper(self):
+            self.request.user = verify_request(self.request, scopes)
+            return f(self)
 
-    def __init__(self, request):
-        self.request = request
-
-    def utcnow(self):
-        return datetime.datetime.now(tz=utc)
-
-
-def get_date(request):
-    return DateService(request)
+        return wrapper
+    return decorator
 
 
-def get_datetime(request):
-    return DatetimeService(request)
+def protected(scopes):
+    def decorator(f):
+        @functools.wraps(f)
+        def wrapper(request):
+            request.user = verify_request(request, scopes)
+            return f(request)
 
-
-def includeme(config):
-    config.set_request_property(get_date, 'date_service', reify=True)
-    config.set_request_property(get_datetime, 'datetime_service', reify=True)
-
+        return wrapper
+    return decorator

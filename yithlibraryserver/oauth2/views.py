@@ -21,24 +21,33 @@
 import bson
 from deform import Button, Form, ValidationFailure
 
-from pyramid.httpexceptions import HTTPBadRequest, HTTPFound, HTTPNotFound
-from pyramid.httpexceptions import HTTPNotImplemented, HTTPUnauthorized
+from pyramid.httpexceptions import (
+    HTTPBadRequest,
+    HTTPFound,
+    HTTPNotFound,
+)
+from pyramid.httpexceptions import HTTPUnauthorized
 from pyramid.view import view_config
+
+from oauthlib.oauth2 import (
+    AccessDeniedError,
+    FatalClientError,
+    OAuth2Error,
+    Server,
+)
 
 from yithlibraryserver.i18n import TranslationString as _
 from yithlibraryserver.oauth2.application import create_client_id_and_secret
-from yithlibraryserver.oauth2.authentication import authenticate_client
 from yithlibraryserver.oauth2.authorization import Authorizator
 from yithlibraryserver.oauth2.schemas import ApplicationSchema
 from yithlibraryserver.oauth2.schemas import FullApplicationSchema
+from yithlibraryserver.oauth2.utils import (
+    create_response,
+    extract_params,
+    response_from_error,
+)
+from yithlibraryserver.oauth2.validator import RequestValidator
 from yithlibraryserver.user.security import assert_authenticated_user_is_registered
-
-
-DEFAULT_SCOPE = 'passwords'
-
-SCOPE_NAMES = {
-    'passwords': _('Access your passwords'),
-    }
 
 
 @view_config(route_name='oauth2_developer_applications',
@@ -198,127 +207,103 @@ def developer_application_delete(request):
     return {'app': app}
 
 
-@view_config(route_name='oauth2_authorization_endpoint',
-             renderer='templates/application_authorization.pt',
-             permission='add-authorized-app')
-def authorization_endpoint(request):
-    response_type = request.params.get('response_type')
-    if response_type is None:
-        return HTTPBadRequest('Missing required response_type')
+class AuthorizationEndpoint(object):
 
-    if response_type != 'code':
-        return HTTPNotImplemented('Only code is supported')
+    def __init__(self, request):
+        self.request = request
+        self.validator = RequestValidator(request.db, request.datetime_service)
+        self.server = Server(self.validator)
+        self.authorizator = Authorizator(request.db)
 
-    client_id = request.params.get('client_id')
-    if client_id is None:
-        return HTTPBadRequest('Missing required client_type')
+    @view_config(route_name='oauth2_authorization_endpoint',
+                 renderer='templates/application_authorization.pt',
+                 permission='add-authorized-app',
+                 request_method='GET')
+    def get(self):
+        uri, http_method, body, headers = extract_params(self.request)
 
-    app = request.db.applications.find_one({'client_id': client_id})
-    if app is None:
-        return HTTPNotFound()
+        try:
+            scopes, credentials = self.server.validate_authorization_request(
+                uri, http_method, body, headers,
+            )
+            credentials['user'] = self.request.user
 
-    redirect_uri = request.params.get('redirect_uri')
-    if redirect_uri is None:
-        redirect_uri = app['callback_url']
-    else:
-        if redirect_uri != app['callback_url']:
-            return HTTPBadRequest(
-                'Redirect URI does not match registered callback URL')
+            if self.authorizator.is_app_authorized(scopes, credentials):
+                server_response = self.server.create_authorization_response(
+                    uri, http_method, body, headers, scopes, credentials,
+                )
+                return create_response(*server_response)
+            else:
+                app = self.validator.get_client(credentials['client_id'])
+                authorship_information = ''
+                owner_id = app._client.get('owner', None)
+                if owner_id is not None:
+                    owner = self.request.db.users.find_one({'_id': owner_id})
+                    if owner:
+                        email = owner.get('email', None)
+                        if email:
+                            authorship_information = _('By ${owner}',
+                                                       mapping={'owner': email})
 
-    scope = request.params.get('scope', DEFAULT_SCOPE)
-
-    state = request.params.get('state')
-
-    user = assert_authenticated_user_is_registered(request)
-
-    authorizator = Authorizator(request.db, app)
-
-    if 'submit' in request.POST:
-        if not authorizator.is_app_authorized(request.user):
-            authorizator.store_user_authorization(request.user)
-
-        code = authorizator.auth_codes.create(
-            request.user['_id'], app['client_id'], scope)
-        url = authorizator.auth_codes.get_redirect_url(
-            code, redirect_uri, state)
-        return HTTPFound(location=url)
-
-    elif 'cancel' in request.POST:
-        return HTTPFound(app['main_url'])
-
-    else:
-        if authorizator.is_app_authorized(user):
-            code = authorizator.auth_codes.create(
-                user['_id'], app['client_id'], scope)
-            url = authorizator.auth_codes.get_redirect_url(
-                code, redirect_uri, state)
-            return HTTPFound(location=url)
-
-        else:
-            authorship_information = ''
-            owner_id = app.get('owner', None)
-            if owner_id is not None:
-                owner = request.db.users.find_one({'_id': owner_id})
-                if owner:
-                    email = owner.get('email', None)
-                    if email:
-                        authorship_information = _('By ${owner}',
-                                                   mapping={'owner': email})
-
-            scopes = [SCOPE_NAMES.get(scope, scope)
-                      for scope in scope.split(' ')]
-            return {
-                'response_type': response_type,
-                'client_id': client_id,
-                'redirect_uri': redirect_uri,
-                'scope': scope,
-                'state': state,
-                'app': app,
-                'scopes': scopes,
-                'authorship_information': authorship_information,
+                pretty_scopes = self.validator.get_pretty_scopes(scopes)
+                return {
+                    'response_type': credentials['response_type'],
+                    'client_id': credentials['client_id'],
+                    'redirect_uri': credentials['redirect_uri'],
+                    'state': credentials['state'],
+                    'scope': ' '.join(scopes),
+                    'app': app._client,
+                    'scopes': pretty_scopes,
+                    'authorship_information': authorship_information,
                 }
+        except FatalClientError as e:
+            return response_from_error(e)
+
+        except OAuth2Error as e:
+            return HTTPFound(e.in_uri(e.redirect_uri))
+
+    @view_config(route_name='oauth2_authorization_endpoint',
+                 permission='add-authorized-app',
+                 request_method='POST')
+    def post(self):
+        uri, http_method, body, headers = extract_params(self.request)
+
+        redirect_uri = self.request.POST.get('redirect_uri')
+        if 'submit' in self.request.POST:
+            scope = self.request.POST.get('scope', '')
+            scopes = scope.split()
+            credentials = {
+                'client_id': self.request.POST.get('client_id'),
+                'redirect_uri': redirect_uri,
+                'response_type': self.request.POST.get('response_type'),
+                'state': self.request.POST.get('state'),
+                'user': self.request.user,
+            }
+            try:
+                server_response = self.server.create_authorization_response(
+                    uri, http_method, body, headers, scopes, credentials,
+                )
+                self.authorizator.store_user_authorization(scopes, credentials)
+                return create_response(*server_response)
+            except FatalClientError as e:
+                return response_from_error(e)
+
+        elif 'cancel' in self.request.POST:
+            e = AccessDeniedError()
+            return HTTPFound(e.in_uri(redirect_uri))
 
 
 @view_config(route_name='oauth2_token_endpoint',
              renderer='json')
 def token_endpoint(request):
-    app = authenticate_client(request)
+    validator = RequestValidator(request.db, request.datetime_service)
+    server = Server(validator)
 
-    grant_type = request.POST.get('grant_type')
-    if grant_type is None:
-        return HTTPBadRequest('Missing required grant_type')
-
-    if grant_type != 'authorization_code':
-        return HTTPNotImplemented('Only authorization_code is supported')
-
-    code = request.POST.get('code')
-    if code is None:
-        return HTTPBadRequest('Missing required code')
-
-    authorizator = Authorizator(request.db, app)
-
-    grant = authorizator.auth_codes.find(code)
-    if grant is None:
-        return HTTPUnauthorized()
-
-    # TODO: check if the grant is rotten
-
-    if app['client_id'] != grant['client_id']:
-        return HTTPUnauthorized()
-
-    authorizator.auth_codes.remove(grant)
-
-    request.response.headers['Cache-Control'] = 'no-store'
-    request.response.headers['Pragma'] = 'no-cache'
-
-    access_code = authorizator.access_codes.create(grant['user'], grant)
-
-    return {
-        'access_code': access_code,
-        'token_type': 'bearer',
-        'expires_in': 3600,
-        'scope': grant['scope'],
-        }
+    uri, http_method, body, headers = extract_params(request)
+    server_response = server.create_token_response(
+        uri, http_method, body, headers, {},
+    )
+    return create_response(*server_response)
 
 
 @view_config(route_name='oauth2_authorized_applications',
@@ -326,8 +311,14 @@ def token_endpoint(request):
              permission='view-applications')
 def authorized_applications(request):
     assert_authenticated_user_is_registered(request)
-    authorized_apps_filter = {'_id': {'$in': request.user['authorized_apps']}}
-    authorized_apps = request.db.applications.find(authorized_apps_filter)
+    authorizator = Authorizator(request.db)
+    authorized_apps = []
+    for authorization in authorizator.get_user_authorizations(request.user):
+        app = request.db.applications.find_one({
+            'client_id': authorization['client_id'],
+        })
+        if app is not None:
+            authorized_apps.append(app)
     return {'authorized_apps': authorized_apps}
 
 
@@ -346,13 +337,10 @@ def revoke_application(request):
     if app is None:
         return HTTPNotFound()
 
-    authorizator = Authorizator(request.db, app)
-
-    if not authorizator.is_app_authorized(request.user):
-        return HTTPUnauthorized()
+    authorizator = Authorizator(request.db)
 
     if 'submit' in request.POST:
-        authorizator.remove_user_authorization(request.user)
+        authorizator.remove_user_authorization(request.user, app['client_id'])
 
         request.session.flash(
             _('The access to application ${app} has been revoked',

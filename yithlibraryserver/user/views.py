@@ -29,6 +29,8 @@ from yithlibraryserver.backups.email import get_day_to_send
 from yithlibraryserver.compat import url_quote
 from yithlibraryserver.i18n import translation_domain
 from yithlibraryserver.i18n import TranslationString as _
+from yithlibraryserver.oauth2.decorators import protected_method
+from yithlibraryserver.password.models import PasswordsManager
 from yithlibraryserver.user import analytics
 from yithlibraryserver.user.accounts import get_accounts, merge_accounts
 from yithlibraryserver.user.accounts import notify_admins_of_account_removal
@@ -37,8 +39,6 @@ from yithlibraryserver.user.schemas import UserSchema, NewUserSchema
 from yithlibraryserver.user.schemas import AccountDestroySchema
 from yithlibraryserver.user.schemas import UserPreferencesSchema
 from yithlibraryserver.user.utils import delete_user
-from yithlibraryserver.password.models import PasswordsManager
-from yithlibraryserver.security import authorize_user
 
 
 @view_config(route_name='login', renderer='templates/login.pt')
@@ -109,7 +109,6 @@ def register_new_user(request):
                 'last_name': appstruct['last_name'],
                 'email': appstruct['email'],
                 'email_verified': email_verified,
-                'authorized_apps': [],
                 'date_joined': now,
                 'last_login': now,
                 'send_passwords_periodically': False,
@@ -477,6 +476,6 @@ class UserRESTView(object):
         return ''
 
     @view_config(request_method='GET')
+    @protected_method(['read-userinfo'])
     def get(self):
-        user = authorize_user(self.request)
-        return user
+        return self.request.user

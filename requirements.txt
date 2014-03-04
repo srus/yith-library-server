@@ -21,6 +21,7 @@ zope.interface==4.0.5    # required by pyramid
 
 # direct dependencies
 deform==0.9.9
+oauthlib==0.6.1
 pymongo==2.6.3
 pyramid==1.4.5
 pyramid_beaker==0.8

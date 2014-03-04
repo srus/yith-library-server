@@ -19,6 +19,8 @@
 import datetime
 import os
 
+from bson.tz_util import utc
+
 
 class FakeDateService(object):
 
@@ -39,7 +41,7 @@ class FakeDatetimeService(object):
     def utcnow(self):
         fake = os.environ['YITH_FAKE_DATETIME']
         parts = [int(p) for p in fake.split('-')]
-        return datetime.datetime(*parts)
+        return datetime.datetime(*parts, tzinfo=utc)
 
 
 def get_fake_date(request):

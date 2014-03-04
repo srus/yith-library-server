@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import unittest
 
 from webtest import TestApp
@@ -29,8 +30,14 @@ from pyramid.settings import asbool
 from pyramid.testing import DummyRequest
 
 from yithlibraryserver import main
+from yithlibraryserver.datetimeservice.testing import FakeDatetimeService
 
-MONGO_URI = 'mongodb://localhost:27017/test-yith-library'
+# On Travis-CI tests are executed in paralllel for every Python
+# version we support. We should not share the test database on
+# each of this test executions
+PY_VERSION = '%d%d' % (sys.version_info[0], sys.version_info[1])
+DB_NAME = 'test-yith-library-%s' % PY_VERSION
+MONGO_URI = 'mongodb://localhost:27017/%s' % DB_NAME
 
 
 class FakeRequest(DummyRequest):
@@ -40,6 +47,8 @@ class FakeRequest(DummyRequest):
         self.authorization = self.headers.get('Authorization', '').split(' ')
         if 'db' in kwargs:
             self.db = kwargs['db']
+
+        self.datetime_service = FakeDatetimeService(self)
 
 
 class TestCase(unittest.TestCase):
@@ -69,7 +78,7 @@ class TestCase(unittest.TestCase):
             }
         app = main({}, **settings)
         self.testapp = TestApp(app)
-        self.db = app.registry.settings['db_conn']['test-yith-library']
+        self.db = app.registry.settings['db_conn'][DB_NAME]
 
     def tearDown(self):
         for col in self.clean_collections:

@@ -21,6 +21,7 @@
 import bson
 
 from yithlibraryserver.email import send_email_to_admins
+from yithlibraryserver.oauth2.authorization import Authorizator
 
 
 def get_available_providers():
@@ -95,20 +96,25 @@ def merge_accounts(db, master_user, accounts):
 def merge_users(db, user1, user2):
     # move all passwords of user2 to user1
     db.passwords.update({'owner': user2['_id']}, {
-            '$set': {
-                'owner': user1['_id'],
-                },
-            }, multi=True)
+        '$set': {
+            'owner': user1['_id'],
+        },
+    }, multi=True)
 
-    # copy authorized_apps from user2 to user1
-    updates = {
-        '$addToSet': {
-            'authorized_apps': {
-                '$each': user2['authorized_apps'],
-                },
-            },
+    # move authorized_apps from user2 to user1
+    authorizator = Authorizator(db)
+    for auth in authorizator.get_user_authorizations(user2):
+        credentials = {
+            'client_id': auth['client_id'],
+            'user': user1,
+            'redirect_uri': auth['redirect_uri'],
+            'response_type': auth['response_type'],
         }
+        scopes = auth['scope'].split(' ')
+        authorizator.store_user_authorization(scopes, credentials)
+    authorizator.remove_all_user_authorizations(user2)
 
+    updates = {}
     # copy the providers
     for provider in get_available_providers():
         key = provider + '_id'

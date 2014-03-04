@@ -18,11 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-from pyramid.httpexceptions import HTTPBadRequest, HTTPUnauthorized
 from pyramid.security import Allow, Authenticated
-
-
-from yithlibraryserver.oauth2.authorization import AccessCodes
 
 
 class RootFactory(object):
@@ -42,24 +38,3 @@ class RootFactory(object):
 
     def __init__(self, request):
         self.request = request
-
-
-def authorize_user(request):
-    authorization = request.headers.get('Authorization')
-    if authorization is None:
-        raise HTTPUnauthorized()
-
-    method, credentials = request.authorization
-    if method.lower() != 'bearer':
-        raise HTTPBadRequest('Authorization method not supported')
-
-    access_code = AccessCodes(request.db).find(credentials)
-    if access_code is None:
-        raise HTTPUnauthorized()
-
-    user_id = access_code['user']
-    user = request.db.users.find_one(user_id)
-    if user is None:
-        raise HTTPUnauthorized()
-
-    return user

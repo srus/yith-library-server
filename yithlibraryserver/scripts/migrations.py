@@ -22,6 +22,7 @@ import sys
 
 from pyramid.paster import bootstrap
 
+from yithlibraryserver.oauth2.authorization import Authorizator
 from yithlibraryserver.scripts.utils import safe_print
 from yithlibraryserver.scripts.utils import get_user_display_name
 
@@ -46,6 +47,36 @@ def add_send_email_preference(db):
     for user in db.users.find():
         add_attribute(db.users, user, get_user_display_name(user),
                       'send_passwords_periodically', True)
+
+@migration
+def new_authorized_apps_collection(db):
+    """Move the authorized_apps information from the users collection
+    to an authorized_apps collection.
+    """
+    app_cache = {}
+    auth = Authorizator(db)
+    scopes = ['read-passwords', 'write-passwords', 'read-userinfo']
+    for user in db.users.find():
+        authorized_apps = user['authorized_apps']
+        # create an authorized_apps document for every authorized app
+        for app_id in authorized_apps:
+            if app_id not in app_cache:
+                app_cache[app_id] = db.applications.find_one({'_id': app_id})
+            app = app_cache[app_id]
+            credentials = {
+                'client_id': app['client_id'],
+                'user': user,
+                'redirect_uri': app['callback_url'],
+                'response_type': 'code',
+            }
+            auth.store_user_authorization(scopes, credentials)
+            safe_print('Storing authorized app "%s" for user %s' % (
+                app['client_id'],
+                get_user_display_name(user),
+            ))
+
+    # remove the authorized_apps attribute from all users
+    db.users.update({}, {'$unset': {'authorized_apps': ''}}, multi=True)
 
 
 def migrate():

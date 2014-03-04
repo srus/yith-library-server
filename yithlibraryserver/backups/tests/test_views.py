@@ -50,16 +50,15 @@ class ViewTests(TestCase):
         # Log in
         date = datetime.datetime(2012, 12, 12, 12, 12)
         user_id = self.db.users.insert({
-                'twitter_id': 'twitter1',
-                'screen_name': 'John Doe',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': '',
-                'email_verified': False,
-                'authorized_apps': [],
-                'date_joined': date,
-                'last_login': date,
-                })
+            'twitter_id': 'twitter1',
+            'screen_name': 'John Doe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': '',
+            'email_verified': False,
+            'date_joined': date,
+            'last_login': date,
+        })
         self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/backup')
@@ -74,16 +73,15 @@ class ViewTests(TestCase):
         # Log in
         date = datetime.datetime(2012, 12, 12, 12, 12)
         user_id = self.db.users.insert({
-                'twitter_id': 'twitter1',
-                'screen_name': 'John Doe',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': '',
-                'email_verified': False,
-                'authorized_apps': [],
-                'date_joined': date,
-                'last_login': date,
-                })
+            'twitter_id': 'twitter1',
+            'screen_name': 'John Doe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': '',
+            'email_verified': False,
+            'date_joined': date,
+            'last_login': date,
+        })
         self.testapp.get('/__login/' + str(user_id))
 
         os.environ['YITH_FAKE_DATE'] = '2012-1-10'
@@ -128,16 +126,15 @@ class ViewTests(TestCase):
         # Log in
         date = datetime.datetime(2012, 12, 12, 12, 12)
         user_id = self.db.users.insert({
-                'twitter_id': 'twitter1',
-                'screen_name': 'John Doe',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': '',
-                'email_verified': False,
-                'authorized_apps': [],
-                'date_joined': date,
-                'last_login': date,
-                })
+            'twitter_id': 'twitter1',
+            'screen_name': 'John Doe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': '',
+            'email_verified': False,
+            'date_joined': date,
+            'last_login': date,
+        })
         self.testapp.get('/__login/' + str(user_id))
 
         # no file to upload
