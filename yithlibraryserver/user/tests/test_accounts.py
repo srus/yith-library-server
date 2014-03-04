@@ -34,17 +34,9 @@ from yithlibraryserver.user.accounts import notify_admins_of_account_removal
 from yithlibraryserver.testing import MONGO_URI, TestCase
 
 
-class AccountTests(unittest.TestCase):
+class AccountTests(TestCase):
 
-    def setUp(self):
-        self.config = testing.setUp()
-        mdb = MongoDB(MONGO_URI)
-        self.db = mdb.get_database()
-
-    def tearDown(self):
-        testing.tearDown()
-        self.db.drop_collection('users')
-        self.db.drop_collection('passwords')
+    clean_collections = ('users', 'passwords')
 
     def test_get_available_providers(self):
         self.assertEqual(('facebook', 'google', 'twitter', 'persona', 'liveconnect'),
