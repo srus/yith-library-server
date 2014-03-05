@@ -19,49 +19,25 @@
 import datetime
 import unittest
 
-from yithlibraryserver import locale
+from yithlibraryserver.locale import DatesFormatter
 
 
 class DatesFormatterTests(unittest.TestCase):
 
     def test_date(self):
-        df_en = locale.DatesFormatter('en')
-        df_es = locale.DatesFormatter('es')
+        df_en = DatesFormatter('en')
+        df_es = DatesFormatter('es')
 
         date = datetime.date(2012, 12, 12)
 
-        if locale.HAS_BABEL:
-            self.assertEqual(df_en.date(date), 'Dec 12, 2012')
-            self.assertEqual(df_es.date(date), '12/12/2012')
-
-        locale_changed = False
-        if locale.HAS_BABEL:
-            locale.HAS_BABEL = False
-            locale_changed = True
-
-        self.assertEqual(df_en.date(date), 'Wed Dec 12 00:00:00 2012')
-        self.assertEqual(df_es.date(date), 'Wed Dec 12 00:00:00 2012')
-
-        if locale_changed:
-            locale.HAS_BABEL = not locale.HAS_BABEL
+        self.assertEqual(df_en.date(date), 'Dec 12, 2012')
+        self.assertEqual(df_es.date(date), '12/12/2012')
 
     def test_datetime(self):
-        df_en = locale.DatesFormatter('en')
-        df_es = locale.DatesFormatter('es')
+        df_en = DatesFormatter('en')
+        df_es = DatesFormatter('es')
 
         date = datetime.datetime(2012, 12, 12, 12, 12, 12)
 
-        if locale.HAS_BABEL:
-            self.assertEqual(df_en.datetime(date), 'Dec 12, 2012 12:12:12 PM')
-            self.assertEqual(df_es.datetime(date), '12/12/2012 12:12:12')
-
-        locale_changed = False
-        if locale.HAS_BABEL:
-            locale.HAS_BABEL = False
-            locale_changed = True
-
-        self.assertEqual(df_en.datetime(date), 'Wed Dec 12 12:12:12 2012')
-        self.assertEqual(df_es.datetime(date), 'Wed Dec 12 12:12:12 2012')
-
-        if locale_changed:
-            locale.HAS_BABEL = not locale.HAS_BABEL
+        self.assertEqual(df_en.datetime(date), 'Dec 12, 2012, 12:12:12 PM')
+        self.assertEqual(df_es.datetime(date), '12/12/2012 12:12:12')
