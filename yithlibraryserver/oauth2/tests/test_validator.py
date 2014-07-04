@@ -153,14 +153,19 @@ class RequestValidatorTests(testing.TestCase):
         self.assertEquals(rv.get_default_scopes('123456', request),
                           ['read-passwords'])
 
-    def test_validate_response_type_true(self):
+    def test_validate_response_type_code(self):
         rv, request = self._create_request_validator()
         self.assertTrue(rv.validate_response_type('123456', 'code',
                                                   None, request))
 
-    def test_validate_response_type_false(self):
+    def test_validate_response_type_token(self):
         rv, request = self._create_request_validator()
-        self.assertFalse(rv.validate_response_type('123456', 'token',
+        self.assertTrue(rv.validate_response_type('123456', 'token',
+                                                  None, request))
+
+    def test_validate_response_type_invalid(self):
+        rv, request = self._create_request_validator()
+        self.assertFalse(rv.validate_response_type('123456', 'invalid',
                                                    None, request))
 
     def test_save_authorization_code(self):
