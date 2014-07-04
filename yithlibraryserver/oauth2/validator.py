@@ -17,12 +17,16 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
+import logging
 
 import oauthlib.oauth2
 from oauthlib.common import to_unicode
 
 from yithlibraryserver.i18n import TranslationString as _
 from yithlibraryserver.oauth2.utils import decode_base64
+
+
+logger = logging.getLogger(__name__)
 
 
 class WrappedClient(object):
@@ -64,7 +68,9 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
     def validate_client_id(self, client_id, request, *args, **kwargs):
         """Simple validity check, does client exist? Not banned?"""
         request.client = self.get_client(client_id)
-        return request.client is not None
+        result = request.client is not None
+        logger.debug('Validating client id: %s Result: %s', client_id, result)
+        return result
 
     def validate_redirect_uri(self, client_id, redirect_uri, request, *args, **kwargs):
         """Is the client allowed to use the supplied redirect_uri?
@@ -97,9 +103,10 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         """Clients should only be allowed to use one type of response type, the
         one associated with their one allowed grant type.
 
-        In this case it must be "code".
+        In this case it must be "code" or "token".
         """
-        return response_type == 'code'
+        # TODO: store the allowed types in the client
+        return response_type in ('code', 'token')
 
     # Post-authorization
 
@@ -215,7 +222,7 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
             'access_token': token['access_token'],
             'type': token['token_type'],
             'expiration': expiration,
-            'refresh_token': token['refresh_token'],
+            'refresh_token': token.get('refresh_token'),
             'user_id': request.user,
             'scope': ' '.join(request.scopes),
             'client_id': request.client.client_id,
@@ -236,6 +243,9 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
 
     def validate_bearer_token(self, token, scopes, request):
         """Remember to check expiration and scope membership"""
+        if token is None:
+            return False
+
         record = {
             'access_token': token,
         }
