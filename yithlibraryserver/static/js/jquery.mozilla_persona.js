@@ -53,7 +53,7 @@
                     "method='post'>",
                     "<input type='hidden' name='assertion' ",
                     "value='" + assertion + "'/>",
-                    (options.next_url ? "<input type='hidden' name='next_url' value='" + options.next_url + "' />" : ""),
+                    (options.next_url ? "<input type='hidden' name='next_url' value='" + decodeURIComponent(options.next_url) + "' />" : ""),
                     "</form>"
                 ].join("");
                 $(form).appendTo("body").submit();
