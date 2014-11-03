@@ -34,7 +34,7 @@ pyramid_tm==0.7
 pyramid_sna==0.3.1
 raven==3.3.4
 requests==1.2.3
-waitress==0.8.8
+waitress==0.8.9
 newrelic==2.6.0.5
 
 # python2 #
