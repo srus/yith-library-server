@@ -16,21 +16,47 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-from yithlibraryserver import testing
+import unittest
+from pyramid import testing
+from pyramid.events import NewRequest
+from pyramid.request import Request
+
+from yithlibraryserver.subscribers import add_compress_response_callback
 
 
-class ContentEncodingTests(testing.TestCase):
+class ContentEncodingTests(unittest.TestCase):
+
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def _request(self, headers=None):
+        if headers is None:
+            request = Request({})
+        else:
+            request = Request({}, headers=headers)
+
+        request.registry = self.config.registry
+        event = NewRequest(request)
+        add_compress_response_callback(event)
+
+        response = request.response
+        request._process_response_callbacks(response)
+        return response
+
+    def test_no_compression(self):
+        response = self._request()
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(response.content_encoding, None)
 
     def test_identity_compression(self):
-        res = self.testapp.get('/')  # Identity encoding is the default one
-        self.assertEqual(res.status, '200 OK')
-        self.assertEqual(res.content_encoding, None)
-
-        res = self.testapp.get('/', headers={'Accept-Encoding': 'identity'})
-        self.assertEqual(res.status, '200 OK')
-        self.assertEqual(res.content_encoding, None)
+        response = self._request({'Accept-Encoding': 'identity'})
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(response.content_encoding, None)
 
     def test_gzip_compression(self):
-        res = self.testapp.get('/', headers={'Accept-Encoding': 'gzip'})
-        self.assertEqual(res.status, '200 OK')
-        self.assertEqual(res.content_encoding, 'gzip')
+        response = self._request({'Accept-Encoding': 'gzip'})
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(response.content_encoding, 'gzip')

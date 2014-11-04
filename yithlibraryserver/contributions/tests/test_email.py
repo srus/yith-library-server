@@ -17,17 +17,17 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
+import unittest
 
 from pyramid import testing
 
 from pyramid_mailer import get_mailer
 
-from yithlibraryserver.testing import TestCase
 from yithlibraryserver.contributions.email import send_thankyou_email
 from yithlibraryserver.contributions.email import send_notification_to_admins
 
 
-class SendEmailTests(TestCase):
+class SendEmailTests(unittest.TestCase):
 
     def setUp(self):
         self.admin_emails = ['admin1@example.com', 'admin2@example.com']
@@ -35,8 +35,11 @@ class SendEmailTests(TestCase):
                 'admin_emails': self.admin_emails,
                 })
         self.config.include('pyramid_mailer.testing')
-        self.config.include('yithlibraryserver')
-        super(SendEmailTests, self).setUp()
+        self.config.include('pyramid_chameleon')
+        self.config.add_route('home', '/')
+
+    def tearDown(self):
+        testing.tearDown()
 
     def test_send_thankyou_email(self):
         request = testing.DummyRequest()
