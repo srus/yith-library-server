@@ -18,22 +18,30 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import unittest
+
 from pyramid import testing
 from pyramid.testing import DummyRequest
 
 from pyramid_mailer import get_mailer
 
-from yithlibraryserver.testing import TestCase
+from yithlibraryserver.db import MongoDB
+from yithlibraryserver.testing import MONGO_URI
 from yithlibraryserver.user.email_verification import EmailVerificationCode
 
-class EmailVerificationCodeTests(TestCase):
+
+class EmailVerificationCodeTests(unittest.TestCase):
 
     clean_collections = ('users', )
 
     def setUp(self):
         self.config = testing.setUp()
         self.config.include('pyramid_mailer.testing')
-        super(EmailVerificationCodeTests, self).setUp()
+        self.config.include('pyramid_chameleon')
+        self.db = MongoDB(MONGO_URI).get_database()
+
+    def tearDown(self):
+        testing.tearDown()
 
     def test_email_verification_code(self):
         evc = EmailVerificationCode()

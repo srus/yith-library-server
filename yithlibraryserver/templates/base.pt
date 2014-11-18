@@ -30,171 +30,174 @@
   </head>
   <body>
 
-  <div class="container">
-    <div class="alert" tal:condition="request.google_analytics.enabled and request.google_analytics.first_time">
-      <p>
-        <strong tal:condition="not request.user" i18n:translate="">Welcome, new visitor!</strong>
-        <strong tal:condition="request.user" i18n:translate="">Welcome <span i18n:name="current-user">${request.user}</span></strong>.
-        <span i18n:translate="">We are using cookies to get statistics about the usage of Yith Library. This is completely optional and we want to ask you if this is ok with you.</span></p>
-      <form id="google-analytics-preference-form" action="${request.route_path('user_google_analytics_preference')}" method="POST">
-        <input type="submit" class="btn btn-success" name="yes" value="Ok, I can handle one more cookie" i18n:attributes="value" />
-        <input type="submit" class="btn btn-danger" name="no" value="No, I don't want to be tracked" i18n:attributes="value" />
-      </form>
-    </div>
-  </div>
+    <div class="wrapper">
+      <div class="container">
+        <div class="alert" tal:condition="request.google_analytics.enabled and request.google_analytics.first_time">
+          <p>
+            <strong tal:condition="not request.user" i18n:translate="">Welcome, new visitor!</strong>
+            <strong tal:condition="request.user" i18n:translate="">Welcome <span i18n:name="current-user">${request.user}</span></strong>.
+            <span i18n:translate="">We are using cookies to get statistics about the usage of Yith Library. This is completely optional and we want to ask you if this is ok with you.</span></p>
+          <form id="google-analytics-preference-form" action="${request.route_path('user_google_analytics_preference')}" method="POST">
+            <input type="submit" class="btn btn-success" name="yes" value="Ok, I can handle one more cookie" i18n:attributes="value" />
+            <input type="submit" class="btn btn-danger" name="no" value="No, I don't want to be tracked" i18n:attributes="value" />
+          </form>
+        </div>
+      </div>
 
-  <tal:block metal:define-slot="navbar">
-    <div class="navbar container" tal:attributes="class 'navbar container home-navbar' if request.matched_route.name == 'home' else 'navbar container'">
-      <div class="navbar-inner">
-        <a class="brand" href="${request.route_path('home')}">Yith Library</a>
-        <ul class="nav pull-right">
-          <li tal:condition="not request.user">
-            <a href="${request.route_path('login')}" i18n:translate="">Log in</a>
-          </li>
-          <li tal:condition="request.user">
-            <a href="${request.route_path('user_information')}">
-              <img class="avatar" src="${request.gravatar.get_image_url(32)}" height="32" alt="" />
-              ${request.user}
-            </a>
-          </li>
-          <li tal:condition="request.user">
-            <a href="${request.route_path('oauth2_clients')}" i18n:translate="">My passwords</a>
-          </li>
-          <li tal:condition="request.user">
-            <a class="logout" href="${request.route_path('logout')}" i18n:translate="">Log out</a>
-          </li>
+      <tal:block metal:define-slot="navbar">
+        <div class="navbar container" tal:attributes="class 'navbar container home-navbar' if request.matched_route.name == 'home' else 'navbar container'">
+          <div class="navbar-inner">
+            <a class="brand" href="${request.route_path('home')}">Yith Library</a>
+            <ul class="nav pull-right">
+              <li tal:condition="not request.user">
+                <a href="${request.route_path('login')}" i18n:translate="">Log in</a>
+              </li>
+              <li tal:condition="request.user">
+                <a href="${request.route_path('user_information')}">
+                  <img class="avatar" src="${request.gravatar.get_image_url(32)}" height="32" alt="" />
+                  ${request.user}
+                </a>
+              </li>
+              <li tal:condition="request.user">
+                <a href="${request.route_path('oauth2_clients')}" i18n:translate="">My passwords</a>
+              </li>
+              <li tal:condition="request.user">
+                <a class="logout" href="${request.route_path('logout')}" i18n:translate="">Log out</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </tal:block>
+
+      <div id="messages" class="container">
+        <div tal:repeat="queue ('info', 'success', 'error', '')" tal:omit-tag="">
+          <div class="alert alert-${queue}"
+               tal:define="messages request.session.pop_flash(queue)"
+               tal:condition="messages"
+               tal:repeat="message messages">
+            <button class="close" data-dismiss="alert">x</button>
+            ${message}
+          </div>
+        </div>
+      </div>
+
+      <article class="container">
+
+        <tal:block metal:define-slot="content"></tal:block>
+
+      </article>
+
+    </div>
+
+    <footer class="container-fluid">
+      <div class="container">
+        <ul class="pull-left">
+          <li><a href="${request.route_path('faq')}" i18n:translate="">FAQ</a> |</li>
+          <li><a href="${request.route_path('tos')}" id="tosButton" i18n:translate="">Terms of service</a> |</li>
+          <li><a href="${request.route_path('contact')}" i18n:translate="">Contact</a> |</li>
+          <li><a href="#" id="creditsButton" i18n:translate="">Credits</a></li>
+        </ul>
+        <ul class="pull-right">
+          <li><a href="https://twitter.com/YithLibrary" target="_blank" i18n:translate="">Follow us on Twitter!</a></li>
+          <li><a href="https://github.com/lorenzogil/yith-library-server" target="_blank" i18n:translate="">Fork us on GitHub!</a></li>
         </ul>
       </div>
-    </div>
-  </tal:block>
+    </footer>
 
-  <div id="messages" class="container">
-    <div tal:repeat="queue ('info', 'success', 'error', '')" tal:omit-tag="">
-      <div class="alert alert-${queue}"
-           tal:define="messages request.session.pop_flash(queue)"
-           tal:condition="messages"
-           tal:repeat="message messages">
-        <button class="close" data-dismiss="alert">x</button>
-        ${message}
+    <div class="modal hide" id="credits">
+      <div class="modal-header">
+        <button class="close" data-dismiss="modal">&times;</button>
+        <h3 i18n:translate="">Credits</h3>
       </div>
-    </div>
-  </div>
-
-  <div class="container">
-
-    <tal:block metal:define-slot="content"></tal:block>
-
-  </div>
-
-  <footer class="container-fluid">
-    <div class="container">
-      <ul class="pull-left">
-        <li><a href="${request.route_path('faq')}" i18n:translate="">FAQ</a> |</li>
-        <li><a href="${request.route_path('tos')}" id="tosButton" i18n:translate="">Terms of service</a> |</li>
-        <li><a href="${request.route_path('contact')}" i18n:translate="">Contact</a> |</li>
-        <li><a href="#" id="creditsButton" i18n:translate="">Credits</a></li>
-      </ul>
-      <ul class="pull-right">
-        <li><a href="https://twitter.com/YithLibrary" target="_blank" i18n:translate="">Follow us on Twitter!</a></li>
-        <li><a href="https://github.com/lorenzogil/yith-library-server" target="_blank" i18n:translate="">Fork us on GitHub!</a></li>
-      </ul>
-    </div>
-  </footer>
-
-  <div class="modal hide" id="credits">
-    <div class="modal-header">
-      <button class="close" data-dismiss="modal">&times;</button>
-      <h3 i18n:translate="">Credits</h3>
-    </div>
-    <div class="modal-body">
-      <p><span i18n:translate="">Yith Library is copyright of:</span>
+      <div class="modal-body">
+        <p><span i18n:translate="">Yith Library is copyright of:</span>
+          <ul>
+            <li><a href="http://mensab.com" target="_blank">Alejandro Blanco</a> &lt;alejandro.b.e at gmail.com&gt;</li>
+            <li><a href="http://lorenzogil.com/" target="_blank">Lorenzo Gil</a> &lt;lorenzo.gil.sanchez at gmail.com&gt;</li>
+            <li><a href="http://www.yaco.es" target="_blank">Yaco Sistemas S.L.</a></li>
+          </ul>
+          And is licensed under the terms of the <a href="http://www.gnu.org/licenses/agpl.html" target="_blank">GNU Affero General Public License</a>.
+        </p>
+        <hr />
+        <p>Yithian image is copyright of <a href="http://narizpuntiaguda.com/" target="_blank">Isaac (Ismurg)</a> &lt;ismurg at gmail.com&gt; under the terms of the <a href="http://creativecommons.org/licenses/by-sa/3.0/" target="_blank">CC BY-SA 3.0</a></p>
+        <hr />
+        <p>Icons from <a href="http://glyphicons.com" target="_blank">Glyphicons Free</a> - <a href="http://creativecommons.org/licenses/by/3.0/" target="_blank">CC BY 3.0</a> and the <a href="http://thenounproject.com" target="_blank">Noun Project</a>:</p>
         <ul>
-          <li><a href="http://mensab.com" target="_blank">Alejandro Blanco</a> &lt;alejandro.b.e at gmail.com&gt;</li>
-          <li><a href="http://lorenzogil.com/" target="_blank">Lorenzo Gil</a> &lt;lorenzo.gil.sanchez at gmail.com&gt;</li>
-          <li><a href="http://www.yaco.es" target="_blank">Yaco Sistemas S.L.</a></li>
+          <li>"Smartphone" symbol by George Agpoon, from The Noun Project</li>
+          <li>"iPad" symbol by Daxx, from The Noun Project</li>
+          <li>"Inalámbrica" symbol by Libre, from The Noun Project</li>
+          <li>"Monitor" symbol by James Fenton, from The Noun Project</li>
+          <li>"Lavadora" symbol by jon trillana, from The Noun Project</li>
+          <li>"Caja Fuerte" symbol by Simon Child, from The Noun Project</li>
+          <li>"Botón" symbol by The Noun Project</li>
+          <li>"Cóndor" symbol by Megan Shrewsbury, from The Noun Project</li>
+	      <li>"Browser" symbol by Alexandre Lachèze from The Noun Project</li>
+          <li><a href="http://thenounproject.com/noun/raised-hand/#icon-No12043" target="_blank">Raised Hand</a> designed by <a href="http://thenounproject.com/niftyacres" target="_blank">Stephen JB Thomas</a> from The Noun Project</li>
+          <li><a href="http://thenounproject.com/noun/megaphone/#icon-No5095" target="_blank">Megaphone</a> designed by <a href="http://thenounproject.com/karthicknagarajanps" target="_blank">Karthick Nagarajan</a> from The Noun Project</li>
         </ul>
-        And is licensed under the terms of the <a href="http://www.gnu.org/licenses/agpl.html" target="_blank">GNU Affero General Public License</a>.
-      </p>
-      <hr />
-      <p>Yithian image is copyright of <a href="http://narizpuntiaguda.com/" target="_blank">Isaac (Ismurg)</a> &lt;ismurg at gmail.com&gt; under the terms of the <a href="http://creativecommons.org/licenses/by-sa/3.0/" target="_blank">CC BY-SA 3.0</a></p>
-      <hr />
-      <p>Icons from <a href="http://glyphicons.com" target="_blank">Glyphicons Free</a> - <a href="http://creativecommons.org/licenses/by/3.0/" target="_blank">CC BY 3.0</a> and the <a href="http://thenounproject.com" target="_blank">Noun Project</a>:</p>
-      <ul>
-        <li>"Smartphone" symbol by George Agpoon, from The Noun Project</li>
-        <li>"iPad" symbol by Daxx, from The Noun Project</li>
-        <li>"Inalámbrica" symbol by Libre, from The Noun Project</li>
-        <li>"Monitor" symbol by James Fenton, from The Noun Project</li>
-        <li>"Lavadora" symbol by jon trillana, from The Noun Project</li>
-        <li>"Caja Fuerte" symbol by Simon Child, from The Noun Project</li>
-        <li>"Botón" symbol by The Noun Project</li>
-        <li>"Cóndor" symbol by Megan Shrewsbury, from The Noun Project</li>
-	    <li>"Browser" symbol by Alexandre Lachèze from The Noun Project</li>
-        <li><a href="http://thenounproject.com/noun/raised-hand/#icon-No12043" target="_blank">Raised Hand</a> designed by <a href="http://thenounproject.com/niftyacres" target="_blank">Stephen JB Thomas</a> from The Noun Project</li>
-        <li><a href="http://thenounproject.com/noun/megaphone/#icon-No5095" target="_blank">Megaphone</a> designed by <a href="http://thenounproject.com/karthicknagarajanps" target="_blank">Karthick Nagarajan</a> from The Noun Project</li>
-      </ul>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn btn-primary" data-dismiss="modal" i18n:translate="">Close</a>
+      </div>
     </div>
-    <div class="modal-footer">
-      <a href="#" class="btn btn-primary" data-dismiss="modal" i18n:translate="">Close</a>
-    </div>
-  </div>
 
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-  <script>window.jQuery || document.write('<script src=\'${request.static_path("yithlibraryserver:static/js/libs/jquery-1.7.2.min.js")}\'><\/script>')</script>
-  <script src="${request.static_path('yithlibraryserver:static/js/libs/bootstrap.js')}"></script>
-  <script src="${request.static_path('yithlibraryserver:static/js/jquery.google_analytics.js')}"></script>
-  <script type="text/javascript">
-    (function ($) {
-        "use strict";
-        $(document).ready(function () {
-            var credits_dialog = $("#credits").modal({ show: false });
-            $("#creditsButton").click(function (event) {
-                credits_dialog.modal("show");
-                event.preventDefault();
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src=\'${request.static_path("yithlibraryserver:static/js/libs/jquery-1.7.2.min.js")}\'><\/script>')</script>
+      <script src="${request.static_path('yithlibraryserver:static/js/libs/bootstrap.js')}"></script>
+      <script src="${request.static_path('yithlibraryserver:static/js/jquery.google_analytics.js')}"></script>
+      <script type="text/javascript">
+        (function ($) {
+            "use strict";
+            $(document).ready(function () {
+                var credits_dialog = $("#credits").modal({ show: false });
+                $("#creditsButton").click(function (event) {
+                    credits_dialog.modal("show");
+                    event.preventDefault();
+                });
+                $("[rel=popover]").popover({trigger: 'hover'}).click(function (event) {
+                    event.preventDefault();
+                });
+                $("[rel=tooltip]").tooltip().click(function (event) {
+                    event.preventDefault();
+                });
             });
-            $("[rel=popover]").popover({trigger: 'hover'}).click(function (event) {
-                event.preventDefault();
-            });
-            $("[rel=tooltip]").tooltip().click(function (event) {
-                event.preventDefault();
-            });
-        });
-    }(jQuery));
-  </script>
-  <div tal:omit-tag="" tal:condition="request.google_analytics.enabled">
-    <script type="text/javascript" tal:condition="request.google_analytics.show">
-    (function ($) {
-        "use strict";
-        $.google_analytics.init('${request.registry.settings['google_analytics_code']}');
-        $.google_analytics.show();
-    }(jQuery));
-    </script>
-    <script type="text/javascript" tal:condition="not request.google_analytics.show">
-    (function ($) {
-        "use strict";
-        $.google_analytics.init('${request.registry.settings['google_analytics_code']}');
-    }(jQuery));
-    </script>
-  </div>
+        }(jQuery));
+      </script>
+      <div tal:omit-tag="" tal:condition="request.google_analytics.enabled">
+        <script type="text/javascript" tal:condition="request.google_analytics.show">
+          (function ($) {
+              "use strict";
+              $.google_analytics.init('${request.registry.settings['google_analytics_code']}');
+              $.google_analytics.show();
+          }(jQuery));
+        </script>
+        <script type="text/javascript" tal:condition="not request.google_analytics.show">
+          (function ($) {
+              "use strict";
+              $.google_analytics.init('${request.registry.settings['google_analytics_code']}');
+          }(jQuery));
+        </script>
+      </div>
 
-  <script src="${request.static_path('yithlibraryserver:static/js/jquery.mozilla_persona.js')}"></script>
-  <script type="text/javascript" metal:define-slot="mozilla-persona-script">
-      (function ($) {
-          "use strict";
-          $(document).ready(function () {
-              $.mozilla_persona({
-                  login_url: "${request.route_path('persona_login')}",
-                  logout_url: "${request.route_path('logout')}",
-                  current_user: "${request.user.get('email', '') if request.user else ''}",
-                  current_provider: "${request.session.get('current_provider', None)}",
-                  login_selector: "#persona a",
-                  logout_selector: ".logout",
-                  next_url: null
-              });
-          });
-      }(jQuery));
-  </script>
+      <script src="${request.static_path('yithlibraryserver:static/js/jquery.mozilla_persona.js')}"></script>
+      <script type="text/javascript" metal:define-slot="mozilla-persona-script">
+        (function ($) {
+            "use strict";
+            $(document).ready(function () {
+                $.mozilla_persona({
+                    login_url: "${request.route_path('persona_login')}",
+                    logout_url: "${request.route_path('logout')}",
+                    current_user: "${request.user.get('email', '') if request.user else ''}",
+                    current_provider: "${request.session.get('current_provider', None)}",
+                    login_selector: "#persona a",
+                    logout_selector: ".logout",
+                    next_url: null
+                });
+            });
+        }(jQuery));
+      </script>
 
-  <tal:block metal:define-slot="extra-scripts"></tal:block>
+      <tal:block metal:define-slot="extra-scripts"></tal:block>
 
   </body>
 </html>

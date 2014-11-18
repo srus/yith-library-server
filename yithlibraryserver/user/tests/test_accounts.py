@@ -366,7 +366,7 @@ class MergeUsersTests(BaseMergeTests):
         self.assertEqual(auths.count(), 0)
 
 
-class AccountRemovalNotificationTests(TestCase):
+class AccountRemovalNotificationTests(unittest.TestCase):
 
     def setUp(self):
         self.admin_emails = ['admin1@example.com', 'admin2@example.com']
@@ -374,8 +374,11 @@ class AccountRemovalNotificationTests(TestCase):
                 'admin_emails': self.admin_emails,
                 })
         self.config.include('pyramid_mailer.testing')
-        self.config.include('yithlibraryserver')
-        super(AccountRemovalNotificationTests, self).setUp()
+        self.config.include('pyramid_chameleon')
+        self.config.add_route('home', '/')
+
+    def tearDown(self):
+        testing.tearDown()
 
     def test_notify_admins_of_account_removal(self):
         request = DummyRequest()

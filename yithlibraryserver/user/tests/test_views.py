@@ -66,6 +66,15 @@ class ViewTests(TestCase):
 
     clean_collections = ('users', 'passwords', )
 
+    def assertClearAuthCookie(self, headers):
+        self.assertTrue('Set-Cookie' in headers)
+        pieces = [p.split('=') for p in headers['Set-Cookie'].split(';')]
+        cookie = dict([(key.strip(), value) for key, value in pieces])
+        self.assertEqual(cookie['auth_tkt'], '')
+        self.assertEqual(cookie['Path'], '/')
+        self.assertEqual(cookie['Domain'], 'localhost')
+        self.assertEqual(cookie['Max-Age'], '0')
+
     def test_login(self):
         res = self.testapp.get('/login?param1=value1&param2=value2')
         self.assertEqual(res.status, '200 OK')
@@ -288,8 +297,8 @@ class ViewTests(TestCase):
         res = self.testapp.get('/logout', status=302)
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/')
-        self.assertTrue('Set-Cookie' in res.headers)
-        self.assertTrue('auth_tkt=""' in res.headers['Set-Cookie'])
+
+        self.assertClearAuthCookie(res.headers)
         self.assertFalse('current_provider' in self.get_session(res))
 
     def test_user_information(self):
@@ -396,8 +405,7 @@ class ViewTests(TestCase):
                 'submit': 'Yes, I am sure. Destroy my account',
                 }, status=302)
         self.assertEqual(res.location, 'http://localhost/')
-        self.assertTrue('Set-Cookie' in res.headers)
-        self.assertTrue('auth_tkt=""' in res.headers['Set-Cookie'])
+        self.assertClearAuthCookie(res.headers)
 
         user = self.db.users.find_one({'_id': user_id})
         self.assertEqual(None, user)

@@ -27,8 +27,9 @@ from pyramid.testing import DummyRequest
 from pyramid_mailer import get_mailer
 
 from yithlibraryserver.datetimeservice.testing import FakeDateService
+from yithlibraryserver.db import MongoDB
 from yithlibraryserver.backups.email import get_day_to_send, send_passwords
-from yithlibraryserver.testing import TestCase
+from yithlibraryserver.testing import MONGO_URI
 
 
 class GetDayToSendTests(unittest.TestCase):
@@ -66,14 +67,18 @@ class GetDayToSendTests(unittest.TestCase):
         self.assertEqual(empty_days, [])
 
 
-class SendPasswordsTests(TestCase):
+class SendPasswordsTests(unittest.TestCase):
 
     clean_collections = ('users', 'passwords', )
 
     def setUp(self):
         self.config = testing.setUp()
         self.config.include('pyramid_mailer.testing')
-        super(SendPasswordsTests, self).setUp()
+        self.config.include('pyramid_chameleon')
+        self.db = MongoDB(MONGO_URI).get_database()
+
+    def tearDown(self):
+        testing.tearDown()
 
     def test_send_passwords(self):
         preferences_link = 'http://localhost/preferences'

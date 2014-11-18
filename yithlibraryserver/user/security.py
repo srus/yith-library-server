@@ -20,14 +20,13 @@
 
 import bson
 
-from pyramid.security import authenticated_userid, unauthenticated_userid
 from pyramid.httpexceptions import HTTPFound
 
 from yithlibraryserver.user.models import User
 
 
 def get_user(request):
-    user_id = unauthenticated_userid(request)
+    user_id = request.unauthenticated_userid
     if user_id is None:
         return user_id
 
@@ -40,7 +39,7 @@ def get_user(request):
 
 
 def assert_authenticated_user_is_registered(request):
-    user_id = authenticated_userid(request)
+    user_id = request.authenticated_userid
     try:
         user = request.db.users.find_one(bson.ObjectId(user_id))
     except bson.errors.InvalidId:

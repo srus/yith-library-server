@@ -25,13 +25,16 @@ from pyramid_mailer.message import Attachment
 
 from yithlibraryserver.email import create_message, send_email
 from yithlibraryserver.email import send_email_to_admins
-from yithlibraryserver.testing import TestCase
 
 
 class CreateMessageTests(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
+        self.config.include('pyramid_chameleon')
+
+    def tearDown(self):
+        testing.tearDown()
 
     def test_create_message(self):
         request = testing.DummyRequest()
@@ -89,7 +92,7 @@ class CreateMessageTests(unittest.TestCase):
         self.assertEqual(message.extra_headers, {'foo': 'bar'})
 
 
-class SendEmailTests(TestCase):
+class SendEmailTests(unittest.TestCase):
 
     def setUp(self):
         self.admin_emails = ['admin1@example.com', 'admin2@example.com']
@@ -97,8 +100,10 @@ class SendEmailTests(TestCase):
                 'admin_emails': self.admin_emails,
                 })
         self.config.include('pyramid_mailer.testing')
-        self.config.include('yithlibraryserver')
-        super(SendEmailTests, self).setUp()
+        self.config.include('pyramid_chameleon')
+
+    def tearDown(self):
+        testing.tearDown()
 
     def test_send_email(self):
         request = testing.DummyRequest()
@@ -141,14 +146,14 @@ class SendEmailTests(TestCase):
         self.assertEqual(message.extra_headers, {})
 
 
-class SendEmailNoAdminsTests(TestCase):
+class SendEmailNoAdminsTests(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp(settings={
                 'admin_emails': [],
                 })
         self.config.include('pyramid_mailer.testing')
-        self.config.include('yithlibraryserver')
+        self.config.include('pyramid_chameleon')
         super(SendEmailNoAdminsTests, self).setUp()
 
     def test_send_email_to_admins(self):

@@ -104,6 +104,9 @@ def main(global_config, **settings):
     config.add_renderer('json', json_renderer)
     config.add_static_view('static', 'static', cache_max_age=3600)
 
+    # Chameleon setup
+    config.include('pyramid_chameleon')
+
     # Beaker (sessions) setup
     config.include('pyramid_beaker')
 
