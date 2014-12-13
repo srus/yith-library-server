@@ -4,52 +4,38 @@
   method="${field.method}"
   enctype="multipart/form-data"
   accept-charset="utf-8"
+  role="form"
   i18n:domain="deform"
-  tal:attributes="class python:field.css_class + ' form-horizontal'">
+  tal:attributes="class python:field.css_class">
 
-  <fieldset class="deformFormFieldset">
+  <input type="hidden" name="_charset_" />
+  <input type="hidden" name="__formid__" value="${field.formid}"/>
 
-    <legend tal:condition="field.title">${field.title}</legend>
+  <div class="alert alert-danger" role="alert" tal:condition="field.error">
+    <strong class="errorMsgLbl" i18n:translate="">There was a problem with your submission.</strong>
+     <span class="errorMsg" i18n:translate="" i18n:domain="deform">Errors have been highlighted below</span>
+     <span class="errorMsg">${field.errormsg}</span>
+  </div>
 
-    <input type="hidden" name="_charset_" />
-    <input type="hidden" name="__formid__" value="${field.formid}"/>
-    <ul class="unstyled">
+  <p tal:condition="field.description">
+    ${field.description}
+  </p>
 
-      <li class="errorLi" tal:condition="field.error">
-        <h3 class="errorMsgLbl" i18n:translate=""
-            >There was a problem with your submission</h3>
-        <p class="errorMsg" i18n:translate="" i18n:domain="deform"
-           >Errors have been highlighted below</p>
-        <p class="errorMsg">${field.errormsg}</p>
-      </li>
+  <div tal:define="rndr field.renderer;
+                   tmpl field.widget.item_template"
+       tal:repeat="f field.children"
+       tal:replace="structure
+                    rndr(tmpl,field=f,cstruct=cstruct.get(f.name, null))"/>
 
-      <li class="section first" tal:condition="field.description">
-        ${field.description}
-      </li>
-
-      <div
-          tal:define="rndr field.renderer;
-                      tmpl field.widget.item_template"
-          tal:repeat="f field.children"
-          tal:replace="structure
-                       rndr(tmpl,field=f,cstruct=cstruct.get(f.name, null))"/>
-
-      <li class="buttons form-actions">
-        <tal:block repeat="button field.buttons">
-          <button
-              tal:attributes="disabled button.disabled; class python:'btnText submit btn ' + button.css_class"
-              id="${field.formid+button.name}"
-              name="${button.name}"
-              type="${button.type}"
-              value="${button.value}">
-            <span>${button.title}</span>
-          </button>
-        </tal:block>
-      </li>
-
-    </ul>
-
-  </fieldset>
+  <tal:block repeat="button field.buttons">
+    <button tal:attributes="disabled button.disabled; class python:'btnText submit btn ' + button.css_class"
+            id="${field.formid+button.name}"
+            name="${button.name}"
+            type="${button.type}"
+            value="${button.value}">
+      <span>${button.title}</span>
+    </button>
+  </tal:block>
 
 <script type="text/javascript" tal:condition="field.use_ajax">
   deform.addCallback(
