@@ -129,16 +129,20 @@ footer {
 }
 
 /* Contribute styles */
-.contribute-banner {
-    background: #eeeeee url(../img/raised-hand.png) no-repeat 95% center;
+.contribute-banner .container {
+    background-image: url(../img/raised-hand.png);
+    background-repeat: no-repeat;
+    background-position: 95% center;
+    min-height: 225px;
+    padding-right: 225px;
+}
+
+.contribute-banner p {
+    margin: 20px 0;
 }
 
 #banner-preview {
     margin-top: 10px;
-}
-
-.bottom-spacer {
-    margin-bottom: 20px;
 }
 
 .table .flag-cell {
@@ -161,6 +165,7 @@ footer {
 .deck {
     position: relative;
     padding: 20px 0;
+    height: 350px;
 }
 
 .deck img {
