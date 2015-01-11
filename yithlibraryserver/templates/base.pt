@@ -92,50 +92,10 @@
           <a href="${request.route_path('faq')}" i18n:translate="">FAQ</a> &middot;
           <a href="${request.route_path('tos')}" id="tosButton" i18n:translate="">Terms of service</a> &middot;
           <a href="${request.route_path('contact')}" i18n:translate="">Contact</a> &middot;
-          <a href="#" id="creditsButton" i18n:translate="">Credits</a>
+          <a href="${request.route_path('credits')}" i18n:translate="">Credits</a>
         </p>
       </div>
     </footer>
-
-    <div class="modal hide" id="credits">
-      <div class="modal-header">
-        <button class="close" data-dismiss="modal">&times;</button>
-        <h3 i18n:translate="">Credits</h3>
-      </div>
-      <div class="modal-body">
-        <p><span i18n:translate="">Yith Library is copyright of:</span>
-          <ul>
-            <li><a href="http://mensab.com" target="_blank">Alejandro Blanco</a> &lt;alejandro.b.e at gmail.com&gt;</li>
-            <li><a href="http://lorenzogil.com/" target="_blank">Lorenzo Gil</a> &lt;lorenzo.gil.sanchez at gmail.com&gt;</li>
-            <li><a href="http://www.yaco.es" target="_blank">Yaco Sistemas S.L.</a></li>
-          </ul>
-          And is licensed under the terms of the <a href="http://www.gnu.org/licenses/agpl.html" target="_blank">GNU Affero General Public License</a>.
-        </p>
-        <hr />
-        <p>Yithian image is copyright of <a href="http://narizpuntiaguda.com/" target="_blank">Isaac (Ismurg)</a> &lt;ismurg at gmail.com&gt; under the terms of the <a href="http://creativecommons.org/licenses/by-sa/3.0/" target="_blank">CC BY-SA 3.0</a></p>
-        <hr />
-        <p>Icons from <a href="http://glyphicons.com" target="_blank">Glyphicons Free</a> - <a href="http://creativecommons.org/licenses/by/3.0/" target="_blank">CC BY 3.0</a> and the <a href="http://thenounproject.com" target="_blank">Noun Project</a>:</p>
-        <ul>
-          <li>"Smartphone" symbol by George Agpoon, from The Noun Project</li>
-          <li>"iPad" symbol by Daxx, from The Noun Project</li>
-          <li>"Inalámbrica" symbol by Libre, from The Noun Project</li>
-          <li>"Monitor" symbol by James Fenton, from The Noun Project</li>
-          <li>"Lavadora" symbol by jon trillana, from The Noun Project</li>
-          <li>"Caja Fuerte" symbol by Simon Child, from The Noun Project</li>
-          <li>"Botón" symbol by The Noun Project</li>
-          <li>"Cóndor" symbol by Megan Shrewsbury, from The Noun Project</li>
-	      <li>"Browser" symbol by Alexandre Lachèze from The Noun Project</li>
-          <li><a href="http://thenounproject.com/noun/raised-hand/#icon-No12043" target="_blank">Raised Hand</a> designed by <a href="http://thenounproject.com/niftyacres" target="_blank">Stephen JB Thomas</a> from The Noun Project</li>
-          <li><a href="http://thenounproject.com/noun/megaphone/#icon-No5095" target="_blank">Megaphone</a> designed by <a href="http://thenounproject.com/karthicknagarajanps" target="_blank">Karthick Nagarajan</a> from The Noun Project</li>
-          <li>Question designed by <a href="http://www.thenounproject.com/SuperAtic">SuperAtic LABS</a> from the <a href="http://www.thenounproject.com">Noun Project</a></li>
-          <li>Gear designed by <a href="http://www.thenounproject.com/kikajasso">Erika Jasso</a> from the <a href="http://www.thenounproject.com">Noun Project</a></li>
-          <li>Globe designed by <a href="http://www.thenounproject.com/PKG">Proletkult Graphik</a> from the <a href="http://www.thenounproject.com">Noun Project</a></li>
-        </ul>
-      </div>
-      <div class="modal-footer">
-        <a href="#" class="btn btn-primary" data-dismiss="modal" i18n:translate="">Close</a>
-      </div>
-    </div>
 
     <script src="${request.static_path('yithlibraryserver:static/js/libs/jquery-2.1.1.min.js')}"></script>
     <script src="${request.static_path('yithlibraryserver:static/js/libs/bootstrap-3.3.0.min.js')}"></script>
@@ -144,11 +104,6 @@
         (function ($) {
             "use strict";
             $(document).ready(function () {
-                var credits_dialog = $("#credits").modal({ show: false });
-                $("#creditsButton").click(function (event) {
-                    credits_dialog.modal("show");
-                    event.preventDefault();
-                });
                 $("[rel=popover]").popover({trigger: 'hover'}).click(function (event) {
                     event.preventDefault();
                 });

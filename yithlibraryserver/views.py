@@ -117,3 +117,8 @@ def faq(request):
     template = 'yithlibraryserver:templates/faq-%s.pt' % locale_name
 
     return render_to_response(template, {}, request=request)
+
+
+@view_config(route_name='credits', renderer='templates/credits.pt')
+def credits(request):
+    return {}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="yithlibraryserver"
+      metal:use-macro="base.macros['base']">
+
+<tal:block metal:fill-slot="header-title" i18n:translate="">Credits</tal:block>
+
+<tal:block metal:fill-slot="content">
+
+  <div class="container">
+
+    <h1 i18n:translate="">Credits</h1>
+
+    <h2 i18n:translate="">Software</h2>
+
+    <p><span i18n:translate="">Yith Library is copyright of:</span>
+      <ul>
+        <li><a href="http://mensab.com" target="_blank">Alejandro Blanco</a> &lt;alejandro.b.e at gmail.com&gt;</li>
+        <li><a href="http://lorenzogil.com/" target="_blank">Lorenzo Gil</a> &lt;lorenzo.gil.sanchez at gmail.com&gt;</li>
+        <li><a href="http://www.yaco.es" target="_blank">Yaco Sistemas S.L.</a></li>
+      </ul>
+      And is licensed under the terms of the <a href="http://www.gnu.org/licenses/agpl.html" target="_blank">GNU Affero General Public License</a>.
+    </p>
+
+    <h2 i18n:translate="">Media</h2>
+
+    <p>Yithian image is copyright of <a href="http://narizpuntiaguda.com/" target="_blank">Isaac (Ismurg)</a> &lt;ismurg at gmail.com&gt; under the terms of the <a href="http://creativecommons.org/licenses/by-sa/3.0/" target="_blank">CC BY-SA 3.0</a></p>
+    <p>Icons from <a href="http://glyphicons.com" target="_blank">Glyphicons Free</a> - <a href="http://creativecommons.org/licenses/by/3.0/" target="_blank">CC BY 3.0</a> and the <a href="http://thenounproject.com" target="_blank">Noun Project</a>:</p>
+    <ul>
+      <li>"Smartphone" symbol by George Agpoon, from The Noun Project</li>
+      <li>"iPad" symbol by Daxx, from The Noun Project</li>
+      <li>"Inalámbrica" symbol by Libre, from The Noun Project</li>
+      <li>"Monitor" symbol by James Fenton, from The Noun Project</li>
+      <li>"Lavadora" symbol by jon trillana, from The Noun Project</li>
+      <li>"Caja Fuerte" symbol by Simon Child, from The Noun Project</li>
+      <li>"Botón" symbol by The Noun Project</li>
+      <li>"Cóndor" symbol by Megan Shrewsbury, from The Noun Project</li>
+	  <li>"Browser" symbol by Alexandre Lachèze from The Noun Project</li>
+      <li><a href="http://thenounproject.com/noun/raised-hand/#icon-No12043" target="_blank">Raised Hand</a> designed by <a href="http://thenounproject.com/niftyacres" target="_blank">Stephen JB Thomas</a> from The Noun Project</li>
+      <li><a href="http://thenounproject.com/noun/megaphone/#icon-No5095" target="_blank">Megaphone</a> designed by <a href="http://thenounproject.com/karthicknagarajanps" target="_blank">Karthick Nagarajan</a> from The Noun Project</li>
+      <li>Question designed by <a href="http://www.thenounproject.com/SuperAtic">SuperAtic LABS</a> from the <a href="http://www.thenounproject.com">Noun Project</a></li>
+      <li>Gear designed by <a href="http://www.thenounproject.com/kikajasso">Erika Jasso</a> from the <a href="http://www.thenounproject.com">Noun Project</a></li>
+      <li>Globe designed by <a href="http://www.thenounproject.com/PKG">Proletkult Graphik</a> from the <a href="http://www.thenounproject.com">Noun Project</a></li>
+    </ul>
+
+  </div>
+
+</tal:block>
+
+</html>
