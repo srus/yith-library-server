@@ -54,13 +54,18 @@ footer {
 
 /* Home page styles */
 
-.home-banner .container {
-    background-image: url(../img/yithian.png);
-    background-repeat: no-repeat;
-    background-position: center right;
-    min-height: 350px;
-    padding-right: 300px;
+@media (min-width: 768px) {
+
+    .home-banner .container {
+        background-image: url(../img/yithian.png);
+        background-repeat: no-repeat;
+        background-position: center right;
+        min-height: 350px;
+        padding-right: 300px;
+    }
+
 }
+
 
 .home-banner p, .home-banner .btn {
     margin: 20px 0;

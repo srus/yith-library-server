@@ -85,7 +85,7 @@
 
     <footer>
       <div class="container">
-        <p class="pull-right">
+        <p class="pull-right hidden-xs">
           <a href="https://twitter.com/YithLibrary" target="_blank" i18n:translate="">Follow us on Twitter!</a> &middot; <a href="https://github.com/lorenzogil/yith-library-server" target="_blank" i18n:translate="">Fork us on GitHub!</a>
         </p>
         <p>

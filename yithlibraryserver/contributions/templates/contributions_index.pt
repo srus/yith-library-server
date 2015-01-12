@@ -42,7 +42,7 @@
       <div class="col-lg-6">
         <p i18n:translate="">Add a banner from your site ...</p>
         <div class="row">
-          <div class="col-lg-6">
+          <div class="col-sm-6">
             <p i18n:translate="">1. Pick a banner type:</p>
             <div id="banner-selector" class="btn-group" data-toggle="buttons-radio">
               <button type="button" class="btn active" data-src="${request.static_url('yithlibraryserver:static/img/banners/banner1.png')}" i18n:translate="">Small 1</button>
@@ -51,7 +51,7 @@
             </div>
             <img id="banner-preview" src="${request.static_path('yithlibraryserver:static/img/banners/banner1.png')}" />
           </div>
-          <div class="col-lg-6">
+          <div class="col-sm-6">
             <p i18n:translate="">2. Copy and paste this into your website:</p>
             <textarea id="banner-source" class="col-lg-12" rows="7" readonly="readonly"><a href="${request.registry.settings['public_url_root']}"><img src="${request.static_url('yithlibraryserver:static/img/banners/banner1.png')}" alt="Yith Library" title="Yith Library"/></a></textarea>
           </div>
@@ -139,7 +139,7 @@
         <h2 i18n:translate="">Write some code</h2>
         <p i18n:translate="">If you know how to program your help will be very much appreciated since there a lot of room for improvement in Yith Library. The source code is on Github and you can read the documentation to get you started.</p>
         <div class="row">
-          <div class="col-lg-3">
+          <div class="col-sm-3">
             <div class="thumbnail">
               <a href="https://github.com/lorenzogil/yith-library-server">
                 <img src="${request.static_path('yithlibraryserver:static/img/socialite.png')}" width="150" height="125" />
@@ -149,7 +149,7 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-3">
+          <div class="col-sm-3">
             <div class="thumbnail">
               <a href="https://github.com/ablanco/yith-library-web-client">
                 <img src="${request.static_path('yithlibraryserver:static/img/baracktocat.png')}" width="150" height="125" />
@@ -159,7 +159,7 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-3">
+          <div class="col-sm-3">
             <div class="thumbnail">
               <a href="https://github.com/ablanco/yith-library-cli">
                 <img src="${request.static_path('yithlibraryserver:static/img/jenktocat.png')}" width="150" height="125" />
@@ -169,7 +169,7 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-3">
+          <div class="col-sm-3">
             <div class="thumbnail">
               <a href="https://github.com/lorenzogil/yith-library-mobile-client">
                 <img src="${request.static_path('yithlibraryserver:static/img/poptocat_v2.png')}" width="150" height="125" />
@@ -214,7 +214,7 @@
 
         <div class="row">
 
-          <div class="col-lg-4">
+          <div class="col-sm-4">
             <div class="well well-sm">
               <h4 i18n:translate="">Small</h4>
               <p i18n:translate="">A personal thank you from the yithians</p>
@@ -227,7 +227,7 @@
             </div>
           </div>
 
-          <div class="col-lg-4">
+          <div class="col-sm-4">
             <div class="well well-sm">
               <h4 i18n:translate="">Medium</h4>
               <p i18n:translate="">A cool Yith Library sticker and a personal thank you from the yithians</p>
@@ -240,7 +240,7 @@
             </div>
           </div>
 
-          <div class="col-lg-4">
+          <div class="col-sm-4">
             <div class="well well-sm">
               <h4 i18n:translate="">Big</h4>
               <p i18n:translate="">A cool Yith Library sticker, a personal thank you from the yithians and daily backups of your passwords if you want them</p>

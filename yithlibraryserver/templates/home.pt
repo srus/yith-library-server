@@ -56,12 +56,12 @@
     <hr>
 
     <div class="row feature">
-      <div class="col-md-4">
+      <div class="col-sm-4">
         <a name="why">
           <img src="${request.static_path('yithlibraryserver:static/img/lock.png')}" width="175" height="175" alt="" class="center-block" />
         </a>
       </div>
-      <div class="col-md-8">
+      <div class="col-sm-8">
         <h2 i18n:translate="">Using one
           <strong i18n:name="password" i18n:translate="">password</strong>
           for everything is a bad idea</h2>
@@ -79,7 +79,7 @@
     <hr>
 
     <div class="row feature">
-      <div class="col-md-8">
+      <div class="col-sm-8">
         <h2 i18n:translate="">Manage your passwords
           <strong i18n:name="easily" i18n:translate="">easily</strong></h2>
         <p class="lead" i18n:translate="">It's not as easy as using the same password for everything but you
@@ -90,7 +90,7 @@
           <a href="${request.route_path('oauth2_clients')}" i18n:name="any-device" i18n:translate="">any device!</a>
         </p>
       </div>
-      <div class="col-md-4">
+      <div class="col-sm-4 hidden-xs">
         <img src="${request.static_path('yithlibraryserver:static/img/hand-button.png')}" width="175" height="175" alt="" class="center-block" />
       </div>
     </div>
@@ -98,11 +98,11 @@
     <hr>
 
     <div class="row feature">
-      <div class="col-md-4">
+      <div class="col-sm-4">
         <img src="${request.static_path('yithlibraryserver:static/img/safe-deposit-box.png')}" width="175" height="175" alt="" class="center-block" />
       </div>
 
-      <div class="col-md-8">
+      <div class="col-sm-8">
         <h2 i18n:translate="">Keep your secrets
           <strong i18n:name="secure" i18n:translate="">secure</strong></h2>
         <p class="lead" i18n:translate="">Your passwords are transmitted over the network using the TLS
@@ -116,11 +116,11 @@
     <hr>
 
     <div class="row feature">
-      <div class="col-md-8">
+      <div class="col-sm-8">
         <h2 i18n:translate="">Yith Library is a
         <strong i18n:name="free" i18n:translate="">free</strong> service</h2>
         <div class="row">
-	      <div class="col-md-6">
+	      <div class="col-sm-6">
 	        <p><strong i18n:translate="">Free as in freedom</strong></p>
 	        <ul class="list-unstyled">
 	          <li i18n:translate="">You can use it any way you want</li>
@@ -130,7 +130,7 @@
 	          <li i18n:translate="">We are happy with all of this</li>
 	        </ul>
 	      </div>
-	      <div class="col-md-6">
+	      <div class="col-sm-6">
 	        <p><strong i18n:translate="">Free as in beer</strong></p>
 	        <ul class="list-unstyled">
 	          <li i18n:translate="">You can use our server and clients without paying a dime</li>
@@ -141,7 +141,7 @@
         </div>
       </div>
 
-      <div class="col-md-4">
+      <div class="col-sm-4 hidden-xs">
         <img src="${request.static_path('yithlibraryserver:static/img/condor.png')}" width="175" height="175" alt="" class="center-block" />
       </div>
     </div>
@@ -198,7 +198,7 @@
     <hr>
 
     <div class="row feature">
-      <div class="col-md-6">
+      <div class="col-md-6 hidden-xs">
         <a name="where">
           <img src="${request.static_path('yithlibraryserver:static/img/devices.png')}" width="470" height="175" alt="A smartphone, a tablet, a laptop, a desktop and a washing machine!" class="center-block" />
         </a>
@@ -217,7 +217,7 @@
     <hr>
 
     <div class="row feature">
-      <div class="col-md-6">
+      <div class="col-sm-6">
         <h2 i18n:translate="">About the great library of Yith</h2>
         <p><em i18n:translate="">Those captive minds who cooperated with the Great Race were
 	        allowed to wander the Yithian cities at will and to browse the
@@ -228,7 +228,7 @@
         </p>
       </div>
 
-      <div class="col-md-6">
+      <div class="col-sm-6">
         <img class="pull-right" src="${request.static_path('yithlibraryserver:static/img/lovecraft.jpg')}" width="113" height="150" alt="Picture of Howard Phillips Lovecraft" />
         <blockquote>
           <h4><span i18n:translate="">I couldn't live a week without a private library.</span> <small>H. P. Lovecraft</small></h4>
