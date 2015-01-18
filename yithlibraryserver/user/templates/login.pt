@@ -10,21 +10,23 @@
 
 <tal:block metal:fill-slot="content">
 
-  <h1 i18n:translate="">Log in</h1>
-  <ul class="thumbnails">
+  <div class="container">
+    <h1 i18n:translate="">Log in</h1>
+    <ul class="list-unstyled row">
 
-    <li id="${idp.slug}" class="span3" tal:repeat="idp identity_providers">
-      <div class="thumbnail">
-	    <a href="${request.route_path(idp.route_path)}?next_url=${next_url}">
-	      <img src="${request.static_path(idp.image_path)}" alt="" />
-	    </a>
-        <div class="caption">
-          <a class="btn btn-primary" href="${request.route_path(idp.route_path)}?next_url=${next_url}">${idp.message}</a>
+      <li id="${idp.slug}" class="col-sm-4" tal:repeat="idp identity_providers">
+        <div class="thumbnail">
+	      <a href="${request.route_path(idp.route_path)}?next_url=${next_url}">
+	        <img src="${request.static_path(idp.image_path)}" alt="" />
+	      </a>
+          <div class="caption">
+            <a class="btn btn-primary btn-lg btn-block" href="${request.route_path(idp.route_path)}?next_url=${next_url}">${idp.message}</a>
+          </div>
         </div>
-      </div>
-    </li>
+      </li>
+    </ul>
 
-  </ul>
+  </div>
 
 </tal:block>
 
