@@ -31,6 +31,7 @@ from yithlibraryserver.i18n import translation_domain
 from yithlibraryserver.i18n import TranslationString as _
 from yithlibraryserver.oauth2.decorators import protected_method
 from yithlibraryserver.password.models import PasswordsManager
+from yithlibraryserver.schemas import HorizontalForm
 from yithlibraryserver.user import analytics
 from yithlibraryserver.user.accounts import get_accounts, merge_accounts
 from yithlibraryserver.user.accounts import notify_admins_of_account_removal
@@ -222,7 +223,7 @@ def user_information(request):
     button1 = Button('submit', _('Save changes'))
     button1.css_class = 'btn-primary'
 
-    form = Form(schema, buttons=(button1, ))
+    form = HorizontalForm(schema, buttons=(button1, ))
 
     if 'submit' in request.POST:
 

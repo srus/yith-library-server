@@ -68,12 +68,18 @@
         </div>
 
         <div id="messages" class="container">
-          <div tal:repeat="queue ('info', 'success', 'error', '')" tal:omit-tag="">
-            <div class="alert alert-${queue}"
-                 tal:define="messages request.session.pop_flash(queue)"
+          <div tal:repeat="queue (('info', 'info'), ('success', 'success'), ('error', 'danger'), ('warning', 'warning'), ('', ''))" tal:omit-tag="">
+            <div class="alert alert-${queue[1]} alert-dismissible"
+                 role="alert"
+                 tal:define="messages request.session.pop_flash(queue[0])"
                  tal:condition="messages"
                  tal:repeat="message messages">
-              <button class="close" data-dismiss="alert">x</button>
+              <button type="button"
+                      class="close"
+                      data-dismiss="alert"
+                      aria-label="close">
+                <span aria-hidden="true">&times;</span>
+              </button>
               ${message}
             </div>
           </div>

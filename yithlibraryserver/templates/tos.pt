@@ -12,7 +12,9 @@
 
   <div class="container">
 
-    <h1 i18n:translate="">Terms of service</h1>
+    <div class="page-header">
+      <h1 i18n:translate="">Terms of service</h1>
+    </div>
 
     <div class="row">
       <div class="col-lg-6">

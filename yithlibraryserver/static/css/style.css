@@ -118,21 +118,6 @@ footer {
     margin: 0;
 }
 
-
-/* Profile styles */
-.personal-info {
-    margin-bottom: 12px;
-}
-
-.personal-info .avatar {
-    float: left;
-    margin-left: 60px;
-}
-
-.personal-info ul {
-    margin-left: 180px;
-}
-
 /* Contribute styles */
 .contribute-banner .container {
     background-image: url(../img/raised-hand.png);

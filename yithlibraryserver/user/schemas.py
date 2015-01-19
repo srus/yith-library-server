@@ -65,16 +65,19 @@ class BaseUserSchema(colander.MappingSchema):
         colander.String(),
         title=_('First name'),
         missing='',
+        widget=TextInputWidget(css_class='form-control'),
         )
     last_name = colander.SchemaNode(
         colander.String(),
         title=_('Last name'),
         missing='',
+        widget=TextInputWidget(css_class='form-control'),
         )
     screen_name = colander.SchemaNode(
         colander.String(),
         title=_('Screen name'),
         missing='',
+        widget=TextInputWidget(css_class='form-control'),
         )
 
 
@@ -82,7 +85,7 @@ class UserSchema(BaseUserSchema):
 
     email = EmailSchema(
         title=_('Email'),
-        widget=EmailWidget(),
+        widget=EmailWidget(css_class='form-control'),
         missing={'email': '', 'email_verified': False},
         )
 

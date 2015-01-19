@@ -6,13 +6,15 @@
   <!-- mapping_item -->
   <label tal:condition="not (field.widget.hidden or
                              field.widget.category == 'structural')"
-         class="control-label desc"
+         class="control-label col-sm-2"
          title="${field.description}"
          for="${field.oid}"
          >${field.title}<span tal:condition="field.required" class="req"
                               id="req-${field.oid}">*</span>
   </label>
-  <span tal:replace="structure field.serialize(cstruct)"/>
+  <div class="col-sm-10">
+    <span tal:replace="structure field.serialize(cstruct)"/>
+  </div>
 
   <p tal:condition="field.error and not field.widget.hidden and not field.typ.__class__.__name__=='Mapping'"
      tal:define="errstr 'error-%s' % field.oid"

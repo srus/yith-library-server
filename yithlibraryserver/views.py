@@ -29,7 +29,7 @@ from pyramid.view import view_config
 
 from yithlibraryserver.email import send_email_to_admins
 from yithlibraryserver.i18n import TranslationString as _
-from yithlibraryserver.schemas import ContactSchema
+from yithlibraryserver.schemas import ContactSchema, HorizontalForm
 
 log = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ def contact(request):
     button2 = Button('cancel', _('Cancel'))
     button2.css_class = ''
 
-    form = Form(ContactSchema(), buttons=(button1, button2))
+    form = HorizontalForm(ContactSchema(), buttons=(button1, button2))
 
     if 'submit' in request.POST:
         controls = request.POST.items()
