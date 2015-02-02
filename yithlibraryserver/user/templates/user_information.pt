@@ -39,6 +39,8 @@
     </div>
   </div>
 
+  <hr/>
+
   <form tal:replace="structure form">form</form>
 
   <tal:block
