@@ -14,7 +14,7 @@
         <div class="alert alert-info hide">
           <p i18n:translate="">The email message with the verification link has been sent. <strong i18n:name="check-your-inbox" i18n:translate="">Go and check your inbox!</strong></p>
         </div>
-        <div class="alert alert-error hide">
+        <div class="alert alert-danger hide">
           <p><span i18n:translate="">There was an error sending the verification link to your email address.</span> <strong></strong></p>
         </div>
       </div>

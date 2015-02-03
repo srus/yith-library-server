@@ -10,60 +10,61 @@
 
 <tal:block metal:fill-slot="content">
 
-  <h2 i18n:translate="">Backup</h2>
+  <div class="page-header">
+    <h1 i18n:translate="">Backup</h1>
+  </div>
 
   <div class="row">
 
-    <div class="span5">
+    <div class="col-sm-6">
 
-      <h3 i18n:translate="">Export passwords</h3>
+      <h2 i18n:translate="">Export passwords</h2>
 
-      <div style="min-height: 8em">
-        <p class="muted"><small i18n:translate="">By clicking in the following button you will get a backup file with your password collection.</small></p>
+      <div class="form-group" style="min-height: 10em">
+        <p i18n:translate="">By clicking in the following button you will get a backup file with your password collection.</p>
       </div>
 
-      <div class="form-actions">
-        <a href="${request.route_path('backups_export')}" class="btn btn-primary btn-large" i18n:translate="">Download my passwords</a>
-      </div>
+      <a href="${request.route_path('backups_export')}" class="btn btn-primary btn-lg btn-block" i18n:translate="">Download my passwords</a>
     </div>
 
-    <div class="span5">
+    <div class="col-sm-6">
 
-      <h3 i18n:translate="">Import passwords</h3>
+      <h2 i18n:translate="">Import passwords</h2>
 
       <form id="import-form" method="post" action="${request.route_path('backups_import')}" enctype="multipart/form-data">
 
-        <div style="min-height: 8em">
-          <p class="muted"><small i18n:translate="">By uploading a backup file you will replace your existing password collection with the contents of that file.</small></p>
-
+        <div class="form-group" style="min-height: 10em">
+          <p i18n:translate="">By uploading a backup file you will replace your existing password collection with the contents of that file.</p>
           <label class="control-label" for="passwords-file" i18n:translate="">Select a file:</label>
           <input id="passwords-file" name="passwords-file" type="file" class="input-block-level" />
         </div>
 
-        <div class="form-actions">
-          <input type="submit" class="btn btn-primary btn-large" value="Upload my passwords" i18n:attributes="value" data-toggle="modal" data-target="#import-confirmation-dialog" />
-        </div>
+        <a class="btn btn-primary btn-lg btn-block" i18n:translate="" data-toggle="modal" data-target="#import-confirmation-dialog">Upload my passwords</a>
       </form>
     </div>
   </div>
 
 
-  <div class="modal hide" id="import-confirmation-dialog">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal">×</button>
-      <h3 i18n:translate="">Import confirmation</h3>
-    </div>
+  <div class="modal" id="import-confirmation-dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+	<div class="modal-header">
+	  <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>
+	  <h4 i18n:translate="">Import confirmation</h4>
+	</div>
 
-    <div class="modal-body">
-      <p i18n:translate="">Are you sure you want to import a password backup file?</p>
-      <p i18n:translate="">This action will <strong i18n:name="replace" i18n:translate="">replace</strong> your current password collection with the contents of the file you are uploading.</p>
-      <p class="text-error" i18n:translate="">This action can not be undone.</p>
+	<div class="modal-body">
+	  <p i18n:translate="">Are you sure you want to import a password backup file?</p>
+	  <p i18n:translate="">This action will <strong i18n:name="replace" i18n:translate="">replace</strong> your current password collection with the contents of the file you are uploading.</p>
+	  <p class="alert alert-danger" i18n:translate="">This action can not be undone.</p>
 
-    </div>
+	</div>
 
-    <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal" i18n:translate="">Cancel</a>
-      <a href="#" id="confirmation-link" class="btn btn-primary" i18n:translate="">Yes, I am sure</a>
+	<div class="modal-footer">
+	  <a href="#" class="btn" data-dismiss="modal" i18n:translate="">Cancel</a>
+	  <a href="#" id="confirmation-link" class="btn btn-primary" i18n:translate="">Yes, I am sure</a>
+	</div>
+      </div>
     </div>
   </div>
 
