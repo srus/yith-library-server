@@ -47,6 +47,7 @@ from yithlibraryserver.oauth2.utils import (
     response_from_error,
 )
 from yithlibraryserver.oauth2.validator import RequestValidator
+from yithlibraryserver.schemas import HorizontalForm
 from yithlibraryserver.user.security import assert_authenticated_user_is_registered
 
 
@@ -71,7 +72,7 @@ def developer_application_new(request):
     button1.css_class = 'btn-primary'
     button2 = Button('cancel', _('Cancel'))
     button2.css_class = ''
-    form = Form(schema, buttons=(button1, button2))
+    form = HorizontalForm(schema, buttons=(button1, button2))
 
     if 'submit' in request.POST:
         controls = request.POST.items()
@@ -134,7 +135,7 @@ def developer_application_edit(request):
     button2.css_class = 'btn-danger'
     button3 = Button('cancel', _('Cancel'))
     button3.css_class = ''
-    form = Form(schema, buttons=(button1, button2, button3))
+    form = HorizontalForm(schema, buttons=(button1, button2, button3))
 
     if 'submit' in request.POST:
         controls = request.POST.items()

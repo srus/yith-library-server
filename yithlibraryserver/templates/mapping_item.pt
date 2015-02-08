@@ -1,5 +1,4 @@
 <div class="form-group${field.error and ' has-' + (field.widget.error_class or '')}"
-     title="${field.description}"
      id="item-${field.oid}"
      tal:omit-tag="field.widget.hidden"
      i18n:domain="deform">

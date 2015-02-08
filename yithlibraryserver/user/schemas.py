@@ -33,14 +33,14 @@ class EmailWidget(TextInputWidget):
             field,
             cstruct.get('email', ''),
             readonly=readonly,
-            )
+        )
 
         pstruct = field.schema.deserialize(cstruct)
         email_verified_output = field.renderer(
             self.email_verified_template,
             email=pstruct.get('email', ''),
             email_verified=pstruct.get('email_verified', False),
-            )
+        )
 
         return email_output + email_verified_output
 
@@ -50,7 +50,7 @@ class EmailWidget(TextInputWidget):
             # The email_verified attr is readonly and
             # thus, not used in the view
             'email_verified': None,
-            }
+        }
 
 
 class EmailSchema(colander.MappingSchema):
@@ -66,19 +66,19 @@ class BaseUserSchema(colander.MappingSchema):
         title=_('First name'),
         missing='',
         widget=TextInputWidget(css_class='form-control'),
-        )
+    )
     last_name = colander.SchemaNode(
         colander.String(),
         title=_('Last name'),
         missing='',
         widget=TextInputWidget(css_class='form-control'),
-        )
+    )
     screen_name = colander.SchemaNode(
         colander.String(),
         title=_('Screen name'),
         missing='',
         widget=TextInputWidget(css_class='form-control'),
-        )
+    )
 
 
 class UserSchema(BaseUserSchema):
@@ -87,7 +87,7 @@ class UserSchema(BaseUserSchema):
         title=_('Email'),
         widget=EmailWidget(css_class='form-control'),
         missing={'email': '', 'email_verified': False},
-        )
+    )
 
 
 class NewUserSchema(BaseUserSchema):
@@ -96,7 +96,7 @@ class NewUserSchema(BaseUserSchema):
         colander.String(),
         title=_('Email'),
         missing='',
-        )
+    )
 
 
 class AccountDestroySchema(colander.MappingSchema):
@@ -107,7 +107,7 @@ class AccountDestroySchema(colander.MappingSchema):
         title=_('Do you mind telling us your reasons?'),
         description=_('We want to get better!'),
         widget=TextAreaWidget(css_class='form-control'),
-        )
+    )
 
 
 class UserPreferencesSchema(colander.MappingSchema):
@@ -117,11 +117,11 @@ class UserPreferencesSchema(colander.MappingSchema):
         title=_('Allow statistics cookie'),
         missing=False,
         widget=CheckboxWidget(css_class='form-control'),
-        )
+    )
 
     send_passwords_periodically = colander.SchemaNode(
         colander.Boolean(),
         title=_('Send my passwords to my email monthly'),
         missing=False,
         widget=CheckboxWidget(css_class='form-control send-passwords-periodically'),
-        )
+    )

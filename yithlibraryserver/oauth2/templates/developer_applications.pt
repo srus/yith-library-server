@@ -10,7 +10,9 @@
 
 <tal:block metal:fill-slot="content">
 
-  <h2 i18n:translate="">Developer Applications</h2>
+  <div class="page-header">
+    <h1 i18n:translate="">Developer Applications</h1>
+  </div>
 
   <table class="table table-striped" tal:condition="applications.count() > 0">
     <thead>
@@ -27,7 +29,7 @@
     </tbody>
   </table>
 
-  <p><a class="btn" href="${request.route_path('oauth2_developer_application_new')}" i18n:translate="">Register new application</a></p>
+  <p><a class="btn btn-primary" href="${request.route_path('oauth2_developer_application_new')}" i18n:translate="">Register new application</a></p>
 
 </tal:block>
 

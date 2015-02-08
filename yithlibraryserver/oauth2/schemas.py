@@ -19,7 +19,7 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import colander
-from deform.widget import TextAreaWidget, TextInputWidget
+from deform.widget import CheckboxWidget, TextAreaWidget, TextInputWidget
 
 from yithlibraryserver.compat import string_types
 from yithlibraryserver.i18n import TranslationString as _
@@ -44,41 +44,46 @@ class AuthorizedOriginsNode(colander.SchemaNode):
 
 class ApplicationSchema(colander.MappingSchema):
 
-    name = colander.SchemaNode(colander.String(), title=_('Name'))
+    name = colander.SchemaNode(
+        colander.String(),
+        title=_('Name'),
+        widget=TextInputWidget(css_class='form-control'),
+    )
     main_url = colander.SchemaNode(
         colander.String(),
         title=_('Main URL'),
-        widget=TextInputWidget(css_class='input-xlarge'),
-        )
+        widget=TextInputWidget(css_class='form-control'),
+    )
     callback_url = colander.SchemaNode(
         colander.String(),
         title=_('Callback URL'),
-        widget=TextInputWidget(css_class='input-xlarge'),
-        )
+        widget=TextInputWidget(css_class='form-control'),
+    )
     authorized_origins = AuthorizedOriginsNode(
         colander.String(),
         title=_('Authorized Origins'),
         description=_('One per line. For example https://example.com'),
         missing=[],
-        widget=TextAreaWidget(css_class='input-xlarge'),
-        )
+        widget=TextAreaWidget(css_class='form-control'),
+    )
     production_ready = colander.SchemaNode(
         colander.Boolean(),
         title=_('Production ready'),
         missing=False,
-        )
+        widget=CheckboxWidget(css_class='form-control'),
+    )
     image_url = colander.SchemaNode(
         colander.String(),
         title=_('Image URL'),
         missing='',
-        widget=TextInputWidget(css_class='input-xlarge'),
-        )
+        widget=TextInputWidget(css_class='form-control'),
+    )
     description = colander.SchemaNode(
         colander.String(),
         title=_('Description'),
         missing='',
-        widget=TextAreaWidget(css_class='input-xlarge'),
-        )
+        widget=TextAreaWidget(css_class='form-control'),
+    )
 
 
 class ReadOnlyTextInputWidget(TextInputWidget):
@@ -94,10 +99,10 @@ class FullApplicationSchema(ApplicationSchema):
     client_id = colander.SchemaNode(
         colander.String(),
         title=_('Client Id'),
-        widget=ReadOnlyTextInputWidget(css_class='input-xlarge'),
-        )
+        widget=ReadOnlyTextInputWidget(css_class='form-control'),
+    )
     client_secret = colander.SchemaNode(
         colander.String(),
         title=_('Client secret'),
-        widget=ReadOnlyTextInputWidget(css_class='input-xlarge'),
-        )
+        widget=ReadOnlyTextInputWidget(css_class='form-control'),
+    )
