@@ -104,8 +104,9 @@ class AccountDestroySchema(colander.MappingSchema):
     reason = colander.SchemaNode(
         colander.String(),
         missing='',
-        title=_('Do you mind telling us your reasons? We want to get better!'),
-        widget=TextAreaWidget(css_class='input-xlarge'),
+        title=_('Do you mind telling us your reasons?'),
+        description=_('We want to get better!'),
+        widget=TextAreaWidget(css_class='form-control'),
         )
 
 

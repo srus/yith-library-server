@@ -175,7 +175,7 @@ def destroy(request):
     button2 = Button('cancel', _('Cancel'))
     button2.css_class = ''
 
-    form = Form(schema, buttons=(button1, button2))
+    form = HorizontalForm(schema, buttons=(button1, button2))
 
     passwords_manager = PasswordsManager(request.db)
     context = {
