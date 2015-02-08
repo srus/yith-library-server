@@ -280,7 +280,7 @@ def preferences(request):
     button1 = Button('submit', _('Save changes'))
     button1.css_class = 'btn-primary'
 
-    form = Form(schema, buttons=(button1, ))
+    form = HorizontalForm(schema, buttons=(button1, ))
 
     today = request.date_service.today()
     # use 28 to get a consistent day_to_send no matter what the

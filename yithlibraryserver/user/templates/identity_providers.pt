@@ -10,76 +10,78 @@
 
 <tal:block metal:fill-slot="content">
 
-  <h2 i18n:translate="">Identity providers</h2>
+  <div class="page-header">
+    <h1 i18n:translate="">Identity providers</h1>
+  </div>
 
   <p i18n:translate="">You are registered with the following accounts:</p>
 
   <form action="" method="post">
 
-  <table class="table table-striped">
-    <thead>
-      <th><input id="check-all" type="checkbox" /></th>
-      <th i18n:translate="">Provider</th>
-      <th i18n:translate="">Passwords</th>
-      <th i18n:translate="">Is current?</th>
-      <th i18n:translate="">Is email verified?</th>
-      <th i18n:translate="">Available actions</th>
-    </thead>
-    <tbody>
-      <tr tal:repeat="account accounts">
-        <td>
-          <input
-             type="checkbox"
-             name="account-${account['id']}" id="account-${account['id']}"
-             tal:attributes="disabled None if account.is_verified else 'disabled'" />
-        </td>
-        <td>
-          <div tal:omit-tag="" tal:repeat="provider account['providers']">
-            <img tal:attributes="class 'current provider' if provider['is_current'] else 'provider'"
-                 src="${request.static_path('yithlibraryserver:static/img/' + provider['name'] + '-mini-logo.png')}"
-                 alt="${provider['name']}"
-                 title="${provider['name']}"
-                 width="32"
-                 height="32" />
-          </div>
-        </td>
-        <td>
-          <span class="badge" title="${account['passwords']} passwords" tal:content="account['passwords']" i18n:translate="">Number of passwords</span>
-        </td>
-        <td>
-          <span class="badge badge-inverse" tal:condition="account.is_current" i18n:translate="">Current</span>
-        </td>
-        <td>
-          <span class="badge badge-success" tal:condition="account.is_verified" i18n:translate="">Email verified</span>
-          <span class="badge badge-warning" tal:condition="request.user.email and not account.is_verified" i18n:translate="">Email not verified</span>
-          <span class="badge" tal:condition="not request.user.email" i18n:translate="">No email available</span>
-        </td>
-        <td>
-          <div tal:omit-tag="" tal:condition="not account.is_verified">
-            <a tal:condition="account.is_current and request.user.email" id="open-email-verification-dialog" href="#email-verification-dialog" class="btn btn-mini btn-primary" data-toggle="modal" i18n:translate="">Verify email address</a>
+    <table class="table table-striped">
+      <thead>
+	<th><input id="check-all" type="checkbox" /></th>
+	<th i18n:translate="">Provider</th>
+	<th i18n:translate="">Passwords</th>
+	<th i18n:translate="">Is current?</th>
+	<th i18n:translate="">Is email verified?</th>
+	<th i18n:translate="">Available actions</th>
+      </thead>
+      <tbody>
+	<tr tal:repeat="account accounts">
+          <td>
+            <input
+               type="checkbox"
+               name="account-${account['id']}" id="account-${account['id']}"
+               tal:attributes="disabled None if account.is_verified else 'disabled'" />
+          </td>
+          <td>
+            <div tal:omit-tag="" tal:repeat="provider account['providers']">
+              <img tal:attributes="class 'current provider' if provider['is_current'] else 'provider'"
+                   src="${request.static_path('yithlibraryserver:static/img/' + provider['name'] + '-mini-logo.png')}"
+                   alt="${provider['name']}"
+                   title="${provider['name']}"
+                   width="32"
+                   height="32" />
+            </div>
+          </td>
+          <td>
+            <span class="badge" title="${account['passwords']} passwords" tal:content="account['passwords']" i18n:translate="">Number of passwords</span>
+          </td>
+          <td>
+            <span class="label label-default" tal:condition="account.is_current" i18n:translate="">Current</span>
+          </td>
+          <td>
+            <span class="label label-success" tal:condition="account.is_verified" i18n:translate="">Email verified</span>
+            <span class="label label-warning" tal:condition="request.user.email and not account.is_verified" i18n:translate="">Email not verified</span>
+            <span class="label label-default" tal:condition="not request.user.email" i18n:translate="">No email available</span>
+          </td>
+          <td>
+            <div tal:omit-tag="" tal:condition="not account.is_verified">
+              <a tal:condition="account.is_current and request.user.email" id="open-email-verification-dialog" href="#email-verification-dialog" class="btn btn-xs btn-primary" data-toggle="modal" i18n:translate="">Verify email address</a>
 
-            <a tal:condition="not account.is_current" href="#" class="btn btn-mini btn-primary disabled" title="You need to log in with this provider to verify this email address" i18n:translate="">Verify email address</a>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+              <a tal:condition="not account.is_current" href="#" class="btn btn-xs btn-primary disabled" title="You need to log in with this provider to verify this email address" i18n:translate="">Verify email address</a>
+            </div>
+          </td>
+	</tr>
+      </tbody>
+    </table>
 
-  <div class="buttons form-actions">
-    <input
-       class="btn btn-primary"
-       value="Merge my accounts"
-       type="submit"
-       name="submit"
-       tal:attributes="disabled None if can_merge else 'disabled'"
-       i18n:attributes="value"
+    <div class="form-group">
+      <input
+	 class="btn btn-primary"
+	 value="Merge my accounts"
+	 type="submit"
+	 name="submit"
+	 tal:attributes="disabled None if can_merge else 'disabled'"
+	 i18n:attributes="value"
        />
-  </div>
+    </div>
   </form>
 
 
   <div tal:condition="can_merge" class="alert alert-info">
-    <button type="button" class="close" data-dismiss="alert">×</button>
+    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
     <strong i18n:translate="">Tip:</strong> <span i18n:translate="">If you merge your accounts you will be able to access your passwords in a unified way: no matter which provider you use to log in you will always see the same set of passwords.</span>
   </div>
 
@@ -101,11 +103,7 @@
                 var is_checked = $("#" + this.id + ":checked").size() === 1,
                     $inputs = $("table input[type='checkbox'][name^='account-']:not([disabled])");
 
-                if (is_checked) {
-                    $inputs.attr("checked", "checked");
-                } else {
-                    $inputs.removeAttr("checked");
-                }
+                $inputs.prop("checked", is_checked);
 
             });
         });

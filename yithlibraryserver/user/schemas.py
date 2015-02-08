@@ -115,11 +115,12 @@ class UserPreferencesSchema(colander.MappingSchema):
         colander.Boolean(),
         title=_('Allow statistics cookie'),
         missing=False,
+        widget=CheckboxWidget(css_class='form-control'),
         )
 
     send_passwords_periodically = colander.SchemaNode(
         colander.Boolean(),
         title=_('Send my passwords to my email monthly'),
         missing=False,
-        widget=CheckboxWidget(css_class='send-passwords-periodically'),
+        widget=CheckboxWidget(css_class='form-control send-passwords-periodically'),
         )
