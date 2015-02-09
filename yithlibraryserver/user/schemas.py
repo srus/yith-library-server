@@ -96,6 +96,7 @@ class NewUserSchema(BaseUserSchema):
         colander.String(),
         title=_('Email'),
         missing='',
+        widget=TextInputWidget(css_class='form-control'),
     )
 
 

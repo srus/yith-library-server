@@ -75,9 +75,9 @@ def register_new_user(request):
     button1 = Button('submit', _('Register into Yith Library'))
     button1.css_class = 'btn-primary'
     button2 = Button('cancel', _('Cancel'))
-    button2.css_class = ''
+    button2.css_class = 'btn-default'
 
-    form = Form(schema, buttons=(button1, button2))
+    form = HorizontalForm(schema, buttons=(button1, button2))
 
     if 'submit' in request.POST:
 
@@ -173,7 +173,7 @@ def destroy(request):
     button1 = Button('submit', _('Yes, I am sure. Destroy my account'))
     button1.css_class = 'btn-danger'
     button2 = Button('cancel', _('Cancel'))
-    button2.css_class = ''
+    button2.css_class = 'btn-default'
 
     form = HorizontalForm(schema, buttons=(button1, button2))
 

@@ -44,7 +44,7 @@ def contact(request):
     button1 = Button('submit', _('Send message'))
     button1.css_class = 'btn-primary'
     button2 = Button('cancel', _('Cancel'))
-    button2.css_class = ''
+    button2.css_class = 'btn-default'
 
     form = HorizontalForm(ContactSchema(), buttons=(button1, button2))
 
