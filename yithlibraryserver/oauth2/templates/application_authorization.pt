@@ -12,7 +12,7 @@
 
   <div class="container">
     <div class="page-header">
-      <h1 i18n:translate="">Authorize Application <small>${app.name}</small></h1>
+      <h1 i18n:translate="">Authorize Application <small i18n:name="app-name">${app.name}</small></h1>
     </div>
 
     <div class="panel panel-default">
