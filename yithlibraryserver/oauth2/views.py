@@ -243,8 +243,7 @@ class AuthorizationEndpoint(object):
                     if owner:
                         email = owner.get('email', None)
                         if email:
-                            authorship_information = _('By ${owner}',
-                                                       mapping={'owner': email})
+                            authorship_information = email
 
                 pretty_scopes = self.validator.get_pretty_scopes(scopes)
                 return {
