@@ -65,19 +65,16 @@ class BaseUserSchema(colander.MappingSchema):
         colander.String(),
         title=_('First name'),
         missing='',
-        widget=TextInputWidget(css_class='form-control'),
     )
     last_name = colander.SchemaNode(
         colander.String(),
         title=_('Last name'),
         missing='',
-        widget=TextInputWidget(css_class='form-control'),
     )
     screen_name = colander.SchemaNode(
         colander.String(),
         title=_('Screen name'),
         missing='',
-        widget=TextInputWidget(css_class='form-control'),
     )
 
 
@@ -85,7 +82,7 @@ class UserSchema(BaseUserSchema):
 
     email = EmailSchema(
         title=_('Email'),
-        widget=EmailWidget(css_class='form-control'),
+        widget=EmailWidget(),
         missing={'email': '', 'email_verified': False},
     )
 
@@ -96,7 +93,6 @@ class NewUserSchema(BaseUserSchema):
         colander.String(),
         title=_('Email'),
         missing='',
-        widget=TextInputWidget(css_class='form-control'),
     )
 
 
@@ -105,9 +101,9 @@ class AccountDestroySchema(colander.MappingSchema):
     reason = colander.SchemaNode(
         colander.String(),
         missing='',
+        widget=TextAreaWidget(rows=6),
         title=_('Do you mind telling us your reasons?'),
         description=_('We want to get better!'),
-        widget=TextAreaWidget(css_class='form-control'),
     )
 
 
@@ -117,12 +113,11 @@ class UserPreferencesSchema(colander.MappingSchema):
         colander.Boolean(),
         title=_('Allow statistics cookie'),
         missing=False,
-        widget=CheckboxWidget(css_class='form-control'),
     )
 
     send_passwords_periodically = colander.SchemaNode(
         colander.Boolean(),
         title=_('Send my passwords to my email monthly'),
         missing=False,
-        widget=CheckboxWidget(css_class='form-control send-passwords-periodically'),
+        widget=CheckboxWidget(css_class='send-passwords-periodically'),
     )

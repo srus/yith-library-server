@@ -1,4 +1,6 @@
-<div class="help-block" i18n:domain="yithlibraryserver">
+<div class="col-sm-9 col-sm-offset-3"
+     style="margin-top: 0.5em;"
+     i18n:domain="yithlibraryserver">
   <span tal:condition="email and email_verified" class="label label-success" i18n:translate="">Verified</span>
   <span tal:condition="email and not email_verified">
     <span class="label label-warning" i18n:translate="">Unverified</span>

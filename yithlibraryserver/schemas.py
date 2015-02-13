@@ -17,31 +17,23 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import colander
-from deform import Form
 from deform.widget import TextAreaWidget, TextInputWidget
 
 from yithlibraryserver.i18n import TranslationString as _
-
-
-class HorizontalForm(Form):
-
-    css_class = 'form-horizontal'
 
 
 class ContactSchema(colander.MappingSchema):
 
     name = colander.SchemaNode(
         colander.String(),
-        widget=TextInputWidget(css_class='form-control'),
         title=_('Name'),
     )
     email = colander.SchemaNode(
         colander.String(),
-        widget=TextInputWidget(css_class='form-control'),
         title=_('Email'),
     )
     message = colander.SchemaNode(
         colander.String(),
-        widget=TextAreaWidget(css_class='form-control', rows=10),
+        widget=TextAreaWidget(rows=10),
         title=_('Message'),
         )

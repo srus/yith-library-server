@@ -47,42 +47,36 @@ class ApplicationSchema(colander.MappingSchema):
     name = colander.SchemaNode(
         colander.String(),
         title=_('Name'),
-        widget=TextInputWidget(css_class='form-control'),
     )
     main_url = colander.SchemaNode(
         colander.String(),
         title=_('Main URL'),
-        widget=TextInputWidget(css_class='form-control'),
     )
     callback_url = colander.SchemaNode(
         colander.String(),
         title=_('Callback URL'),
-        widget=TextInputWidget(css_class='form-control'),
     )
     authorized_origins = AuthorizedOriginsNode(
         colander.String(),
         title=_('Authorized Origins'),
         description=_('One per line. For example https://example.com'),
+        widget=TextAreaWidget(rows=5),
         missing=[],
-        widget=TextAreaWidget(css_class='form-control'),
     )
     production_ready = colander.SchemaNode(
         colander.Boolean(),
         title=_('Production ready'),
         missing=False,
-        widget=CheckboxWidget(css_class='form-control'),
     )
     image_url = colander.SchemaNode(
         colander.String(),
         title=_('Image URL'),
         missing='',
-        widget=TextInputWidget(css_class='form-control'),
     )
     description = colander.SchemaNode(
         colander.String(),
         title=_('Description'),
         missing='',
-        widget=TextAreaWidget(css_class='form-control'),
     )
 
 
@@ -99,10 +93,10 @@ class FullApplicationSchema(ApplicationSchema):
     client_id = colander.SchemaNode(
         colander.String(),
         title=_('Client Id'),
-        widget=ReadOnlyTextInputWidget(css_class='form-control'),
+        widget=ReadOnlyTextInputWidget(),
     )
     client_secret = colander.SchemaNode(
         colander.String(),
         title=_('Client secret'),
-        widget=ReadOnlyTextInputWidget(css_class='form-control'),
+        widget=ReadOnlyTextInputWidget(),
     )

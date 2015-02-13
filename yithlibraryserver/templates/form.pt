@@ -6,7 +6,7 @@
   accept-charset="utf-8"
   role="form"
   i18n:domain="deform"
-  tal:attributes="class python:field.css_class">
+  class="form-horizontal">
 
   <input type="hidden" name="_charset_" />
   <input type="hidden" name="__formid__" value="${field.formid}"/>
@@ -28,7 +28,7 @@
                     rndr(tmpl,field=f,cstruct=cstruct.get(f.name, null))"/>
 
   <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-10">
+    <div class="col-sm-offset-3 col-sm-9">
       <tal:block repeat="button field.buttons">
         <button tal:attributes="disabled button.disabled; class python:'btnText submit btn ' + button.css_class"
                 id="${field.formid+button.name}"
@@ -40,23 +40,5 @@
       </tal:block>
     </div>
   </div>
-
-<script type="text/javascript" tal:condition="field.use_ajax">
-  deform.addCallback(
-     '${field.formid}',
-     function(oid) {
-       var options = {
-         target: '#' + oid,
-         replaceTarget: true,
-         success: function() {
-           deform.processCallbacks();
-           deform.focusFirstInput();
-         }
-       };
-       var extra_options = ${field.ajax_options} || {};
-       $('#' + oid).ajaxForm($.extend(options, extra_options));
-     }
-  );
-</script>
 
 </form>

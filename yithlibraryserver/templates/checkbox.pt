@@ -1,0 +1,18 @@
+<div class="col-sm-9 col-sm-offset-3">
+  <div class="checkbox">
+    <label for="${field.oid}" class="checkbox-label">
+      <input tal:define="name name|field.name;
+                         true_val true_val|field.widget.true_val;
+                         css_class css_class|field.widget.css_class;
+                         oid oid|field.oid"
+             type="checkbox"
+             name="${name}"
+             value="${true_val}"
+             id="${oid}"
+             tal:attributes="checked cstruct == true_val;
+                             class css_class"
+             />
+      <span tal:omit-tag="" tal:content="field.title" />
+    </label>
+  </div>
+</div>
