@@ -5,13 +5,14 @@
   <!-- mapping_item -->
   <span tal:replace="structure field.serialize(cstruct)"/>
 
-  <p tal:condition="field.error and not field.widget.hidden and not field.typ.__class__.__name__=='Mapping'"
-     tal:define="errstr 'error-%s' % field.oid"
-     tal:repeat="msg field.error.messages()"
-     tal:attributes="id repeat.msg.index==0 and errstr or
-     ('%s-%s' % (errstr, repeat.msg.index))"
-     class="${field.widget.error_class} help-block"
-     i18n:translate="">${msg}</p>
-
+  <div class="col-sm-9 col-sm-offset-3"
+       tal:condition="field.error and not field.widget.hidden and not field.typ.__class__.__name__=='Mapping'"
+       tal:define="errstr 'error-%s' % field.oid">
+    <p class="help-block" tal:repeat="msg field.error.messages()">
+      <span tal:attributes="id repeat.msg.index==0 and errstr or ('%s-%s' % (errstr, repeat.msg.index))"
+            class="${field.widget.error_class}"
+            i18n:translate="">${msg}</span>
+    </p>
+  </div>
   <!-- /mapping_item -->
 </div>
