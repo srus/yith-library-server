@@ -21,7 +21,7 @@ import unittest
 import tempfile
 
 from yithlibraryserver.db import MongoDB
-from yithlibraryserver.testing import MONGO_URI
+from yithlibraryserver.testing import MONGO_URI, clean_db
 
 CONFIG = """[app:main]
 use = egg:yith-library-server
@@ -41,8 +41,6 @@ port = 65432
 
 class ScriptTests(unittest.TestCase):
 
-    clean_collections = tuple()
-
     def setUp(self):
         super(ScriptTests, self).setUp()
 
@@ -54,8 +52,7 @@ class ScriptTests(unittest.TestCase):
     def tearDown(self):
         super(ScriptTests, self).tearDown()
         os.unlink(self.conf_file_path)
-        for col in self.clean_collections:
-            self.db.drop_collection(col)
+        clean_db(self.db)
 
     def add_passwords(self, user, n):
         for i in range(n):

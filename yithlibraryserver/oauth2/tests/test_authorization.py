@@ -34,8 +34,6 @@ from yithlibraryserver.oauth2.authorization import (
 
 class AuthorizatorTests(testing.TestCase):
 
-    clean_collections = ('authorized_apps', 'users')
-
     def setUp(self):
         super(AuthorizatorTests, self).setUp()
         self.authorizator = Authorizator(self.db)
@@ -289,8 +287,6 @@ class AuthorizatorTests(testing.TestCase):
 
 
 class VerifyRequestTests(testing.TestCase):
-
-    clean_collections = ('access_codes', 'users')
 
     def test_no_auth_header(self):
         request = testing.FakeRequest(headers={}, db=self.db)

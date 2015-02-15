@@ -28,8 +28,6 @@ from yithlibraryserver import testing
 
 class ViewTests(testing.TestCase):
 
-    clean_collections = ('users', )
-
     def setUp(self):
         super(ViewTests, self).setUp()
         settings = self.testapp.app.registry.settings

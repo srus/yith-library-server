@@ -25,7 +25,7 @@ from pyramid import testing
 
 from yithlibraryserver.datetimeservice.testing import FakeDatetimeService
 from yithlibraryserver.db import MongoDB
-from yithlibraryserver.testing import MONGO_URI
+from yithlibraryserver.testing import MONGO_URI, clean_db
 
 from yithlibraryserver.user.analytics import GoogleAnalytics
 from yithlibraryserver.user.analytics import USER_ATTR
@@ -43,7 +43,7 @@ class UtilsTests(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.db.drop_collection('users')
+        clean_db(self.db)
 
     def test_split_name(self):
         self.assertEqual(split_name('John Doe'),

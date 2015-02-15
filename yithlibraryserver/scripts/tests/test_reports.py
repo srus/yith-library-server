@@ -25,8 +25,6 @@ from yithlibraryserver.scripts.testing import ScriptTests
 
 class ReportTests(ScriptTests):
 
-    clean_collections = ('users', 'passwords', 'applications')
-
     def test_users(self):
         # Save sys values
         old_args = sys.argv[:]

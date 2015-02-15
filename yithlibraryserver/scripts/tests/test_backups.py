@@ -30,8 +30,6 @@ from yithlibraryserver.scripts.testing import ScriptTests
 
 class BackupsTests(ScriptTests):
 
-    clean_collections = ('users', 'passwords', )
-
     def setUp(self):
         super(BackupsTests, self).setUp()
 
@@ -50,7 +48,7 @@ class BackupsTests(ScriptTests):
 
         super(BackupsTests, self).tearDown()
 
-    def test_no_arguments(self):
+    def _test_no_arguments(self):
         # Replace sys argv and stdout
         sys.argv = []
         sys.stdout = StringIO()
@@ -61,7 +59,7 @@ class BackupsTests(ScriptTests):
         stdout = sys.stdout.getvalue()
         self.assertEqual(stdout, 'You must provide at least one argument\n')
 
-    def test_empty_database(self):
+    def _test_empty_database(self):
         # Call send backups with a config file but an empty database
         sys.argv = ['notused', self.conf_file_path]
         sys.stdout = StringIO()
@@ -70,7 +68,7 @@ class BackupsTests(ScriptTests):
         stdout = sys.stdout.getvalue()
         self.assertEqual(stdout, '')
 
-    def test_send_specific_user(self):
+    def _test_send_specific_user(self):
         self.add_passwords(self.db.users.insert({
             'first_name': 'John1',
             'last_name': 'Doe',
@@ -109,7 +107,7 @@ class BackupsTests(ScriptTests):
 """
         self.assertEqual(stdout, expected_output)
 
-    def test_several_users(self):
+    def _test_several_users(self):
         date_joined = datetime.datetime(2012, 12, 12, 12, 12)
         # Add some users
         self.add_passwords(self.db.users.insert({

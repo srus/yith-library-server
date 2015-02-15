@@ -69,8 +69,6 @@ class BaseEndpointTests(testing.TestCase):
 
 class AuthorizationEndpointTests(BaseEndpointTests):
 
-    clean_collections = ('applications', 'users', 'authorization_codes')
-
     def test_anonymous_user(self):
         # this view requires authentication
         res = self.testapp.get('/oauth2/endpoints/authorization')
@@ -304,9 +302,6 @@ class AuthorizationEndpointTests(BaseEndpointTests):
 
 class TokenEndpointTests(BaseEndpointTests):
 
-    clean_collections = ('applications', 'users', 'authorization_codes',
-                         'access_codes')
-
     def test_no_grant_type(self):
         res = self.testapp.post('/oauth2/endpoints/token', {}, status=400)
 
@@ -445,8 +440,6 @@ class TokenEndpointTests(BaseEndpointTests):
 
 
 class ApplicationViewTests(testing.TestCase):
-
-    clean_collections = ('applications', 'users', 'authorized_apps')
 
     def test_applications(self):
         # this view required authentication

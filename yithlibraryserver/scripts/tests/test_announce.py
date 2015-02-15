@@ -25,8 +25,6 @@ from yithlibraryserver.scripts.testing import ScriptTests
 
 class AnnounceTests(ScriptTests):
 
-    clean_collections = ('users', 'passwords')
-
     def setUp(self):
         super(AnnounceTests, self).setUp()
         # Save sys values

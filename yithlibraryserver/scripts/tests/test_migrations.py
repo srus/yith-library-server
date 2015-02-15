@@ -67,8 +67,6 @@ class MigrationsTests(BaseMigrationsTests):
 
 class AddSendEmailPreferenceTests(BaseMigrationsTests):
 
-    clean_collections = ('users', )
-
     def test_no_users(self):
         sys.argv = ['notused', self.conf_file_path, 'add_send_email_preference']
         sys.stdout = StringIO()
@@ -104,8 +102,6 @@ class AddSendEmailPreferenceTests(BaseMigrationsTests):
 
 
 class NewAuthorizedAppsCollectionTests(BaseMigrationsTests):
-
-    clean_collections = ('users', 'applications', 'authorized_apps')
 
     def test_no_users(self):
         sys.argv = ['notused', self.conf_file_path, 'new_authorized_apps_collection']

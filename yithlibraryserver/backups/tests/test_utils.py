@@ -26,8 +26,6 @@ from yithlibraryserver.testing import TestCase
 
 class UtilsTests(TestCase):
 
-    clean_collections = ('users', 'passwords', )
-
     def test_get_user_passwords(self):
         user_id = self.db.users.insert({
                 'first_name': 'John',

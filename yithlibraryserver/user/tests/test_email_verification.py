@@ -26,13 +26,11 @@ from pyramid.testing import DummyRequest
 from pyramid_mailer import get_mailer
 
 from yithlibraryserver.db import MongoDB
-from yithlibraryserver.testing import MONGO_URI
+from yithlibraryserver.testing import MONGO_URI, clean_db
 from yithlibraryserver.user.email_verification import EmailVerificationCode
 
 
 class EmailVerificationCodeTests(unittest.TestCase):
-
-    clean_collections = ('users', )
 
     def setUp(self):
         self.config = testing.setUp()
@@ -42,6 +40,7 @@ class EmailVerificationCodeTests(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
+        clean_db(self.db)
 
     def test_email_verification_code(self):
         evc = EmailVerificationCode()

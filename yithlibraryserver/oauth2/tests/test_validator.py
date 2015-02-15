@@ -31,9 +31,6 @@ from yithlibraryserver.oauth2.validator import RequestValidator
 
 class RequestValidatorTests(testing.TestCase):
 
-    clean_collections = ('applications', 'users', 'authorization_codes',
-                         'access_codes')
-
     def setUp(self):
         super(RequestValidatorTests, self).setUp()
         self.owner_id = self.db.users.insert({

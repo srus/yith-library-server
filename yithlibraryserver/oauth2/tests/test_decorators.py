@@ -47,8 +47,6 @@ class ViewClass(object):
 
 class DecoratorsTests(testing.TestCase):
 
-    clean_collections = ('access_codes', 'users')
-
     def setUp(self):
         super(DecoratorsTests, self).setUp()
         os.environ['YITH_FAKE_DATETIME'] = '2014-2-23-08-00-00'

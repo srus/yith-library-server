@@ -31,12 +31,10 @@ from yithlibraryserver.user.accounts import get_providers, get_n_passwords
 from yithlibraryserver.user.accounts import get_accounts, merge_accounts
 from yithlibraryserver.user.accounts import merge_users
 from yithlibraryserver.user.accounts import notify_admins_of_account_removal
-from yithlibraryserver.testing import MONGO_URI, TestCase
+from yithlibraryserver.testing import MONGO_URI, TestCase, clean_db
 
 
 class AccountTests(TestCase):
-
-    clean_collections = ('users', 'passwords')
 
     def test_get_available_providers(self):
         self.assertEqual(('facebook', 'google', 'twitter', 'persona', 'liveconnect'),
@@ -226,9 +224,7 @@ class BaseMergeTests(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.db.drop_collection('users')
-        self.db.drop_collection('passwords')
-        self.db.drop_collection('authorized_apps')
+        clean_db(self.db)
 
     def _add_authorized_app(self, user_id, client_id):
         self.db.authorized_apps.insert({

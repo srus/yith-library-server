@@ -26,8 +26,6 @@ from yithlibraryserver.cors import CORSManager
 
 class CORSManagerTests(testing.TestCase):
 
-    clean_collections = ('applications', )
-
     def test_cors_headers_global_origins_access_denied(self):
         cm = CORSManager('')
 

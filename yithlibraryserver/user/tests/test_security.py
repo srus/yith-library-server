@@ -24,7 +24,7 @@ from pyramid import testing
 from pyramid.httpexceptions import HTTPFound
 
 from yithlibraryserver.db import MongoDB
-from yithlibraryserver.testing import MONGO_URI
+from yithlibraryserver.testing import MONGO_URI, clean_db
 from yithlibraryserver.user.security import (
     get_user,
     assert_authenticated_user_is_registered,
@@ -41,7 +41,7 @@ class SecurityTests(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.db.drop_collection('users')
+        clean_db(self.db)
 
     def test_get_user(self):
         request = testing.DummyRequest()
