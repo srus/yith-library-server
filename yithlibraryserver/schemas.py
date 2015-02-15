@@ -17,7 +17,7 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import colander
-from deform.widget import TextAreaWidget, TextInputWidget
+from deform.widget import TextAreaWidget
 
 from yithlibraryserver.i18n import TranslationString as _
 

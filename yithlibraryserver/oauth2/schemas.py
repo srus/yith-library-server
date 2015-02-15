@@ -19,7 +19,7 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import colander
-from deform.widget import CheckboxWidget, TextAreaWidget, TextInputWidget
+from deform.widget import TextAreaWidget, TextInputWidget
 
 from yithlibraryserver.compat import string_types
 from yithlibraryserver.i18n import TranslationString as _
