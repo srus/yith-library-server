@@ -24,7 +24,6 @@ from freezegun import freeze_time
 
 from pyramid import testing
 
-from yithlibraryserver.datetimeservice import DatetimeService
 from yithlibraryserver.db import MongoDB
 from yithlibraryserver.testing import MONGO_URI, clean_db
 
@@ -42,7 +41,6 @@ class ModelTests(unittest.TestCase):
         self.freezer.start()
 
         self.request = testing.DummyRequest()
-        self.request.datetime_service = DatetimeService(self.request)
         self.request.db = self.db
 
     def tearDown(self):

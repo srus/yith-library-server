@@ -18,6 +18,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
+
+from bson.tz_util import utc
+
 from deform import Button, Form, ValidationFailure
 
 from pyramid.httpexceptions import HTTPBadRequest, HTTPFound
@@ -100,7 +104,7 @@ def register_new_user(request):
         else:
             email_verified = False
 
-        now = request.datetime_service.utcnow()
+        now = datetime.datetime.now(tz=utc)
 
         user_attrs = {
                 provider_key: user_info[provider_key],
@@ -281,7 +285,7 @@ def preferences(request):
 
     form = Form(schema, buttons=(button1, ))
 
-    today = request.date_service.today()
+    today = datetime.date.today()
     # use 28 to get a consistent day_to_send no matter what the
     # current month is. The disadvantage is that there are
     # several days in a regular month that are not used.

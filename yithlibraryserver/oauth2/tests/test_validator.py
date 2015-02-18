@@ -25,7 +25,6 @@ from freezegun import freeze_time
 from oauthlib.common import Request, to_unicode
 
 from yithlibraryserver import testing
-from yithlibraryserver.datetimeservice import DatetimeService
 from yithlibraryserver.oauth2.validator import RequestValidator
 
 
@@ -60,7 +59,6 @@ class RequestValidatorTests(testing.TestCase):
 
     def _create_request_validator(self, scopes=None):
         rv = RequestValidator(self.db,
-                              DatetimeService(None),
                               default_scopes=scopes)
         request = Request('https://server.example.com/')
         return rv, request

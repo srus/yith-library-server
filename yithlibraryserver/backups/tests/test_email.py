@@ -26,7 +26,6 @@ from pyramid.testing import DummyRequest
 
 from pyramid_mailer import get_mailer
 
-from yithlibraryserver.datetimeservice import DateService
 from yithlibraryserver.db import MongoDB
 from yithlibraryserver.backups.email import get_day_to_send, send_passwords
 from yithlibraryserver.testing import MONGO_URI, clean_db
@@ -109,7 +108,6 @@ class SendPasswordsTests(unittest.TestCase):
 
         request = DummyRequest()
         request.db = self.db
-        request.date_service = DateService(request)
         mailer = get_mailer(request)
 
         with freeze_time('2012-01-10'):

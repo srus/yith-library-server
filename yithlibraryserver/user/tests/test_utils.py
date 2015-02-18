@@ -24,7 +24,6 @@ from freezegun import freeze_time
 
 from pyramid import testing
 
-from yithlibraryserver.datetimeservice import DatetimeService
 from yithlibraryserver.db import MongoDB
 from yithlibraryserver.testing import MONGO_URI, clean_db
 
@@ -145,7 +144,6 @@ class UtilsTests(unittest.TestCase):
         request.db = self.db
         request.session = {USER_ATTR: True}
         request.google_analytics = GoogleAnalytics(request)
-        request.datetime_service = DatetimeService(request)
         response = register_or_update(request, 'skynet', 1, {
                 'screen_name': 'JohnDoe',
                 'first_name': 'John',
@@ -164,7 +162,6 @@ class UtilsTests(unittest.TestCase):
         request.db = self.db
         request.session = {'next_url': '/foo'}
         request.google_analytics = GoogleAnalytics(request)
-        request.datetime_service = DatetimeService(request)
         response = register_or_update(request, 'skynet', 1, {
                 'screen_name': 'JohnDoe',
                 'first_name': 'John',

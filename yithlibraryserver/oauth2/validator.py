@@ -19,6 +19,8 @@
 import datetime
 import logging
 
+from bson.tz_util import utc
+
 import oauthlib.oauth2
 from oauthlib.common import to_unicode
 
@@ -45,9 +47,8 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         'read-userinfo': _('Access your user information'),
     }
 
-    def __init__(self, db, datetime_service, default_scopes=None):
+    def __init__(self, db, default_scopes=None):
         self.db = db
-        self.datetime_service = datetime_service
         if default_scopes is None:
             self.default_scopes = ['read-passwords']
         else:
@@ -117,7 +118,7 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         (the last is passed in post_authorization credentials,
         i.e. { 'user': request.user}.
         """
-        now = self.datetime_service.utcnow()
+        now = datetime.datetime.now(tz=utc)
         expiration = now + datetime.timedelta(minutes=10)
         new_record = {
             'code': code['code'],
@@ -180,7 +181,7 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         if record is None:
             return False
 
-        if self.datetime_service.utcnow() > record['expiration']:
+        if datetime.datetime.now(tz=utc) > record['expiration']:
             return False
 
         request.user = record['user']
@@ -216,7 +217,7 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         Don't forget to save both the access_token and the refresh_token and
         set expiration for the access_token to now + expires_in seconds.
         """
-        now = self.datetime_service.utcnow()
+        now = datetime.datetime.now(tz=utc)
         expiration = now + datetime.timedelta(seconds=token['expires_in'])
         record = {
             'access_token': token['access_token'],
@@ -253,7 +254,7 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         if access_code is None:
             return False
 
-        if self.datetime_service.utcnow() > access_code['expiration']:
+        if datetime.datetime.now(tz=utc) > access_code['expiration']:
             return False
 
         ac_scopes = access_code['scope'].split(' ')

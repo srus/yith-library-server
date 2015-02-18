@@ -65,7 +65,7 @@ class Authorizator(object):
 
 
 def verify_request(request, scopes):
-    validator = RequestValidator(request.db, request.datetime_service)
+    validator = RequestValidator(request.db)
     server = Server(validator)
 
     uri, http_method, body, headers = extract_params(request)
