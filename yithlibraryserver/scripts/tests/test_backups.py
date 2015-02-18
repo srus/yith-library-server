@@ -17,10 +17,10 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-import os
 import sys
 
 import bson
+from freezegun import freeze_time
 
 from yithlibraryserver.backups.email import get_day_to_send
 from yithlibraryserver.compat import StringIO
@@ -37,14 +37,15 @@ class BackupsTests(ScriptTests):
         self.old_args = sys.argv[:]
         self.old_stdout = sys.stdout
 
-        os.environ['YITH_FAKE_DATE'] = '2012-1-26'
+        self.freezer = freeze_time('2012-01-26')
+        self.freezer.start()
 
     def tearDown(self):
         # Restore sys.values
         sys.argv = self.old_args
         sys.stdout = self.old_stdout
 
-        del os.environ['YITH_FAKE_DATE']
+        self.freezer.stop()
 
         super(BackupsTests, self).tearDown()
 

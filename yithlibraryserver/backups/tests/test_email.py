@@ -16,17 +16,17 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import unittest
 
 import bson
+from freezegun import freeze_time
 
 from pyramid import testing
 from pyramid.testing import DummyRequest
 
 from pyramid_mailer import get_mailer
 
-from yithlibraryserver.datetimeservice.testing import FakeDateService
+from yithlibraryserver.datetimeservice import DateService
 from yithlibraryserver.db import MongoDB
 from yithlibraryserver.backups.email import get_day_to_send, send_passwords
 from yithlibraryserver.testing import MONGO_URI, clean_db
@@ -109,23 +109,20 @@ class SendPasswordsTests(unittest.TestCase):
 
         request = DummyRequest()
         request.db = self.db
-        request.date_service = FakeDateService(request)
+        request.date_service = DateService(request)
         mailer = get_mailer(request)
 
-        os.environ['YITH_FAKE_DATE'] = '2012-1-10'
-
-        self.assertTrue(send_passwords(request, user,
-                                       preferences_link, backups_link))
-        self.assertEqual(len(mailer.outbox), 1)
-        message = mailer.outbox[0]
-        self.assertEqual(message.subject, "Your Yith Library's passwords")
-        self.assertEqual(message.recipients, ['john@example.com'])
-        self.assertTrue(preferences_link in message.body)
-        self.assertTrue(backups_link in message.body)
-        self.assertEqual(len(message.attachments), 1)
-        attachment = message.attachments[0]
-        self.assertEqual(attachment.content_type, 'application/yith')
-        self.assertEqual(attachment.filename,
-                         'yith-library-backup-2012-01-10.yith')
-
-        del os.environ['YITH_FAKE_DATE']
+        with freeze_time('2012-01-10'):
+            self.assertTrue(send_passwords(request, user,
+                                           preferences_link, backups_link))
+            self.assertEqual(len(mailer.outbox), 1)
+            message = mailer.outbox[0]
+            self.assertEqual(message.subject, "Your Yith Library's passwords")
+            self.assertEqual(message.recipients, ['john@example.com'])
+            self.assertTrue(preferences_link in message.body)
+            self.assertTrue(backups_link in message.body)
+            self.assertEqual(len(message.attachments), 1)
+            attachment = message.attachments[0]
+            self.assertEqual(attachment.content_type, 'application/yith')
+            self.assertEqual(attachment.filename,
+                             'yith-library-backup-2012-01-10.yith')

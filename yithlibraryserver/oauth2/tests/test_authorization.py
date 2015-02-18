@@ -19,9 +19,9 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-import os
 
 from bson.tz_util import utc
+from freezegun import freeze_time
 
 from pyramid.httpexceptions import HTTPUnauthorized
 
@@ -304,8 +304,8 @@ class VerifyRequestTests(testing.TestCase):
         }, db=self.db)
         self.assertRaises(HTTPUnauthorized, verify_request, request, ['scope1'])
 
+    @freeze_time('2014-02-23 08:00:00')
     def test_invalid_scope(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2014-2-23-08-00-00'
         expiration = datetime.datetime(2014, 2, 23, 9, 0, tzinfo=utc)
         self.db.access_codes.insert({
             'access_token': '1234',
@@ -320,10 +320,8 @@ class VerifyRequestTests(testing.TestCase):
         }, db=self.db)
         self.assertRaises(HTTPUnauthorized, verify_request, request, ['scope2'])
 
-        del os.environ['YITH_FAKE_DATETIME']
-
+    @freeze_time('2014-02-23 08:00:00')
     def test_expired_token(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2014-2-23-08-00-00'
         expiration = datetime.datetime(2014, 2, 23, 7, 0, tzinfo=utc)
         self.db.access_codes.insert({
             'access_token': '1234',
@@ -338,10 +336,8 @@ class VerifyRequestTests(testing.TestCase):
         }, db=self.db)
         self.assertRaises(HTTPUnauthorized, verify_request, request, ['scope1'])
 
-        del os.environ['YITH_FAKE_DATETIME']
-
+    @freeze_time('2014-02-23 08:00:00')
     def test_invalid_user(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2014-2-23-08-00-00'
         expiration = datetime.datetime(2014, 2, 23, 9, 0, tzinfo=utc)
         self.db.access_codes.insert({
             'access_token': '1234',
@@ -356,11 +352,8 @@ class VerifyRequestTests(testing.TestCase):
         }, db=self.db)
         self.assertRaises(HTTPUnauthorized, verify_request, request, ['scope1'])
 
-        del os.environ['YITH_FAKE_DATETIME']
-
+    @freeze_time('2014-02-23 08:00:00')
     def test_valid_user(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2014-2-23-08-00-00'
-
         user_id = self.db.users.insert({
                 'username': 'user1',
                 })
@@ -380,5 +373,3 @@ class VerifyRequestTests(testing.TestCase):
 
         user = verify_request(request, ['scope1'])
         self.assertEqual(user['username'], 'user1')
-
-        del os.environ['YITH_FAKE_DATETIME']

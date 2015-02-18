@@ -18,12 +18,13 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import unittest
+
+from freezegun import freeze_time
 
 from pyramid import testing
 
-from yithlibraryserver.datetimeservice.testing import FakeDatetimeService
+from yithlibraryserver.datetimeservice import DatetimeService
 from yithlibraryserver.db import MongoDB
 from yithlibraryserver.testing import MONGO_URI, clean_db
 
@@ -108,9 +109,8 @@ class UtilsTests(unittest.TestCase):
         updated_user = self.db.users.find_one({'_id': user_id})
         self.assertEqual(updated_user['foo'], 'bar')
 
+    @freeze_time('2013-01-02 10:11:12')
     def test_register_or_update(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2013-1-2-10-11-02'
-
         request = testing.DummyRequest()
         request.db = self.db
         request.session = {}
@@ -145,7 +145,7 @@ class UtilsTests(unittest.TestCase):
         request.db = self.db
         request.session = {USER_ATTR: True}
         request.google_analytics = GoogleAnalytics(request)
-        request.datetime_service = FakeDatetimeService(request)
+        request.datetime_service = DatetimeService(request)
         response = register_or_update(request, 'skynet', 1, {
                 'screen_name': 'JohnDoe',
                 'first_name': 'John',
@@ -164,7 +164,7 @@ class UtilsTests(unittest.TestCase):
         request.db = self.db
         request.session = {'next_url': '/foo'}
         request.google_analytics = GoogleAnalytics(request)
-        request.datetime_service = FakeDatetimeService(request)
+        request.datetime_service = DatetimeService(request)
         response = register_or_update(request, 'skynet', 1, {
                 'screen_name': 'JohnDoe',
                 'first_name': 'John',
@@ -173,5 +173,3 @@ class UtilsTests(unittest.TestCase):
                 }, '/next')
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location, '/foo')
-
-        del os.environ['YITH_FAKE_DATETIME']

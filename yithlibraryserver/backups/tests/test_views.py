@@ -19,7 +19,8 @@
 import datetime
 import gzip
 import json
-import os
+
+from freezegun import freeze_time
 
 from yithlibraryserver.compat import text_type, BytesIO
 from yithlibraryserver.testing import TestCase
@@ -82,39 +83,37 @@ class ViewTests(TestCase):
         })
         self.testapp.get('/__login/' + str(user_id))
 
-        os.environ['YITH_FAKE_DATE'] = '2012-1-10'
-
-        res = self.testapp.get('/backup/export')
-        self.assertEqual(res.status, '200 OK')
-        self.assertEqual(res.content_type, 'application/yith-library')
-        self.assertUncompressData(res.body, '[]')
-        self.assertEqual(
-            res.content_disposition,
-            'attachment; filename=yith-library-backup-2012-01-10.yith',
+        with freeze_time('2012-01-10'):
+            res = self.testapp.get('/backup/export')
+            self.assertEqual(res.status, '200 OK')
+            self.assertEqual(res.content_type, 'application/yith-library')
+            self.assertUncompressData(res.body, '[]')
+            self.assertEqual(
+                res.content_disposition,
+                'attachment; filename=yith-library-backup-2012-01-10.yith',
             )
 
-        self.db.passwords.insert({
+            self.db.passwords.insert({
                 'owner': user_id,
                 'password': 'secret1',
-                })
-        self.db.passwords.insert({
+            })
+            self.db.passwords.insert({
                 'owner': user_id,
                 'password': 'secret2',
-                })
+            })
 
-        res = self.testapp.get('/backup/export')
-        self.assertEqual(res.status, '200 OK')
-        self.assertEqual(res.content_type, 'application/yith-library')
-        self.assertUncompressData(res.body, json.dumps([{
-                    'password': 'secret1',
-                    }, {
-                    'password': 'secret2',
-                    }]))
-        self.assertEqual(
-            res.content_disposition,
-            'attachment; filename=yith-library-backup-2012-01-10.yith',
+            res = self.testapp.get('/backup/export')
+            self.assertEqual(res.status, '200 OK')
+            self.assertEqual(res.content_type, 'application/yith-library')
+            self.assertUncompressData(res.body, json.dumps([{
+                'password': 'secret1',
+            }, {
+                'password': 'secret2',
+            }]))
+            self.assertEqual(
+                res.content_disposition,
+                'attachment; filename=yith-library-backup-2012-01-10.yith',
             )
-        del os.environ['YITH_FAKE_DATE']
 
     def test_backups_import(self):
         res = self.testapp.post('/backup/import')

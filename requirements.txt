@@ -40,7 +40,10 @@ wsgiref==0.1.2  # required only in Heroku (which uses Python 2)
 
 # test support #
 WebTest==2.0.16
+freezegun==0.3.1
 mock==1.0.1
+six==1.9.0             # required by freezegun
+python-dateutil==2.4.0 # required by freezegun
 
 # testing #
 coverage==3.7.1

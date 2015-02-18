@@ -30,7 +30,7 @@ from pyramid.settings import asbool
 from pyramid.testing import DummyRequest
 
 from yithlibraryserver import main
-from yithlibraryserver.datetimeservice.testing import FakeDatetimeService
+from yithlibraryserver.datetimeservice import DatetimeService
 
 # On Travis-CI tests are executed in paralllel for every Python
 # version we support. We should not share the test database on
@@ -48,7 +48,7 @@ class FakeRequest(DummyRequest):
         if 'db' in kwargs:
             self.db = kwargs['db']
 
-        self.datetime_service = FakeDatetimeService(self)
+        self.datetime_service = DatetimeService(self)
 
 
 def clean_db(db):

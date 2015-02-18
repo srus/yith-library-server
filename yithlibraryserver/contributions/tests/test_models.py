@@ -17,14 +17,14 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-import os
 import unittest
 
 from bson.tz_util import utc
+from freezegun import freeze_time
 
 from pyramid import testing
 
-from yithlibraryserver.datetimeservice.testing import FakeDatetimeService
+from yithlibraryserver.datetimeservice import DatetimeService
 from yithlibraryserver.db import MongoDB
 from yithlibraryserver.testing import MONGO_URI, clean_db
 
@@ -38,16 +38,17 @@ class ModelTests(unittest.TestCase):
         self.config = testing.setUp()
         mdb = MongoDB(MONGO_URI)
         self.db = mdb.get_database()
-        os.environ['YITH_FAKE_DATETIME'] = '2013-1-2-10-11-02'
+        self.freezer = freeze_time('2013-01-02 10:11:02')
+        self.freezer.start()
 
         self.request = testing.DummyRequest()
-        self.request.datetime_service = FakeDatetimeService(self.request)
+        self.request.datetime_service = DatetimeService(self.request)
         self.request.db = self.db
 
     def tearDown(self):
         testing.tearDown()
         clean_db(self.db)
-        del os.environ['YITH_FAKE_DATETIME']
+        self.freezer.stop()
 
     def test_include_sticker(self):
         self.assertFalse(include_sticker(1))

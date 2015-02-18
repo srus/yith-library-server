@@ -18,8 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-
+from freezegun import freeze_time
 import mock
 from mock import patch
 
@@ -139,12 +138,11 @@ class ViewTests(testing.TestCase):
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/register')
 
+    @freeze_time('2012-01-10 15:31:11')
     @mock.patch('requests.get')
     @mock.patch('requests.post')
     def test_twitter_callback_existing_user(self, post_mock, get_mock):
         # good request, twitter is happy now. Existing user
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
-
         user_id = self.db.users.insert({
             'twitter_id': 'user1',
             'screen_name': 'Johnny',
@@ -186,14 +184,11 @@ class ViewTests(testing.TestCase):
         new_user = self.db.users.find_one({'_id': user_id})
         self.assertEqual(new_user['screen_name'], 'Johnny')
 
-        del os.environ['YITH_FAKE_DATETIME']
-
+    @freeze_time('2012-01-10 15:31:11')
     @mock.patch('requests.get')
     @mock.patch('requests.post')
     def test_twitter_callback_existing_user_remember_url(self, post_mock, get_mock):
         # good request, existing user, remember next_url
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
-
         self.db.users.insert({
             'twitter_id': 'user1',
             'screen_name': 'Johnny',
@@ -229,5 +224,3 @@ class ViewTests(testing.TestCase):
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/foo/bar')
         self.assertTrue('Set-Cookie' in res.headers)
-
-        del os.environ['YITH_FAKE_DATETIME']
