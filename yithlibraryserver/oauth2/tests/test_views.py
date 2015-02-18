@@ -313,8 +313,8 @@ class TokenEndpointTests(BaseEndpointTests):
     def test_no_client(self):
         res = self.testapp.post('/oauth2/endpoints/token', {
             'grant_type': 'password',
-        }, status=400)
-        self.assertEqual(res.status, '400 Bad Request')
+        }, status=401)
+        self.assertEqual(res.status, '401 Unauthorized')
         self.assertEqual(res.json, {
             'error': 'invalid_client'
         })
@@ -325,7 +325,7 @@ class TokenEndpointTests(BaseEndpointTests):
         }
         res = self.testapp.post('/oauth2/endpoints/token', {
             'grant_type': 'password',
-        }, headers=headers, status=400)
+        }, headers=headers, status=401)
         self.assertEqual(res.json, {
             'error': 'invalid_client'
         })
@@ -337,7 +337,7 @@ class TokenEndpointTests(BaseEndpointTests):
         }
         res = self.testapp.post('/oauth2/endpoints/token', {
             'grant_type': 'password',
-        }, headers=headers, status=400)
+        }, headers=headers, status=401)
         self.assertEqual(res.json, {
             'error': 'invalid_client'
         })
@@ -376,7 +376,7 @@ class TokenEndpointTests(BaseEndpointTests):
         res = self.testapp.post('/oauth2/endpoints/token', {
             'grant_type': 'authorization_code',
             'code': 'this-code-does-not-exist',
-        }, headers=headers, status=400)
+        }, headers=headers, status=401)
 
         self.assertEqual(res.json, {
             'error': 'invalid_grant',
