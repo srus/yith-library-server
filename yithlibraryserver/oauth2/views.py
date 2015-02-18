@@ -211,7 +211,7 @@ class AuthorizationEndpoint(object):
 
     def __init__(self, request):
         self.request = request
-        self.validator = RequestValidator(request.db, request.datetime_service)
+        self.validator = RequestValidator(request.db)
         self.server = Server(self.validator)
         self.authorizator = Authorizator(request.db)
 
@@ -295,7 +295,7 @@ class AuthorizationEndpoint(object):
 @view_config(route_name='oauth2_token_endpoint',
              renderer='json')
 def token_endpoint(request):
-    validator = RequestValidator(request.db, request.datetime_service)
+    validator = RequestValidator(request.db)
     server = Server(validator)
 
     uri, http_method, body, headers = extract_params(request)

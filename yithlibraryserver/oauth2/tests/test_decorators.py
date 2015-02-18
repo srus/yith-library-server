@@ -17,9 +17,9 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-import os
 
 from bson.tz_util import utc
+from freezegun import freeze_time
 
 from pyramid.httpexceptions import HTTPUnauthorized
 
@@ -49,7 +49,6 @@ class DecoratorsTests(testing.TestCase):
 
     def setUp(self):
         super(DecoratorsTests, self).setUp()
-        os.environ['YITH_FAKE_DATETIME'] = '2014-2-23-08-00-00'
         self.user_id = self.db.users.insert({
             'username': 'user1',
         })
@@ -65,10 +64,7 @@ class DecoratorsTests(testing.TestCase):
             'client_id': 'client1',
         })
 
-    def tearDown(self):
-        del os.environ['YITH_FAKE_DATETIME']
-        super(DecoratorsTests, self).tearDown()
-
+    @freeze_time('2014-02-23 08:00:00')
     def test_protected_bad_scope(self):
         self._create_access_code('scope2')
 
@@ -78,6 +74,7 @@ class DecoratorsTests(testing.TestCase):
 
         self.assertRaises(HTTPUnauthorized, view_function, request)
 
+    @freeze_time('2014-02-23 08:00:00')
     def test_protected(self):
         self._create_access_code('scope1')
 
@@ -88,6 +85,7 @@ class DecoratorsTests(testing.TestCase):
         self.assertEqual(view_function(request), 'response')
         self.assertEqual(request.user['username'], 'user1')
 
+    @freeze_time('2014-02-23 08:00:00')
     def test_protected_method_bad_scope(self):
         self._create_access_code('scope2')
         request = testing.FakeRequest(headers={
@@ -97,6 +95,7 @@ class DecoratorsTests(testing.TestCase):
         view_object = ViewClass(request)
         self.assertRaises(HTTPUnauthorized, view_object.view_method)
 
+    @freeze_time('2014-02-23 08:00:00')
     def test_protected_method(self):
         self._create_access_code('scope1')
         request = testing.FakeRequest(headers={

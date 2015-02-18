@@ -18,14 +18,13 @@
 
 import base64
 import datetime
-import os
 
 from bson.tz_util import utc
+from freezegun import freeze_time
 
 from oauthlib.common import Request, to_unicode
 
 from yithlibraryserver import testing
-from yithlibraryserver.datetimeservice.testing import FakeDatetimeService
 from yithlibraryserver.oauth2.validator import RequestValidator
 
 
@@ -60,7 +59,6 @@ class RequestValidatorTests(testing.TestCase):
 
     def _create_request_validator(self, scopes=None):
         rv = RequestValidator(self.db,
-                              FakeDatetimeService(None),
                               default_scopes=scopes)
         request = Request('https://server.example.com/')
         return rv, request
@@ -165,9 +163,8 @@ class RequestValidatorTests(testing.TestCase):
         self.assertFalse(rv.validate_response_type('123456', 'invalid',
                                                    None, request))
 
+    @freeze_time('2012-01-10 15:31:11')
     def test_save_authorization_code(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
-
         rv, request = self._create_request_validator()
         request.user = {'_id': self.user_id}
         request.scopes = ['read-passwords', 'write-passwords']
@@ -183,8 +180,6 @@ class RequestValidatorTests(testing.TestCase):
                                                 tzinfo=utc)
         expected_expiration += datetime.timedelta(minutes=10)
         self.assertEquals(auth_code['expiration'], expected_expiration)
-
-        del os.environ['YITH_FAKE_DATETIME']
 
     def test_authenticate_client_no_headers_no_request_attrs(self):
         rv, request = self._create_request_validator()
@@ -244,41 +239,34 @@ class RequestValidatorTests(testing.TestCase):
         self.assertFalse(rv.validate_code('123456', 'abcdef', client, request))
 
     def test_validate_code_expired_code(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
+        with freeze_time('2012-01-10 15:31:11'):
+            rv, request = self._create_request_validator()
+            client = rv.get_client('123456')
 
-        rv, request = self._create_request_validator()
-        client = rv.get_client('123456')
-
-        request.user = {'_id': self.user_id}
-        request.scopes = ['read-passwords', 'write-passwords']
-        request.redirect_uri = 'https://example.com/callback'
-        rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
+            request.user = {'_id': self.user_id}
+            request.scopes = ['read-passwords', 'write-passwords']
+            request.redirect_uri = 'https://example.com/callback'
+            rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
 
         # move time forward 11 minutes
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-42-11'
-
-        self.assertFalse(rv.validate_code('123456', 'abcdef', client, request))
-        del os.environ['YITH_FAKE_DATETIME']
+        with freeze_time('2012-01-10 15:42:11'):
+            self.assertFalse(rv.validate_code('123456', 'abcdef', client, request))
 
     def test_validate_code_good(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
-
-        rv, request = self._create_request_validator()
-        request.user = {'_id': self.user_id}
-        request.scopes = ['read-passwords', 'write-passwords']
-        request.redirect_uri = 'https://example.com/callback'
-        rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
+        with freeze_time('2012-01-10 15:31:11'):
+            rv, request = self._create_request_validator()
+            request.user = {'_id': self.user_id}
+            request.scopes = ['read-passwords', 'write-passwords']
+            request.redirect_uri = 'https://example.com/callback'
+            rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
 
         # move time forward 5 minutes
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-36-11'
-
-        rv2, request2 = self._create_request_validator()
-        client2 = rv2.get_client('123456')
-        self.assertTrue(rv2.validate_code('123456', 'abcdef', client2, request2))
-        self.assertEquals(request2.user, self.user_id)
-        self.assertEquals(request2.scopes, ['read-passwords', 'write-passwords'])
-
-        del os.environ['YITH_FAKE_DATETIME']
+        with freeze_time('2012-01-10 15:36:11'):
+            rv2, request2 = self._create_request_validator()
+            client2 = rv2.get_client('123456')
+            self.assertTrue(rv2.validate_code('123456', 'abcdef', client2, request2))
+            self.assertEquals(request2.user, self.user_id)
+            self.assertEquals(request2.scopes, ['read-passwords', 'write-passwords'])
 
     def test_confirm_redirect_uri_no_redirect_uri(self):
         rv, request = self._create_request_validator()
@@ -293,8 +281,8 @@ class RequestValidatorTests(testing.TestCase):
                                                  'https://example.com/callback',
                                                  client))
 
+    @freeze_time('2012-01-10 15:31:11')
     def test_confirm_redirect_uri_bad_redirect_uri(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
         rv, request = self._create_request_validator()
         request.user = {'_id': self.user_id}
         request.scopes = ['read-passwords', 'write-passwords']
@@ -306,10 +294,9 @@ class RequestValidatorTests(testing.TestCase):
         self.assertFalse(rv.confirm_redirect_uri('123456', 'abcdef',
                                                  'http://example.com/callback',
                                                  client))
-        del os.environ['YITH_FAKE_DATETIME']
 
+    @freeze_time('2012-01-10 15:31:11')
     def test_confirm_redirect_uri_good_redirect_uri(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
         rv, request = self._create_request_validator()
         request.user = {'_id': self.user_id}
         request.scopes = ['read-passwords', 'write-passwords']
@@ -321,7 +308,6 @@ class RequestValidatorTests(testing.TestCase):
         self.assertTrue(rv.confirm_redirect_uri('123456', 'abcdef',
                                                 'https://example.com/callback',
                                                 client))
-        del os.environ['YITH_FAKE_DATETIME']
 
     def test_validate_grant_type_bad(self):
         rv, request = self._create_request_validator()
@@ -335,8 +321,8 @@ class RequestValidatorTests(testing.TestCase):
         self.assertTrue(rv.validate_grant_type('123456', 'authorization_code',
                                                client, request))
 
+    @freeze_time('2012-01-10 15:31:11')
     def test_save_bearer_token(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
         rv, request = self._create_request_validator()
         token = {
             'expires_in': 3600,  # seconds
@@ -361,18 +347,13 @@ class RequestValidatorTests(testing.TestCase):
         self.assertEquals(access_code['user_id'], self.user_id)
         self.assertEquals(access_code['client_id'], '123456')
 
-        del os.environ['YITH_FAKE_DATETIME']
-
+    @freeze_time('2012-01-10 15:31:11')
     def test_invalidate_authorization_code(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
-
         rv, request = self._create_request_validator()
         request.user = {'_id': self.user_id}
         request.scopes = ['read-passwords', 'write-passwords']
         request.redirect_uri = 'https://example.com/callback'
         rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
-
-        del os.environ['YITH_FAKE_DATETIME']
 
         rv, request = self._create_request_validator()
         request.client = rv.get_client('123456')
@@ -389,82 +370,73 @@ class RequestValidatorTests(testing.TestCase):
         ))
 
     def test_validate_bearer_token_expired_token(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
-        rv, request = self._create_request_validator()
-        token = {
-            'expires_in': 3600,  # seconds
-            'access_token': 'fghijk',
-            'token_type': 'Bearer',
-            'refresh_token': 'lmnopq',
-        }
-        request.user = self.user_id
-        request.scopes = ['read-passwords', 'write-passwords']
-        request.client = rv.get_client('123456')
-        rv.save_bearer_token(token, request)
+        with freeze_time('2012-01-10 15:31:11'):
+            rv, request = self._create_request_validator()
+            token = {
+                'expires_in': 3600,  # seconds
+                'access_token': 'fghijk',
+                'token_type': 'Bearer',
+                'refresh_token': 'lmnopq',
+            }
+            request.user = self.user_id
+            request.scopes = ['read-passwords', 'write-passwords']
+            request.client = rv.get_client('123456')
+            rv.save_bearer_token(token, request)
 
         # move time forward 2 hours
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-17-42-11'
-
-        rv, request = self._create_request_validator()
-        self.assertFalse(rv.validate_bearer_token(
-            'fghijk',
-            ['read-passwords', 'write-passwords'],
-            request,
-        ))
-
-        del os.environ['YITH_FAKE_DATETIME']
+        with freeze_time('2012-01-10 17:42:11'):
+            rv, request = self._create_request_validator()
+            self.assertFalse(rv.validate_bearer_token(
+                'fghijk',
+                ['read-passwords', 'write-passwords'],
+                request,
+            ))
 
     def test_validate_bearer_token_bad_scopes(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
-        rv, request = self._create_request_validator()
-        token = {
-            'expires_in': 3600,  # seconds
-            'access_token': 'fghijk',
-            'token_type': 'Bearer',
-            'refresh_token': 'lmnopq',
-        }
-        request.user = self.user_id
-        request.scopes = ['read-passwords', 'write-passwords']
-        request.client = rv.get_client('123456')
-        rv.save_bearer_token(token, request)
+        with freeze_time('2012-01-10 15:31:11'):
+            rv, request = self._create_request_validator()
+            token = {
+                'expires_in': 3600,  # seconds
+                'access_token': 'fghijk',
+                'token_type': 'Bearer',
+                'refresh_token': 'lmnopq',
+            }
+            request.user = self.user_id
+            request.scopes = ['read-passwords', 'write-passwords']
+            request.client = rv.get_client('123456')
+            rv.save_bearer_token(token, request)
 
         # move time forward 1/2 hour
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-16-01-11'
-
-        rv, request = self._create_request_validator()
-        self.assertFalse(rv.validate_bearer_token(
-            'fghijk',
-            ['read-passwords', 'write-passwords', 'read-userinfo'],
-            request,
-        ))
-
-        del os.environ['YITH_FAKE_DATETIME']
+        with freeze_time('2012-01-10 16:01:11'):
+            rv, request = self._create_request_validator()
+            self.assertFalse(rv.validate_bearer_token(
+                'fghijk',
+                ['read-passwords', 'write-passwords', 'read-userinfo'],
+                request,
+            ))
 
     def test_validate_bearer_token_good(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
-        rv, request = self._create_request_validator()
-        token = {
-            'expires_in': 3600,  # seconds
-            'access_token': 'fghijk',
-            'token_type': 'Bearer',
-            'refresh_token': 'lmnopq',
-        }
-        request.user = self.user_id
-        request.scopes = ['read-passwords', 'write-passwords']
-        request.client = rv.get_client('123456')
-        rv.save_bearer_token(token, request)
+        with freeze_time('2012-01-10 15:31:11'):
+            rv, request = self._create_request_validator()
+            token = {
+                'expires_in': 3600,  # seconds
+                'access_token': 'fghijk',
+                'token_type': 'Bearer',
+                'refresh_token': 'lmnopq',
+            }
+            request.user = self.user_id
+            request.scopes = ['read-passwords', 'write-passwords']
+            request.client = rv.get_client('123456')
+            rv.save_bearer_token(token, request)
 
         # move time forward 1/2 hour
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-16-01-11'
-
-        rv, request = self._create_request_validator()
-        self.assertTrue(rv.validate_bearer_token(
-            'fghijk',
-            ['read-passwords', 'write-passwords'],
-            request,
-        ))
-
-        del os.environ['YITH_FAKE_DATETIME']
+        with freeze_time('2012-01-10 16:01:11'):
+            rv, request = self._create_request_validator()
+            self.assertTrue(rv.validate_bearer_token(
+                'fghijk',
+                ['read-passwords', 'write-passwords'],
+                request,
+            ))
 
     def test_get_original_scopes_non_implemented(self):
         rv, request = self._create_request_validator()

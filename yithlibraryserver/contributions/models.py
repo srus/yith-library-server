@@ -16,6 +16,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
+from bson.tz_util import utc
+
 
 def include_sticker(amount):
     return amount > 1
@@ -33,7 +36,7 @@ def create_donation(request, data):
         'street': data['street'],
         'zip': data['zip'],
         'email': data['email'],
-        'creation': request.datetime_service.utcnow(),
+        'creation': datetime.datetime.now(tz=utc),
     }
     if include_sticker(amount):
         donation['send_sticker'] = not ('no-sticker' in data)

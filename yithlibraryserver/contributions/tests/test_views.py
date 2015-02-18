@@ -17,10 +17,9 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-import os
 
 import bson
-
+from freezegun import freeze_time
 from mock import patch
 
 from pyramid_mailer import get_mailer
@@ -140,9 +139,8 @@ class TestViews(TestCase):
         session = self.get_session(res)
         self.assertEqual(session['_f_error'], ['There was a problem in the confirmation process. Please start the checkout again'])
 
+    @freeze_time('2013-01-02 10:11:02')
     def test_contributions_confirm_success(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2013-1-2-10-11-02'
-
         with patch('requests.post') as fake:
             fake.return_value.ok = True
             fake.return_value.text = 'ACK=Success'
@@ -219,8 +217,6 @@ class TestViews(TestCase):
                              datetime.datetime(2013, 1, 2, 10, 11, 2, tzinfo=bson.tz_util.utc))
             self.assertEqual(donation['send_sticker'], True)
             self.assertEqual(donation['user'], None)
-
-        del os.environ['YITH_FAKE_DATETIME']
 
     def test_contributions_cancel(self):
         res = self.testapp.get('/contribute/paypal-cancel-callback',

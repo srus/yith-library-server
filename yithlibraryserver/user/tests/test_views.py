@@ -19,10 +19,10 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-import os
 
 import bson
 from bson.tz_util import utc
+from freezegun import freeze_time
 
 from deform import ValidationFailure
 
@@ -86,9 +86,8 @@ class ViewTests(TestCase):
         res.mustcontain('/twitter/login')
         res.mustcontain('next_url=/')
 
+    @freeze_time('2013-01-02 10:11:02')
     def test_register_new_user(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2013-1-2-10-11-02'
-
         res = self.testapp.get('/register', status=400)
         self.assertEqual(res.status, '400 Bad Request')
         res.mustcontain('Missing user info in the session')
@@ -282,8 +281,6 @@ class ViewTests(TestCase):
                     'submit': 'Register into Yith Library',
                     })
             self.assertEqual(res.status, '200 OK')
-
-        del os.environ['YITH_FAKE_DATETIME']
 
     def test_logout(self):
         # Log in
@@ -698,8 +695,8 @@ class RESTViewTests(TestCase):
         self.assertEqual(res.headers['Access-Control-Allow-Headers'],
                          'Origin, Content-Type, Accept, Authorization')
 
+    @freeze_time('2014-02-23 08:00:00')
     def test_user_get(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2014-2-23-08-00-00'
         expiration = datetime.datetime(2014, 2, 23, 9, 0, tzinfo=utc)
 
         self.db.access_codes.insert({
@@ -727,8 +724,6 @@ class RESTViewTests(TestCase):
             'date_joined': '2012-12-12T12:12:00+00:00',
             'last_login': '2012-12-12T12:12:00+00:00',
         })
-
-        del os.environ['YITH_FAKE_DATETIME']
 
 
 class PreferencesTests(TestCase):
@@ -763,8 +758,8 @@ class PreferencesTests(TestCase):
 
         return user_id
 
+    @freeze_time('2012-10-27')
     def test_backup_next_month(self):
-        os.environ['YITH_FAKE_DATE'] = '2012-10-27'
         self._login()
         res = self.testapp.get('/preferences')
         self.assertEqual(res.status, '200 OK')
@@ -774,10 +769,9 @@ class PreferencesTests(TestCase):
             'You will receive your passwords backup on the day 26 of next month',
             'Save changes',
         )
-        del os.environ['YITH_FAKE_DATE']
 
+    @freeze_time('2012-10-25')
     def test_backup_this_month(self):
-        os.environ['YITH_FAKE_DATE'] = '2012-10-25'
         self._login()
         res = self.testapp.get('/preferences')
         self.assertEqual(res.status, '200 OK')
@@ -787,10 +781,9 @@ class PreferencesTests(TestCase):
             'You will receive your passwords backup on the day 26 of this month',
             'Save changes',
         )
-        del os.environ['YITH_FAKE_DATE']
 
+    @freeze_time('2012-10-26')
     def test_backup_today(self):
-        os.environ['YITH_FAKE_DATE'] = '2012-10-26'
         self._login()
         res = self.testapp.get('/preferences')
         self.assertEqual(res.status, '200 OK')
@@ -800,10 +793,9 @@ class PreferencesTests(TestCase):
             'You will receive your passwords backup today',
             'Save changes',
         )
-        del os.environ['YITH_FAKE_DATE']
 
+    @freeze_time('2012-10-27')
     def test_save_changes(self):
-        os.environ['YITH_FAKE_DATE'] = '2012-10-27'
         user_id = self._login()
         res = self.testapp.post('/preferences', {
                 'submit': 'Save changes',
@@ -817,10 +809,8 @@ class PreferencesTests(TestCase):
         self.assertEqual(new_user['allow_google_analytics'], True)
         self.assertEqual(new_user['send_passwords_periodically'], False)
 
-        del os.environ['YITH_FAKE_DATE']
-
+    @freeze_time('2012-10-27')
     def test_form_fail(self):
-        os.environ['YITH_FAKE_DATE'] = '2012-10-27'
         self._login()
         # make the form fail
         with patch('deform.Form.validate') as fake:
@@ -830,10 +820,8 @@ class PreferencesTests(TestCase):
             })
             self.assertEqual(res.status, '200 OK')
 
-        del os.environ['YITH_FAKE_DATE']
-
+    @freeze_time('2012-10-27')
     def test_db_fail(self):
-        os.environ['YITH_FAKE_DATE'] = '2012-10-27'
         user_id = self._login()
         new_user = self.db.users.find_one({'_id': user_id})
         # make the db fail
@@ -846,5 +834,3 @@ class PreferencesTests(TestCase):
             })
             self.assertEqual(res.status, '200 OK')
             res.mustcontain('There were an error while saving your changes')
-
-        del os.environ['YITH_FAKE_DATE']

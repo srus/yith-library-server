@@ -18,9 +18,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-
 import bson
+from freezegun import freeze_time
 
 from yithlibraryserver import testing
 from yithlibraryserver.compat import encodebytes, encode_header, urlparse
@@ -140,9 +139,8 @@ class AuthorizationEndpointTests(BaseEndpointTests):
         self.assertEqual(res.location,
                          'https://example.com/callback?error=access_denied')
 
+    @freeze_time('2012-01-10 15:31:11')
     def test_non_authorized_app_yet(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
-
         user_id = self._login()
         self._create_client()
 
@@ -192,11 +190,8 @@ class AuthorizationEndpointTests(BaseEndpointTests):
         location = 'https://example.com/callback?code=%s' % code
         self.assertEqual(res.location, location)
 
-        del os.environ['YITH_FAKE_DATETIME']
-
+    @freeze_time('2012-01-10 15:31:11')
     def test_already_authorized_app(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
-
         user_id = self._login()
         self._create_client()
 
@@ -246,11 +241,8 @@ class AuthorizationEndpointTests(BaseEndpointTests):
         location = 'https://example.com/callback?code=%s' % code
         self.assertEqual(res.location, location)
 
-        del os.environ['YITH_FAKE_DATETIME']
-
+    @freeze_time('2012-01-10 15:31:11')
     def test_invalid_redirect_callback_in_post(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
-
         self._login()
         self._create_client()
 
@@ -271,11 +263,8 @@ class AuthorizationEndpointTests(BaseEndpointTests):
         self.assertEqual(res.status, '400 Bad Request')
         res.mustcontain('Error is: mismatching_redirect_uri')
 
-        del os.environ['YITH_FAKE_DATETIME']
-
+    @freeze_time('2012-01-10 15:31:11')
     def test_no_response_type_in_post(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
-
         self._login()
         self._create_client()
 
@@ -296,8 +285,6 @@ class AuthorizationEndpointTests(BaseEndpointTests):
         self.assertEqual(res.status, '302 Found')
         self._assert_error(res.location, 'invalid_request',
                            'Missing response_type parameter.')
-
-        del os.environ['YITH_FAKE_DATETIME']
 
 
 class TokenEndpointTests(BaseEndpointTests):
@@ -382,8 +369,8 @@ class TokenEndpointTests(BaseEndpointTests):
             'error': 'invalid_grant',
         })
 
+    @freeze_time('2012-01-10 15:31:11')
     def test_valid_request(self):
-        os.environ['YITH_FAKE_DATETIME'] = '2012-1-10-15-31-11'
         user_id = self._login()
         self._create_client()
 
@@ -435,8 +422,6 @@ class TokenEndpointTests(BaseEndpointTests):
             'access_token': res.json['access_token'],
         })
         self.assertNotEqual(access_code, None)
-
-        del os.environ['YITH_FAKE_DATETIME']
 
 
 class ApplicationViewTests(testing.TestCase):

@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
+
 from pyramid.i18n import get_localizer
 from pyramid.httpexceptions import HTTPFound
 from pyramid.response import Response
@@ -42,7 +44,7 @@ def backups_export(request):
     passwords = get_user_passwords(request.db, request.user)
     data = compress(passwords)
     response = Response(body=data, content_type='application/yith-library')
-    today = request.date_service.today()
+    today = datetime.date.today()
     filename = get_backup_filename(today)
     response.content_disposition = 'attachment; filename=%s' % filename
     return response

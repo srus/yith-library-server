@@ -113,7 +113,6 @@ def main(global_config, **settings):
     # Setup of stuff used only in the tests
     if 'testing' in settings and asbool(settings['testing']):
         config.include('pyramid_mailer.testing')
-        config.include('yithlibraryserver.datetimeservice.testing')
 
         # add test only views to make it easy to login and add
         # things to the session during the tests
@@ -129,7 +128,6 @@ def main(global_config, **settings):
 
     else:  # pragma: no cover
         config.include('pyramid_mailer')
-        config.include('yithlibraryserver.datetimeservice')
 
     # Google/Facebook authentication
     config.include('pyramid_sna')

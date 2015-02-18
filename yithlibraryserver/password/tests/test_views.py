@@ -19,9 +19,9 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-import os
 
 from bson.tz_util import utc
+from freezegun import freeze_time
 
 from yithlibraryserver import testing
 from yithlibraryserver.compat import text_type
@@ -39,7 +39,8 @@ class ViewTests(testing.TestCase):
             'screen_name': 'User 1',
         })
 
-        os.environ['YITH_FAKE_DATETIME'] = '2014-2-23-08-00-00'
+        self.freezer = freeze_time('2014-02-23 08:00:00')
+        self.freezer.start()
         expiration = datetime.datetime(2014, 2, 23, 9, 0, tzinfo=utc)
 
         self.db.access_codes.insert({
@@ -52,7 +53,7 @@ class ViewTests(testing.TestCase):
         })
 
     def tearDown(self):
-        del os.environ['YITH_FAKE_DATETIME']
+        self.freezer.stop()
         super(ViewTests, self).tearDown()
 
     def test_password_collection_options(self):
