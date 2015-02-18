@@ -69,8 +69,6 @@ class BaseEndpointTests(testing.TestCase):
 
 class AuthorizationEndpointTests(BaseEndpointTests):
 
-    clean_collections = ('applications', 'users', 'authorization_codes')
-
     def test_anonymous_user(self):
         # this view requires authentication
         res = self.testapp.get('/oauth2/endpoints/authorization')
@@ -158,9 +156,12 @@ class AuthorizationEndpointTests(BaseEndpointTests):
             'redirect_uri': 'https://example.com/callback',
         })
         self.assertEqual(res.status, '200 OK')
-        res.mustcontain('is asking your permission for')
+        res.mustcontain('Authorize Application')
+        res.mustcontain('Permissions:')
+        res.mustcontain('Access your passwords')
         res.mustcontain('Allow access')
         res.mustcontain('No, thanks')
+        res.mustcontain('You can revoke this authorization in the future.')
 
         res = self.testapp.post('/oauth2/endpoints/authorization', {
             'submit': 'Authorize',
@@ -301,9 +302,6 @@ class AuthorizationEndpointTests(BaseEndpointTests):
 
 class TokenEndpointTests(BaseEndpointTests):
 
-    clean_collections = ('applications', 'users', 'authorization_codes',
-                         'access_codes')
-
     def test_no_grant_type(self):
         res = self.testapp.post('/oauth2/endpoints/token', {}, status=400)
 
@@ -442,8 +440,6 @@ class TokenEndpointTests(BaseEndpointTests):
 
 
 class ApplicationViewTests(testing.TestCase):
-
-    clean_collections = ('applications', 'users', 'authorized_apps')
 
     def test_applications(self):
         # this view required authentication
@@ -751,7 +747,9 @@ https://example.com""")
             'owner': bson.ObjectId(),
             'name': 'Test Application 1',
             'main_url': 'http://example.com/1',
+            'image_url': 'http://example.com/1/logo.png',
             'callback_url': 'http://example.com/1/callback',
+            'description': 'Test description 1',
             'client_id': '123456',
             'client_secret': 'secret',
                 })
@@ -766,7 +764,9 @@ https://example.com""")
             'owner': bson.ObjectId(),
             'name': 'Test Application 2',
             'main_url': 'http://example.com/2',
+            'image_url': 'http://example.com/2/logo.png',
             'callback_url': 'http://example.com/2/callback',
+            'description': 'Test description 2',
             'client_id': '789012',
             'client_secret': 'secret',
         })

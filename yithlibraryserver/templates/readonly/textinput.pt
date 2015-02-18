@@ -1,4 +1,15 @@
-<input type="text" name="${field.name}" value="${cstruct}"
-           tal:attributes="size field.widget.size;
-                           class field.widget.css_class"
-           id="${field.oid}" readonly="readonly"/>
+<label tal:condition="not (field.widget.hidden or
+                           field.widget.category == 'structural')"
+       class="control-label col-sm-3"
+       for="${field.oid}">${field.title}<span tal:condition="field.required" class="req" id="req-${field.oid}">*</span></label>
+
+<div class="col-sm-9">
+  <input type="text"
+         name="${field.name}"
+	 value="${cstruct}"
+         class="form-control${field.widget.css_class and ' ' + field.widget.css_class}"
+         tal:attributes="size field.widget.size"
+         id="${field.oid}"
+	 readonly="readonly"/>
+  <span tal:condition="field.description" class="help-block" tal:content="field.description"></span>
+</div>

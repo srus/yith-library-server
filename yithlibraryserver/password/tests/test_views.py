@@ -29,8 +29,6 @@ from yithlibraryserver.compat import text_type
 
 class ViewTests(testing.TestCase):
 
-    clean_collections = ('passwords', 'access_codes', 'users')
-
     def setUp(self):
         super(ViewTests, self).setUp()
 

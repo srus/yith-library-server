@@ -30,8 +30,6 @@ from yithlibraryserver.scripts.testing import ScriptTests
 
 class BackupsTests(ScriptTests):
 
-    clean_collections = ('users', 'passwords', )
-
     def setUp(self):
         super(BackupsTests, self).setUp()
 

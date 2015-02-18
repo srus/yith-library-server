@@ -10,8 +10,10 @@
 
 <tal:block metal:fill-slot="content">
 
-  <h2 tal:condition="verified" i18n:translate="">Email verified</h2>
-  <h2 tal:condition="not verified" i18n:translate="">Email not verified</h2>
+  <div class="page-header">
+    <h1 tal:condition="verified" i18n:translate="">Email verified</h1>
+    <h1 tal:condition="not verified" i18n:translate="">Email not verified</h1>
+  </div>
 
   <div tal:condition="verified">
     <p i18n:translate="">Now you can link several accounts to identify yourself.</p>

@@ -44,41 +44,40 @@ class AuthorizedOriginsNode(colander.SchemaNode):
 
 class ApplicationSchema(colander.MappingSchema):
 
-    name = colander.SchemaNode(colander.String(), title=_('Name'))
+    name = colander.SchemaNode(
+        colander.String(),
+        title=_('Name'),
+    )
     main_url = colander.SchemaNode(
         colander.String(),
         title=_('Main URL'),
-        widget=TextInputWidget(css_class='input-xlarge'),
-        )
+    )
     callback_url = colander.SchemaNode(
         colander.String(),
         title=_('Callback URL'),
-        widget=TextInputWidget(css_class='input-xlarge'),
-        )
+    )
     authorized_origins = AuthorizedOriginsNode(
         colander.String(),
         title=_('Authorized Origins'),
         description=_('One per line. For example https://example.com'),
+        widget=TextAreaWidget(rows=5),
         missing=[],
-        widget=TextAreaWidget(css_class='input-xlarge'),
-        )
+    )
     production_ready = colander.SchemaNode(
         colander.Boolean(),
         title=_('Production ready'),
         missing=False,
-        )
+    )
     image_url = colander.SchemaNode(
         colander.String(),
         title=_('Image URL'),
         missing='',
-        widget=TextInputWidget(css_class='input-xlarge'),
-        )
+    )
     description = colander.SchemaNode(
         colander.String(),
         title=_('Description'),
         missing='',
-        widget=TextAreaWidget(css_class='input-xlarge'),
-        )
+    )
 
 
 class ReadOnlyTextInputWidget(TextInputWidget):
@@ -94,10 +93,10 @@ class FullApplicationSchema(ApplicationSchema):
     client_id = colander.SchemaNode(
         colander.String(),
         title=_('Client Id'),
-        widget=ReadOnlyTextInputWidget(css_class='input-xlarge'),
-        )
+        widget=ReadOnlyTextInputWidget(),
+    )
     client_secret = colander.SchemaNode(
         colander.String(),
         title=_('Client secret'),
-        widget=ReadOnlyTextInputWidget(css_class='input-xlarge'),
-        )
+        widget=ReadOnlyTextInputWidget(),
+    )

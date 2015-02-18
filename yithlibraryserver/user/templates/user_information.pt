@@ -10,28 +10,36 @@
 
 <tal:block metal:fill-slot="content">
 
-  <h2 i18n:translate="">Personal information</h2>
-
-  <div class="personal-info clearfix">
-    <img class="avatar" src="${request.gravatar.get_image_url(100)}" height="100" alt="" />
-    <ul class="unstyled">
-      <li>Id: ${request.user._id }</li>
-      <li><span i18n:translate="">Member since:</span>
-        <time
-           datetime="${request.user.date_joined.isoformat()}"
-           tal:content="dates_formatter.datetime(request.user.date_joined)" />
-      </li>
-      <li><span i18n:translate="">Last seen:</span>
-        <time
-           datetime="${request.user.last_login.isoformat()}"
-           tal:content="dates_formatter.datetime(request.user.last_login)" />
-      </li>
-      <li><a href="http://www.gravatar.com/" target="_blank">
-          <span tal:condition="request.gravatar.has_avatar()" i18n:translate="">Change your avatar at gravatar.com</span>
-          <span tal:condition="not request.gravatar.has_avatar()" i18n:translate="">Set your avatar at gravatar.com</span>
-      </a></li>
-    </ul>
+  <div class="page-header">
+    <h1 i18n:translate="">Personal information</h1>
   </div>
+
+  <div class="row">
+    <div class="col-sm-2 text-right">
+      <img class="avatar" src="${request.gravatar.get_image_url(100)}" height="100" alt="" />
+    </div>
+    <div class="col-sm-10">
+      <ul class="list-unstyled">
+        <li>Id: ${request.user._id }</li>
+        <li><span i18n:translate="">Member since:</span>
+          <time
+             datetime="${request.user.date_joined.isoformat()}"
+             tal:content="dates_formatter.datetime(request.user.date_joined)" />
+        </li>
+        <li><span i18n:translate="">Last seen:</span>
+          <time
+             datetime="${request.user.last_login.isoformat()}"
+             tal:content="dates_formatter.datetime(request.user.last_login)" />
+        </li>
+        <li><a href="http://www.gravatar.com/" target="_blank">
+            <span tal:condition="request.gravatar.has_avatar()" i18n:translate="">Change your avatar at gravatar.com</span>
+            <span tal:condition="not request.gravatar.has_avatar()" i18n:translate="">Set your avatar at gravatar.com</span>
+        </a></li>
+      </ul>
+    </div>
+  </div>
+
+  <hr/>
 
   <form tal:replace="structure form">form</form>
 

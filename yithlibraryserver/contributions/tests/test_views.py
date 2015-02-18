@@ -30,8 +30,6 @@ from yithlibraryserver.testing import TestCase
 
 class TestViews(TestCase):
 
-    clean_collections = ('donations', )
-
     def test_contributions_index(self):
         res = self.testapp.get('/contribute')
         self.assertEqual(res.status, '200 OK')

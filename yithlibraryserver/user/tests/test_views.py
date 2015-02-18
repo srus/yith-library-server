@@ -64,8 +64,6 @@ class BadDB(object):
 
 class ViewTests(TestCase):
 
-    clean_collections = ('users', 'passwords', )
-
     def assertClearAuthCookie(self, headers):
         self.assertTrue('Set-Cookie' in headers)
         pieces = [p.split('=') for p in headers['Set-Cookie'].split(';')]
@@ -670,8 +668,6 @@ class ViewTests(TestCase):
 
 class RESTViewTests(TestCase):
 
-    clean_collections = ('users', 'access_codes', 'applications')
-
     def setUp(self):
         super(RESTViewTests, self).setUp()
 
@@ -736,8 +732,6 @@ class RESTViewTests(TestCase):
 
 
 class PreferencesTests(TestCase):
-
-    clean_collections = ('users', )
 
     def test_authentication_required(self):
         # this view required authentication

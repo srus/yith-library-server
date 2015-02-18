@@ -44,7 +44,7 @@ def contact(request):
     button1 = Button('submit', _('Send message'))
     button1.css_class = 'btn-primary'
     button2 = Button('cancel', _('Cancel'))
-    button2.css_class = ''
+    button2.css_class = 'btn-default'
 
     form = Form(ContactSchema(), buttons=(button1, button2))
 
@@ -117,3 +117,8 @@ def faq(request):
     template = 'yithlibraryserver:templates/faq-%s.pt' % locale_name
 
     return render_to_response(template, {}, request=request)
+
+
+@view_config(route_name='credits', renderer='templates/credits.pt')
+def credits(request):
+    return {}

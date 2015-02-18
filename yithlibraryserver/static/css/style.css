@@ -1,18 +1,28 @@
-* {
-    margin: 0;
-}
-
-html, body {
-    height: 100%;
-}
-
-.wrapper {
+html {
+    position: relative;
     min-height: 100%;
-    margin: 0 auto -51px;
+}
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 32px;
+}
+footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 32px;
+    border-top: 1px solid #DDD;
+    padding: 5px 10px 5px 10px;
+    background-color: #F9F9F9;
+ }
+
+.jumbotron {
+    margin-top: -20px;
 }
 
-.navbar {
-    margin-top: 20px;
+.align-centered {
+    text-align: center;
 }
 
 .navbar img.avatar {
@@ -25,33 +35,9 @@ html, body {
     border-radius: 5px;
 }
 
-.home-navbar .navbar-inner {
-    padding-right: 80px;
-}
-
 .passwords td:first-child .btn.btn-info {
     display: block;
     margin-bottom: 5px;
-}
-
-article.container {
-    padding-bottom: 50px;
-}
-
-footer {
-    margin-top: 20px;
-    border-top: 1px solid #DDD;
-    padding: 5px 10px 5px 10px;
-    background-color: #F9F9F9;
-}
-
-footer ul {
-    list-style: none;
-    margin: 0;
-}
-
-footer ul li {
-    display: inline;
 }
 
 .thumbnail .caption {
@@ -68,146 +54,63 @@ footer ul li {
 
 /* Home page styles */
 
-.ribbon {
-    position: absolute;
-    top: 0;
-    right: 0;
+@media (min-width: 768px) {
+
+    .home-banner .container {
+        background-image: url(../img/yithian.png);
+        background-repeat: no-repeat;
+        background-position: center right;
+        min-height: 350px;
+        padding-right: 300px;
+    }
+
+}
+
+
+.home-banner p, .home-banner .btn {
+    margin: 20px 0;
+}
+
+.marketing {
+    margin-top: 60px;
+    margin-bottom: 60px;
+}
+
+.marketing h2 {
+    font-weight: normal;
+}
+
+.marketing .col-lg-4 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.marketing .col-lg-4 p {
+    margin-right: 10px;
+    margin-left: 10px;
+    font-size: 16px;
+}
+
+.marketing hr {
+    margin: 60px 0;
+}
+
+.feature h2 {
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -1px;
+}
+
+.list-group-minimal .list-group-item {
     border: 0;
+}
+
+.list-group-minimal .list-group-item-heading > .badge {
+    vertical-align: middle;
 }
 
 .btn small {
     display: block;
-}
-
-.banner {
-    border: 1px solid #d4d4d4;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
-    padding-right: 40%;
-}
-
-.main-banner {
-    background: #eeeeee url(../img/yithian.png) no-repeat center right;
-}
-
-.banner h1 {
-    font-size: 40px;
-    letter-spacing: normal;
-    margin: 10px 0;
-}
-
-.main-banner p, .main-banner .btn {
-    margin: 10px 0;
-}
-
-.block-header {
-    color: #ffffff;
-    background-color: #3f3f3f;
-    margin: 0;
-    padding: 6px;
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
-}
-
-.row-no-margin {
-    margin: 0;
-}
-
-.marketing-block {
-    clear: both;
-    border-left: 1px solid #d4d4d4;
-    border-right: 1px solid #d4d4d4;
-    border-bottom: 1px solid #eeeeee;
-    margin: 0;
-    padding: 10px 0;
-    text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.067);
-}
-
-.marketing-block.marketing-block-first {
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
-    border-top: 1px solid #d4d4d4;
-}
-
-.marketing-block.marketing-block-last {
-    border-bottom: 1px solid #d4d4d4;
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
-    margin-bottom: 30px;
-}
-
-.marketing-block h3, .marketing-block p,
-.marketing-block ul, .marketing-block ol,
-.marketing-block blockquote {
-    text-align: left;
-}
-
-.marketing-block [class*="span"] {
-    float: left;
-    min-height: 1px;
-    margin-left: 7px;
-    margin-right: 7px;
-}
-
-.marketing-block img {
-    margin: 12px 0;
-}
-
-.marketing-block .unstyled {
-    margin-left: 12px;
-}
-
-.marketing-block-big {
-    height: 340px;
-    background-image: none;
-}
-
-.marketing-block-big img {
-    box-shadow: 6px 6px 10px #cccccc;
-    border: 1px solid #bbb;
-}
-
-.marketing-block-right {
-    background-image:    -moz-linear-gradient(-45deg, #ffffff, #eeeeee);
-    background-image:     -ms-linear-gradient(-45deg, #ffffff, #eeeeee);
-    background-image:      -o-linear-gradient(-45deg, #ffffff, #eeeeee);
-    background-image: -webkit-linear-gradient(-45deg, #ffffff, #eeeeee);
-}
-
-.marketing-block-left {
-    background-image:    -moz-linear-gradient(-45deg, #eeeeee, #ffffff);
-    background-image:     -ms-linear-gradient(-45deg, #eeeeee, #ffffff);
-    background-image:      -o-linear-gradient(-45deg, #eeeeee, #ffffff);
-    background-image: -webkit-linear-gradient(-45deg, #eeeeee, #ffffff);
-}
-
-.marketing-block-right h3, .marketing-block-right p {
-    padding-right: 12px;
-}
-
-.marketing-block-left h3, .marketing-block-left p {
-    padding-left: 12px;
-}
-
-.marketing-block blockquote {
-    margin-top: 75px;
-    padding-left: 12px;
-    margin-left: 12px;
-    border-left: 5px solid #dddddd;
-}
-
-.fancy-list li {
-    padding-left: 20px;
-    margin: 20px 0 20px 20px;
-}
-
-.fancy-list li:before {
-    content: ' \25CF';
-    font-size: 100px;
-    color: #bbbbbb;
-    float: left;
-    margin-top: -6px;
-    margin-left: -64px;
 }
 
 .alert form {
@@ -215,35 +118,21 @@ footer ul li {
     margin: 0;
 }
 
-.content-centered {
-    text-align: center;
-}
-
-/* Profile styles */
-.personal-info {
-    margin-bottom: 12px;
-}
-
-.personal-info .avatar {
-    float: left;
-    margin-left: 60px;
-}
-
-.personal-info ul {
-    margin-left: 180px;
-}
-
 /* Contribute styles */
-.contribute-banner {
-    background: #eeeeee url(../img/raised-hand.png) no-repeat 95% center;
+.contribute-banner .container {
+    background-image: url(../img/raised-hand.png);
+    background-repeat: no-repeat;
+    background-position: 95% center;
+    min-height: 225px;
+    padding-right: 225px;
+}
+
+.contribute-banner p {
+    margin: 20px 0;
 }
 
 #banner-preview {
     margin-top: 10px;
-}
-
-.bottom-spacer {
-    margin-bottom: 20px;
 }
 
 .table .flag-cell {
@@ -266,6 +155,7 @@ footer ul li {
 .deck {
     position: relative;
     padding: 20px 0;
+    height: 350px;
 }
 
 .deck img {

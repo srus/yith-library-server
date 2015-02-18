@@ -10,43 +10,50 @@
 
 <tal:block metal:fill-slot="content">
 
-  <h2 i18n:translate="">Confirm your donation</h2>
+  <div class="container">
 
-  <form method="post" action="">
+    <h2 i18n:translate="">Confirm your donation</h2>
 
-    <p i18n:translate="">Hey <span i18n:name="firstname">${firstname}</span>, this is the final step for your donation. Thanks a lot for your patiente and generosity. <strong i18n:name="you-are-donating" i18n:translate="">You are donating <span i18n:name="amount">$${amount}</span>.</strong></p>
+    <form method="post" action="">
 
-    <div tal:condition="include_sticker">
-      <p i18n:translate="">We are going to send you a cool sticker to this address:</p>
-      <address>
-        <p><strong i18n:translate="">Shipping address</strong></p>
-        <p>${street}</p>
-        <p>${zip} ${city}</p>
-        <p>${state} ${country}</p>
-      </address>
-      <label class="checkbox" for="no-sticker">
-        <input type="checkbox" name="no-sticker" id="no-sticker" />
-        <span i18n:translate="" tal:omit-tag="">I want to use all the money to make Yith Library awesome. Do not send me the sticker</span>
-      </label>
-    </div>
+      <p i18n:translate="">Hey <span i18n:name="firstname">${firstname}</span>, this is the final step for your donation. Thanks a lot for your patiente and generosity. <strong i18n:name="you-are-donating" i18n:translate="">You are donating <span i18n:name="amount">$${amount}</span>.</strong></p>
 
-    <input type="hidden" name="token" value="${token}" />
-    <input type="hidden" name="payerid" value="${payerid}" />
-    <input type="hidden" name="amount" value="${amount}" />
-    <input type="hidden" name="firstname" value="${firstname}" />
-    <input type="hidden" name="lastname" value="${lastname}" />
-    <input type="hidden" name="city" value="${city}" />
-    <input type="hidden" name="country" value="${country}" />
-    <input type="hidden" name="state" value="${state}" />
-    <input type="hidden" name="street" value="${street}" />
-    <input type="hidden" name="zip" value="${zip}" />
-    <input type="hidden" name="email" value="${email}" />
+      <div tal:condition="include_sticker">
+        <p i18n:translate="">We are going to send you a cool sticker to this address:</p>
+        <address>
+          <p><strong i18n:translate="">Shipping address</strong></p>
+          <p>${street}</p>
+          <p>${zip} ${city}</p>
+          <p>${state} ${country}</p>
+        </address>
 
-    <div class="buttons form-actions">
-      <input type="submit" class="btn btn-primary" i18n:attributes="value" value="Ok, take my money" name="submit" />
-      <input type="submit" class="btn" i18n:attributes="value" value="No, maybe later" name="cancel" />
-    </div>
-  </form>
+        <div class="checkbox">
+          <label for="no-sticker">
+            <input type="checkbox" name="no-sticker" id="no-sticker" />
+            <span i18n:translate="" tal:omit-tag="">I want to use all the money to make Yith Library awesome. Do not send me the sticker</span>
+          </label>
+        </div>
+      </div>
+
+      <input type="hidden" name="token" value="${token}" />
+      <input type="hidden" name="payerid" value="${payerid}" />
+      <input type="hidden" name="amount" value="${amount}" />
+      <input type="hidden" name="firstname" value="${firstname}" />
+      <input type="hidden" name="lastname" value="${lastname}" />
+      <input type="hidden" name="city" value="${city}" />
+      <input type="hidden" name="country" value="${country}" />
+      <input type="hidden" name="state" value="${state}" />
+      <input type="hidden" name="street" value="${street}" />
+      <input type="hidden" name="zip" value="${zip}" />
+      <input type="hidden" name="email" value="${email}" />
+
+      <div class="buttons form-actions">
+        <input type="submit" class="btn btn-primary" i18n:attributes="value" value="Ok, take my money" name="submit" />
+        <input type="submit" class="btn" i18n:attributes="value" value="No, maybe later" name="cancel" />
+      </div>
+    </form>
+
+  </div>
 
 </tal:block>
 

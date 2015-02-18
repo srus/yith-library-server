@@ -26,7 +26,7 @@ from pyramid import testing
 
 from yithlibraryserver.datetimeservice.testing import FakeDatetimeService
 from yithlibraryserver.db import MongoDB
-from yithlibraryserver.testing import MONGO_URI
+from yithlibraryserver.testing import MONGO_URI, clean_db
 
 from yithlibraryserver.contributions.models import include_sticker
 from yithlibraryserver.contributions.models import create_donation
@@ -46,7 +46,7 @@ class ModelTests(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.db.drop_collection('donations')
+        clean_db(self.db)
         del os.environ['YITH_FAKE_DATETIME']
 
     def test_include_sticker(self):

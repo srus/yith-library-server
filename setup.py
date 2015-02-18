@@ -85,11 +85,12 @@ if sys.version_info[0] < 3:
     requirements['base'].extend(requirements['python2'])
 
 
-setup(name='yith-library-server',
-      version='0.2',
-      description='yith-library-server',
-      long_description=README + '\n\n' +  CHANGES,
-      classifiers=[
+setup(
+    name='yith-library-server',
+    version='0.2',
+    description='yith-library-server',
+    long_description=README + '\n\n' +  CHANGES,
+    classifiers=[
         "Development Status :: 4 - Beta",
         "Framework :: Pyramid",
         "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
@@ -104,33 +105,29 @@ setup(name='yith-library-server',
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-        ],
-      author='',
-      author_email='',
-      url='',
-      keywords='web pyramid pylons',
-      packages=find_packages(),
-      include_package_data=True,
-      zip_safe=False,
-      install_requires=requirements['base'],
-      tests_require=requirements['base'] + requirements['test support'],
-      extras_require = {
-          'testing': requirements['testing'] + requirements['test support'],
-          'docs': requirements['docs'],
-      },
-      test_suite="yithlibraryserver",
-      entry_points = """\
-      [paste.app_factory]
-      main = yithlibraryserver:main
-      [console_scripts]
-      yith_users_report = yithlibraryserver.scripts.reports:users
-      yith_apps_report = yithlibraryserver.scripts.reports:applications
-      yith_stats_report = yithlibraryserver.scripts.reports:statistics
-      yith_migrate = yithlibraryserver.scripts.migrations:migrate
-      yith_send_backups_via_email = yithlibraryserver.scripts.backups:send_backups_via_email
-      yith_announce = yithlibraryserver.scripts.announce:announce""",
-      message_extractors = {'.': [
-            ('**.py', 'lingua_python', None),
-            ('**.pt', 'lingua_xml', None),
-        ]}
-      )
+    ],
+    author='',
+    author_email='',
+    url='',
+    keywords='web pyramid pylons',
+    packages=find_packages(),
+    include_package_data=True,
+    zip_safe=False,
+    install_requires=requirements['base'],
+    tests_require=requirements['base'] + requirements['test support'],
+    extras_require = {
+        'testing': requirements['testing'] + requirements['test support'],
+        'docs': requirements['docs'],
+    },
+    test_suite="yithlibraryserver",
+    entry_points = """\
+    [paste.app_factory]
+    main = yithlibraryserver:main
+    [console_scripts]
+    yith_users_report = yithlibraryserver.scripts.reports:users
+    yith_apps_report = yithlibraryserver.scripts.reports:applications
+    yith_stats_report = yithlibraryserver.scripts.reports:statistics
+    yith_migrate = yithlibraryserver.scripts.migrations:migrate
+    yith_send_backups_via_email = yithlibraryserver.scripts.backups:send_backups_via_email
+    yith_announce = yithlibraryserver.scripts.announce:announce""",
+)

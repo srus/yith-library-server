@@ -51,9 +51,12 @@ class FakeRequest(DummyRequest):
         self.datetime_service = FakeDatetimeService(self)
 
 
-class TestCase(unittest.TestCase):
+def clean_db(db):
+    for col in db.collection_names(include_system_collections=False):
+        db.drop_collection(col)
 
-    clean_collections = tuple()
+
+class TestCase(unittest.TestCase):
 
     def setUp(self):
         settings = {
@@ -81,9 +84,7 @@ class TestCase(unittest.TestCase):
         self.db = app.registry.settings['db_conn'][DB_NAME]
 
     def tearDown(self):
-        for col in self.clean_collections:
-            self.db.drop_collection(col)
-
+        clean_db(self.db)
         self.testapp.reset()
 
     def get_session(self, response):

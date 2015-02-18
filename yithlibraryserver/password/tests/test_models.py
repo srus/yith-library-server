@@ -24,7 +24,7 @@ from pyramid import testing
 
 from yithlibraryserver.db import MongoDB
 from yithlibraryserver.password.models import PasswordsManager
-from yithlibraryserver.testing import MONGO_URI
+from yithlibraryserver.testing import MONGO_URI, clean_db
 
 
 class PasswordsManagerTests(unittest.TestCase):
@@ -39,8 +39,7 @@ class PasswordsManagerTests(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        self.db.drop_collection('users')
-        self.db.drop_collection('passwords')
+        clean_db(self.db)
 
     def test_create(self):
         n_passwords = self.db.passwords.count()

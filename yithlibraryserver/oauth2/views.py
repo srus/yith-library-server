@@ -70,7 +70,7 @@ def developer_application_new(request):
     button1 = Button('submit', _('Save application'))
     button1.css_class = 'btn-primary'
     button2 = Button('cancel', _('Cancel'))
-    button2.css_class = ''
+    button2.css_class = 'btn-default'
     form = Form(schema, buttons=(button1, button2))
 
     if 'submit' in request.POST:
@@ -133,7 +133,7 @@ def developer_application_edit(request):
     button2 = Button('delete', _('Delete application'))
     button2.css_class = 'btn-danger'
     button3 = Button('cancel', _('Cancel'))
-    button3.css_class = ''
+    button3.css_class = 'btn-default'
     form = Form(schema, buttons=(button1, button2, button3))
 
     if 'submit' in request.POST:
@@ -242,8 +242,7 @@ class AuthorizationEndpoint(object):
                     if owner:
                         email = owner.get('email', None)
                         if email:
-                            authorship_information = _('By ${owner}',
-                                                       mapping={'owner': email})
+                            authorship_information = email
 
                 pretty_scopes = self.validator.get_pretty_scopes(scopes)
                 return {

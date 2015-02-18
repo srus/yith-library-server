@@ -1,7 +1,15 @@
-<div tal:omit-tag="" i18n:domain="yithlibraryserver">
-  <span tal:condition="email and email_verified" class="badge badge-success" i18n:translate="">Verified</span>
+<div class="col-sm-9 col-sm-offset-3"
+     style="margin-top: 0.5em;"
+     i18n:domain="yithlibraryserver">
+  <span tal:condition="email and email_verified" class="label label-success" i18n:translate="">Verified</span>
   <span tal:condition="email and not email_verified">
-    <span class="badge badge-warning" i18n:translate="">Unverified</span>
-    <a tabindex="-1" id="open-email-verification-dialog" href="#email-verification-dialog" class="btn btn-mini btn-primary" data-toggle="modal" i18n:translate="">Verify email address</a>
+    <span class="label label-warning" i18n:translate="">Unverified</span>
+    <button tabindex="-1"
+            type="button"
+            id="open-email-verification-dialog"
+            class="btn btn-xs btn-primary"
+            data-toggle="modal"
+            data-target="#email-verification-dialog"
+            i18n:translate="">Verify email address</button>
   </span>
 </div>

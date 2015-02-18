@@ -26,7 +26,7 @@ from yithlibraryserver.sna_callbacks import (
     google_callback,
     liveconnect_callback,
 )
-from yithlibraryserver.testing import MONGO_URI
+from yithlibraryserver.testing import MONGO_URI, clean_db
 
 
 class SNACallbackTests(unittest.TestCase):
@@ -42,6 +42,7 @@ class SNACallbackTests(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
+        clean_db(self.request.db)
 
     def test_facebook_callback(self):
         result = facebook_callback(self.request, '123', {

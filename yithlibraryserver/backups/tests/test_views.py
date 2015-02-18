@@ -35,8 +35,6 @@ def get_gzip_data(text):
 
 class ViewTests(TestCase):
 
-    clean_collections = ('users', 'passwords', )
-
     def assertUncompressData(self, body, data):
         buf = BytesIO(body)
         gzip_file = gzip.GzipFile(fileobj=buf, mode='rb')
