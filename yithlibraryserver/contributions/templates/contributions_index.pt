@@ -41,19 +41,19 @@
     <div class="row">
       <div class="col-lg-6">
         <p i18n:translate="">Add a banner from your site ...</p>
-        <div class="row">
+        <div class="row banner">
           <div class="col-sm-6">
             <p i18n:translate="">1. Pick a banner type:</p>
-            <div id="banner-selector" class="btn-group" data-toggle="buttons-radio">
+            <div class="btn-group banner-selector" data-toggle="buttons-radio">
               <button type="button" class="btn active" data-src="${request.static_url('yithlibraryserver:static/img/banners/banner1.png')}" i18n:translate="">Small 1</button>
               <button type="button" class="btn" data-src="${request.static_url('yithlibraryserver:static/img/banners/banner2.png')}" i18n:translate="">Small 2</button>
               <button type="button" class="btn" data-src="${request.static_url('yithlibraryserver:static/img/banners/banner3.png')}" i18n:translate="">Medium</button>
             </div>
-            <img id="banner-preview" src="${request.static_path('yithlibraryserver:static/img/banners/banner1.png')}" />
+            <img class="banner-preview" src="${request.static_path('yithlibraryserver:static/img/banners/banner1.png')}" />
           </div>
           <div class="col-sm-6">
             <p i18n:translate="">2. Copy and paste this into your website:</p>
-            <textarea id="banner-source" class="col-lg-12" rows="7" readonly="readonly"><a href="${request.registry.settings['public_url_root']}"><img src="${request.static_url('yithlibraryserver:static/img/banners/banner1.png')}" alt="Yith Library" title="Yith Library"/></a></textarea>
+            <textarea class="banner-source" class="col-lg-12" rows="7" readonly="readonly"><a href="${request.registry.settings['public_url_root']}"><img src="${request.static_url('yithlibraryserver:static/img/banners/banner1.png')}" alt="Yith Library" title="Yith Library"/></a></textarea>
           </div>
         </div>
       </div>
@@ -267,20 +267,5 @@
   </div>
 
 </tal:block>
-
-<script type="text/javascript" metal:fill-slot="extra-scripts">
-      (function ($) {
-          "use strict";
-          $(document).ready(function () {
-              $("#banner-selector button").click(function () {
-                  var src = $(this).attr("data-src"),
-                      code = $("#banner-source").html();
-                  $("#banner-preview").attr("src", src);
-                  code = code.replace(/(img src=")(.*)(" alt)/, "$1" + src + "$3");
-                  $("#banner-source").html(code);
-              });
-          });
-      }(jQuery));
-</script>
 
 </html>

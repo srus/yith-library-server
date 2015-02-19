@@ -111,6 +111,7 @@
     <script src="${request.static_path('yithlibraryserver:static/js/libs/jquery-2.1.1.min.js')}"></script>
     <script src="${request.static_path('yithlibraryserver:static/js/libs/bootstrap-3.3.0.min.js')}"></script>
     <script src="${request.static_path('yithlibraryserver:static/js/jquery.googleAnalyticsPreferenceForm.js')}"></script>
+    <script src="${request.static_path('yithlibraryserver:static/js/jquery.banner.js')}"></script>
     <script src="${request.static_path('yithlibraryserver:static/js/app.js')}"></script>
 
     <script src="${request.static_path('yithlibraryserver:static/js/jquery.mozilla_persona.js')}"></script>
