@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import json
+
 USER_ATTR = 'allow_google_analytics'
 
 
@@ -63,6 +65,13 @@ class GoogleAnalytics(object):
     def get_user_attr(self, value):
         return {USER_ATTR: value}
 
+    @property
+    def json(self):
+        data = {
+            'code': self.request.registry.settings['google_analytics_code'],
+            'show': self.show,
+        }
+        return json.dumps(data)
 
 def get_google_analytics(request):
     return GoogleAnalytics(request)

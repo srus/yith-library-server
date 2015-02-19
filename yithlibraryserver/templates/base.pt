@@ -60,7 +60,7 @@
               <strong tal:condition="not request.user" i18n:translate="">Welcome, new visitor!</strong>
               <strong tal:condition="request.user" i18n:translate="">Welcome <span i18n:name="current-user">${request.user}</span></strong>.
               <span i18n:translate="">We are using cookies to get statistics about the usage of Yith Library. This is completely optional and we want to ask you if this is ok with you.</span></p>
-            <form id="google-analytics-preference-form" action="${request.route_path('user_google_analytics_preference')}" method="POST">
+            <form class="google-analytics-preference-form" action="${request.route_path('user_google_analytics_preference')}" method="POST">
               <input type="submit" class="btn btn-default" name="yes" value="Ok, I can handle one more cookie" i18n:attributes="value" />
               <input type="submit" class="btn btn-default" name="no" value="No, I don't want to be tracked" i18n:attributes="value" />
             </form>
@@ -104,37 +104,14 @@
       </div>
     </footer>
 
+    <script type="text/javascript">
+      var YITH = window.YITH || {};
+      YITH.ga = ${request.google_analytics.json};
+    </script>
     <script src="${request.static_path('yithlibraryserver:static/js/libs/jquery-2.1.1.min.js')}"></script>
     <script src="${request.static_path('yithlibraryserver:static/js/libs/bootstrap-3.3.0.min.js')}"></script>
-    <script src="${request.static_path('yithlibraryserver:static/js/jquery.google_analytics.js')}"></script>
-    <script type="text/javascript">
-        (function ($) {
-            "use strict";
-            $(document).ready(function () {
-                $("[rel=popover]").popover({trigger: 'hover'}).click(function (event) {
-                    event.preventDefault();
-                });
-                $("[rel=tooltip]").tooltip().click(function (event) {
-                    event.preventDefault();
-                });
-            });
-        }(jQuery));
-    </script>
-    <div tal:omit-tag="" tal:condition="request.google_analytics.enabled">
-      <script type="text/javascript" tal:condition="request.google_analytics.show">
-          (function ($) {
-              "use strict";
-              $.google_analytics.init('${request.registry.settings['google_analytics_code']}');
-              $.google_analytics.show();
-          }(jQuery));
-      </script>
-      <script type="text/javascript" tal:condition="not request.google_analytics.show">
-          (function ($) {
-              "use strict";
-              $.google_analytics.init('${request.registry.settings['google_analytics_code']}');
-          }(jQuery));
-      </script>
-    </div>
+    <script src="${request.static_path('yithlibraryserver:static/js/jquery.googleAnalyticsPreferenceForm.js')}"></script>
+    <script src="${request.static_path('yithlibraryserver:static/js/app.js')}"></script>
 
     <script src="${request.static_path('yithlibraryserver:static/js/jquery.mozilla_persona.js')}"></script>
     <script type="text/javascript" metal:define-slot="mozilla-persona-script">
