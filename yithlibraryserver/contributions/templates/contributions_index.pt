@@ -53,7 +53,7 @@
           </div>
           <div class="col-sm-6">
             <p i18n:translate="">2. Copy and paste this into your website:</p>
-            <textarea class="banner-source" class="col-lg-12" rows="7" readonly="readonly"><a href="${request.registry.settings['public_url_root']}"><img src="${request.static_url('yithlibraryserver:static/img/banners/banner1.png')}" alt="Yith Library" title="Yith Library"/></a></textarea>
+            <textarea class="col-lg-12 banner-source" rows="7" readonly="readonly"><a href="${request.registry.settings['public_url_root']}"><img src="${request.static_url('yithlibraryserver:static/img/banners/banner1.png')}" alt="Yith Library" title="Yith Library"/></a></textarea>
           </div>
         </div>
       </div>
