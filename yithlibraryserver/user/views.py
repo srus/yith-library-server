@@ -304,6 +304,8 @@ def preferences(request):
             'You will receive your passwords backup today!',
             mapping={'day': day_to_send})
 
+    form['send_passwords_periodically'].description = day_to_send_msg
+
     if 'submit' in request.POST:
         controls = request.POST.items()
         try:

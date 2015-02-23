@@ -15,4 +15,5 @@
       <span tal:omit-tag="" tal:content="field.title" />
     </label>
   </div>
+  <span class="help-block" tal:condition="field.description" tal:content="field.description"></span>
 </div>
