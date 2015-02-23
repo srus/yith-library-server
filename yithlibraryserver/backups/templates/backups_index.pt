@@ -62,28 +62,11 @@
 
 	<div class="modal-footer">
 	  <a href="#" class="btn" data-dismiss="modal" i18n:translate="">Cancel</a>
-	  <a href="#" id="confirmation-link" class="btn btn-primary" i18n:translate="">Yes, I am sure</a>
+	  <a href="#" data-target="#import-form" class="btn btn-primary confirm-form" i18n:translate="">Yes, I am sure</a>
 	</div>
       </div>
     </div>
   </div>
-
-</tal:block>
-
-<tal:block metal:fill-slot="extra-scripts">
-
-  <script type="text/javascript">
-    (function ($) {
-        "use strict";
-
-        $(document).ready(function () {
-            $("#confirmation-link").click(function (event) {
-                $("#import-form").submit();
-            });
-        });
-
-    }(jQuery));
-  </script>
 
 </tal:block>
 

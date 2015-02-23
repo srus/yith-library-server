@@ -16,27 +16,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-(function ($, YITH) {
+(function ($) {
     "use strict";
 
-    $(document).ready(function () {
+    $.fn.confirmForm = function (options) {
+        return this.each(function () {
+            var target = $(this).data('target');
 
-	// Show the form for choosing to be tracked or not
-	$('.google-analytics-preference-form').googleAnalyticsPreferenceForm(YITH.ga);
-	// Enable GA if required
-	$.fn.googleAnalyticsPreferenceForm.show(YITH.ga);
+            $(this).click(function (event) {
+                $(target).submit();
+            });
 
-	$('.banner').banner();
-
-	$('.confirm-form').confirmForm();
-
-	// Allow to close the popovers
-	$("[rel=popover]").popover({trigger: 'hover'}).click(function (event) {
-            event.preventDefault();
         });
-        $("[rel=tooltip]").tooltip().click(function (event) {
-            event.preventDefault();
-        });
-    });
+    };
 
-}(jQuery, YITH));
+}(jQuery));
