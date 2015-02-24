@@ -20,7 +20,7 @@
 
     <table class="table table-striped">
       <thead>
-	<th><input id="check-all" type="checkbox" /></th>
+	<th><input class="check-all" type="checkbox" /></th>
 	<th i18n:translate="">Provider</th>
 	<th i18n:translate="">Passwords</th>
 	<th i18n:translate="">Is current?</th>
@@ -89,25 +89,6 @@
      tal:define="email_verification_dialog load: email_verification_dialog.pt"
      metal:use-macro="email_verification_dialog"
      />
-
-</tal:block>
-
-<tal:block metal:fill-slot="extra-scripts">
-
-  <script type="text/javascript">
-    (function ($) {
-        "use strict";
-        $(document).ready(function () {
-            $("#check-all").click(function (event) {
-                var is_checked = $("#" + this.id + ":checked").size() === 1,
-                    $inputs = $("table input[type='checkbox'][name^='account-']:not([disabled])");
-
-                $inputs.prop("checked", is_checked);
-
-            });
-        });
-    }(jQuery));
-  </script>
 
 </tal:block>
 
