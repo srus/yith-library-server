@@ -94,7 +94,6 @@
 
 <tal:block metal:fill-slot="extra-scripts">
 
-  <script src="${request.static_path('yithlibraryserver:static/js/email_verification_dialog.js')}"></script>
   <script type="text/javascript">
     (function ($) {
         "use strict";

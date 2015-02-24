@@ -30,6 +30,8 @@
 
 	$('.confirm-form').confirmForm();
 
+	$('.btn-email-verification').emailVerificationButton();
+
 	// Allow to close the popovers
 	$("[rel=popover]").popover({trigger: 'hover'}).click(function (event) {
             event.preventDefault();
