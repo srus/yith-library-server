@@ -14,39 +14,26 @@
     <h1 i18n:translate="">Destroy account</h1>
   </div>
 
-  <div id="initial-block">
-    <h3 i18n:translate="">I am tired of using Yith Library</h3>
-    <p i18n:translate="">We are very sorry to hear that, but hey, it's your decission!</p>
-    <a href="" class="btn btn-danger" i18n:translate="">Destroy my account ...</a>
+  <div class="wizard">
+    <div class="wizard-block">
+      <h3 i18n:translate="">I am tired of using Yith Library</h3>
+      <p i18n:translate="">We are very sorry to hear that, but hey, it's your decission!</p>
+      <button class="btn btn-danger wizard-next" i18n:translate="">Destroy my account ...</button>
+    </div>
+
+    <div class="wizard-block hidden">
+      <h3 i18n:translate="">Do you really really really want to destroy your account?</h3>
+
+      <p tal:condition="passwords">${request.user.first_name}, you already have <strong>${passwords} passwords</strong></p>
+
+      <p i18n:translate="">All your personal information and passwords will be removed from this server.</p>
+
+      <p i18n:translate="">You will not be able to undo this operation. Think about it.</p>
+
+      <form tal:replace="structure form">form</form>
+    </div>
   </div>
 
-  <div class="hidden" id="destroy-account-form">
-    <h3 i18n:translate="">Do you really really really want to destroy your account?</h3>
-
-    <p tal:condition="passwords">${request.user.first_name}, you already have <strong>${passwords} passwords</strong></p>
-
-    <p i18n:translate="">All your personal information and passwords will be removed from this server.</p>
-
-    <p i18n:translate="">You will not be able to undo this operation. Think about it.</p>
-
-    <form tal:replace="structure form">form</form>
-  </div>
-
-</tal:block>
-
-<tal:block metal:fill-slot="extra-scripts">
-  <script type="text/javascript">
-    (function ($) {
-      "use strict";
-      $(document).ready(function () {
-        $("#initial-block a").click(function (event) {
-            event.preventDefault();
-            $("#initial-block").addClass("hidden");
-            $("#destroy-account-form").removeClass("hidden");
-        });
-      });
-    })(jQuery);
-  </script>
 </tal:block>
 
 <script type="text/javascript" metal:fill-slot="mozilla-persona-script">
