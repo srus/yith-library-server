@@ -136,7 +136,5 @@
         }(jQuery));
     </script>
 
-    <tal:block metal:define-slot="extra-scripts"></tal:block>
-
   </body>
 </html>
