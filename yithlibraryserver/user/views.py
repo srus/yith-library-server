@@ -78,7 +78,7 @@ def register_new_user(request):
     button1 = Button('submit', _('Register into Yith Library'))
     button1.css_class = 'btn-primary'
     button2 = Button('cancel', _('Cancel'))
-    button2.css_class = 'btn-default'
+    button2.css_class = 'btn-default logout'
 
     form = Form(schema, buttons=(button1, button2))
 
@@ -161,10 +161,16 @@ def register_new_user(request):
 
 @view_config(route_name='logout', renderer='string')
 def logout(request):
+    location = request.route_path('home')
+
     if 'current_provider' in request.session:
+        current_provider = request.session['current_provider']
         del request.session['current_provider']
 
-    return HTTPFound(location=request.route_path('home'),
+        if current_provider == 'persona':
+            location += '?force-persona-logout=true'
+
+    return HTTPFound(location=location,
                      headers=forget(request))
 
 

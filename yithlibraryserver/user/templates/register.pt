@@ -25,21 +25,4 @@
   </div>
 </tal:block>
 
-<script type="text/javascript" metal:fill-slot="mozilla-persona-script">
-      (function ($) {
-          "use strict";
-          $(document).ready(function () {
-              $.mozilla_persona({
-                  login_url: "${request.route_path('persona_login')}",
-                  logout_url: "${request.route_path('home')}",
-                  current_user: "${email}",
-                  current_provider: "${provider}",
-                  login_selector: "#persona a",
-                  logout_selector: "#deformcancel",
-                  next_url: "${next_url}"
-              });
-          });
-      }(jQuery));
-</script>
-
 </html>

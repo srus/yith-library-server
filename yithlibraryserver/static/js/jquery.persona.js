@@ -1,6 +1,5 @@
-/*jslint nomen: true*/
 // Yith Library Server is a password storage server.
-// Copyright (C) 2012 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+// Copyright (C) 2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 //
 // This file is part of Yith Library Server.
 //
@@ -20,24 +19,41 @@
 (function ($) {
     "use strict";
 
-    $.mozilla_persona = function (options) {
-        var current_user = options.current_user,
-            current_provider = options.current_provider;
+    var getSearchParam = function (param) {
+        var items = window.location.search.substr(1).split("&"),
+            index = 0,
+            item = [];
+        for (index = 0; index < items.length; index++) {
+            item = items[index].split("=");
+            if (item[0] === param) {
+                return decodeURIComponent(item[1]);
+            }
+        }
+        return null;
+    };
 
-        if (!current_user || current_provider !== 'persona') {
-            current_user = null;
+    $.persona = function (options) {
+        var currentUser = options.currentUser,
+            currentProvider = options.currentProvider;
+
+        if (!currentUser || currentProvider !== 'persona') {
+            currentUser = null;
         }
 
-        if (options.login_selector) {
-            $(options.login_selector).click(function (event) {
+        if (getSearchParam('force-persona-logout') === "true") {
+            navigator.id.logout();
+        }
+
+        if (options.loginSelector) {
+            $(options.loginSelector).click(function (event) {
                 event.preventDefault();
                 navigator.id.request();
             });
         }
 
-        if (options.logout_selector) {
-            $(options.logout_selector).click(function (event) {
-                if (current_provider === 'persona') {
+        if (options.logoutSelector) {
+            $(options.logoutSelector).click(function (event) {
+                if (currentProvider === 'persona') {
                     event.preventDefault();
                     navigator.id.logout();
                 }
@@ -45,26 +61,22 @@
         }
 
         navigator.id.watch({
-            loggedInUser: current_user,
+            loggedInUser: currentUser,
             onlogin: function (assertion) {
                 var form = [
                     "<form class='hide' ",
-                    "action='" + options.login_url + "' ",
+                    "action='" + options.loginUrl + "' ",
                     "method='post'>",
                     "<input type='hidden' name='assertion' ",
                     "value='" + assertion + "'/>",
-                    (options.next_url ? "<input type='hidden' name='next_url' value='" + decodeURIComponent(options.next_url) + "' />" : ""),
+                    (options.nextUrl ? "<input type='hidden' name='next_url' value='" + decodeURIComponent(options.nextUrl) + "' />" : ""),
                     "</form>"
                 ].join("");
                 $(form).appendTo("body").submit();
             },
             onlogout: function () {
-                if (current_provider === 'persona') {
-                    if (typeof options.logout_url === 'string') {
-                        window.location = options.logout_url;
-                    } else {
-                        options.logout_url();
-                    }
+                if (currentProvider === 'persona') {
+                    window.location = options.logoutUrl;
                 }
             }
         });

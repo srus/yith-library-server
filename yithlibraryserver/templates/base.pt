@@ -104,37 +104,32 @@
       </div>
     </footer>
 
-    <script type="text/javascript">
+    <script type="text/javascript"
+	    tal:define="next next_url|nothing;
+			current_user request.user.get('email', '') if request.user else email|'';
+			current_provider request.session.get('current_provider', None) or provider|''">
+
       var YITH = window.YITH || {};
       YITH.ga = ${request.google_analytics.json};
+      YITH.persona = {
+          loginUrl: "${request.route_path('persona_login')}",
+          logoutUrl: "${request.route_path('logout')}",
+          currentUser: "${current_user}",
+          currentProvider: "${current_provider}",
+          loginSelector: "#persona a",
+          logoutSelector: ".logout",
+          nextUrl: "${next}"
+      };
     </script>
     <script src="${request.static_path('yithlibraryserver:static/js/libs/jquery-2.1.1.min.js')}"></script>
     <script src="${request.static_path('yithlibraryserver:static/js/libs/bootstrap-3.3.0.min.js')}"></script>
-    <script src="${request.static_path('yithlibraryserver:static/js/jquery.googleAnalyticsPreferenceForm.js')}"></script>
     <script src="${request.static_path('yithlibraryserver:static/js/jquery.banner.js')}"></script>
     <script src="${request.static_path('yithlibraryserver:static/js/jquery.checkAll.js')}"></script>
     <script src="${request.static_path('yithlibraryserver:static/js/jquery.confirmForm.js')}"></script>
     <script src="${request.static_path('yithlibraryserver:static/js/jquery.emailVerificationButton.js')}"></script>
+    <script src="${request.static_path('yithlibraryserver:static/js/jquery.googleAnalyticsPreferenceForm.js')}"></script>
+    <script src="${request.static_path('yithlibraryserver:static/js/jquery.persona.js')}"></script>
     <script src="${request.static_path('yithlibraryserver:static/js/jquery.wizard.js')}"></script>
     <script src="${request.static_path('yithlibraryserver:static/js/app.js')}"></script>
-
-    <script src="${request.static_path('yithlibraryserver:static/js/jquery.mozilla_persona.js')}"></script>
-    <script type="text/javascript" metal:define-slot="mozilla-persona-script">
-        (function ($) {
-            "use strict";
-            $(document).ready(function () {
-                $.mozilla_persona({
-                    login_url: "${request.route_path('persona_login')}",
-                    logout_url: "${request.route_path('logout')}",
-                    current_user: "${request.user.get('email', '') if request.user else ''}",
-                    current_provider: "${request.session.get('current_provider', None)}",
-                    login_selector: "#persona a",
-                    logout_selector: ".logout",
-                    next_url: null
-                });
-            });
-        }(jQuery));
-    </script>
-
   </body>
 </html>
