@@ -296,6 +296,20 @@ class ViewTests(TestCase):
         self.assertClearAuthCookie(res.headers)
         self.assertFalse('current_provider' in self.get_session(res))
 
+    def test_logout_from_persona(self):
+        # Log in
+        self.testapp.get('/__login/persona1')
+        self.testapp.post('/__session', {
+            'current_provider': 'persona',
+        }, status=302)
+
+        res = self.testapp.get('/logout', status=302)
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual(res.location, 'http://localhost/?force-persona-logout=true')
+
+        self.assertClearAuthCookie(res.headers)
+        self.assertFalse('current_provider' in self.get_session(res))
+
     def test_user_information(self):
         # this view required authentication
         res = self.testapp.get('/profile')
