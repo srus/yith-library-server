@@ -143,3 +143,7 @@ class ViewTests(testing.TestCase):
                 })
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Frequently Asked Questions')
+
+    def test_credits(self):
+        res = self.testapp.get('/credits')
+        self.assertEqual(res.status, '200 OK')
