@@ -57,7 +57,8 @@ def update_user(db, user, user_info, other_changes):
 
     changes.update(other_changes)
 
-    db.users.update({'_id': user['_id']}, {'$set': changes})
+    if changes:
+        db.users.update({'_id': user['_id']}, {'$set': changes})
 
 
 def user_from_provider_id(db, provider, user_id):
