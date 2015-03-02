@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import os.path
 import re
 
 from pkg_resources import resource_filename
@@ -89,6 +90,14 @@ def main(global_config, **settings):
     settings['facebook_scope'] = 'email'
     settings['facebook_callback'] = 'yithlibraryserver.sna_callbacks.facebook_callback'
     settings['liveconnect_callback'] = 'yithlibraryserver.sna_callbacks.liveconnect_callback'
+
+    # webassets
+    settings['webassets.base_dir'] = 'yithlibraryserver:static'
+    settings['webassets.base_url'] = 'static'
+    settings['webassets.static_view'] = 'True'
+    here = global_config['here']
+    manifest_path = ('yithlibraryserver', 'static', 'build', 'manifest.json')
+    settings['webassets.manifest'] = 'json:%s' % os.path.join(here, *manifest_path)
 
     # main config object
     config = Configurator(
