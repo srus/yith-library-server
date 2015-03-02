@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -29,6 +29,7 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.path import AssetResolver
 from pyramid.settings import asbool
 
+from yithlibraryserver.assets import yithlibrary_css, yithlibrary_js
 from yithlibraryserver.config import read_setting_from_env
 from yithlibraryserver.cors import CORSManager
 from yithlibraryserver.db import MongoDB
@@ -110,6 +111,9 @@ def main(global_config, **settings):
     # Beaker (sessions) setup
     config.include('pyramid_beaker')
 
+    # Webassets
+    config.include('pyramid_webassets')
+
     # Setup of stuff used only in the tests
     if 'testing' in settings and asbool(settings['testing']):
         config.include('pyramid_mailer.testing')
@@ -190,6 +194,11 @@ def includeme(config):
 
     Form.set_zpt_renderer(search_path, translator=deform_translator)
 
+    # register webassets
+    config.add_webasset('yithlibrary_css', yithlibrary_css)
+    config.add_webasset('yithlibrary_js', yithlibrary_js)
+
+    # setup views
     config.add_route('home', '/')
     config.add_route('contact', '/contact')
     config.add_route('tos', '/tos')

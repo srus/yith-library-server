@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -129,5 +129,6 @@ setup(
     yith_stats_report = yithlibraryserver.scripts.reports:statistics
     yith_migrate = yithlibraryserver.scripts.migrations:migrate
     yith_send_backups_via_email = yithlibraryserver.scripts.backups:send_backups_via_email
-    yith_announce = yithlibraryserver.scripts.announce:announce""",
+    yith_announce = yithlibraryserver.scripts.announce:announce
+    yith_build_assets = yithlibraryserver.scripts.buildassets:buildassets""",
 )
