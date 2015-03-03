@@ -33,3 +33,7 @@ def buildassets():
 
     assets_env = env['request'].webassets_env
     webassets.script.main(['build'], assets_env)
+
+
+if __name__ == '__main__':  # pragma: no cover
+    buildassets()
