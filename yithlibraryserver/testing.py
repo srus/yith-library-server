@@ -75,6 +75,7 @@ class TestCase(unittest.TestCase):
             'mail_default_sender': 'no-reply@yithlibrary.com',
             'admin_emails': 'admin1@example.com admin2@example.com',
             'public_url_root': 'http://localhost:6543/',
+            'webassets.debug': 'True',
             }
         app = main({}, **settings)
         self.testapp = TestApp(app)

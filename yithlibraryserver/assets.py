@@ -39,3 +39,8 @@ yithlibrary_js = Bundle(
     filters='rjsmin',
     output='build/yithlibrary.%(version)s.js',
 )
+
+
+def includeme(config):
+    config.add_webasset('yithlibrary_css', yithlibrary_css)
+    config.add_webasset('yithlibrary_js', yithlibrary_js)

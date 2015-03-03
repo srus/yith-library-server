@@ -30,7 +30,6 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.path import AssetResolver
 from pyramid.settings import asbool
 
-from yithlibraryserver.assets import yithlibrary_css, yithlibrary_js
 from yithlibraryserver.config import read_setting_from_env
 from yithlibraryserver.cors import CORSManager
 from yithlibraryserver.db import MongoDB
@@ -95,7 +94,7 @@ def main(global_config, **settings):
     settings['webassets.base_dir'] = 'yithlibraryserver:static'
     settings['webassets.base_url'] = 'static'
     settings['webassets.static_view'] = 'True'
-    here = global_config['here']
+    here = os.path.dirname(os.path.abspath(__file__))
     manifest_path = ('yithlibraryserver', 'static', 'build', 'manifest.json')
     settings['webassets.manifest'] = 'json:%s' % os.path.join(here, *manifest_path)
 
@@ -182,6 +181,9 @@ def main(global_config, **settings):
 
     config.include('yithlibraryserver.persona')
 
+    # assets
+    config.include('yithlibraryserver.assets')
+
     includeme(config)
 
     # Subscribers
@@ -202,10 +204,6 @@ def includeme(config):
         )
 
     Form.set_zpt_renderer(search_path, translator=deform_translator)
-
-    # register webassets
-    config.add_webasset('yithlibrary_css', yithlibrary_css)
-    config.add_webasset('yithlibrary_js', yithlibrary_js)
 
     # setup views
     config.add_route('home', '/')
