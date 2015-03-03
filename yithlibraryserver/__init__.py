@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import os.path
 import re
 
 from pkg_resources import resource_filename
@@ -89,6 +90,14 @@ def main(global_config, **settings):
     settings['facebook_callback'] = 'yithlibraryserver.sna_callbacks.facebook_callback'
     settings['liveconnect_callback'] = 'yithlibraryserver.sna_callbacks.liveconnect_callback'
 
+    # webassets
+    settings['webassets.base_dir'] = 'yithlibraryserver:static'
+    settings['webassets.base_url'] = 'static'
+    settings['webassets.static_view'] = 'True'
+    here = os.path.dirname(os.path.abspath(__file__))
+    manifest_path = ('static', 'build', 'manifest.json')
+    settings['webassets.manifest'] = 'json:%s' % os.path.join(here, *manifest_path)
+
     # main config object
     config = Configurator(
         settings=settings,
@@ -109,6 +118,9 @@ def main(global_config, **settings):
 
     # Beaker (sessions) setup
     config.include('pyramid_beaker')
+
+    # Webassets
+    config.include('pyramid_webassets')
 
     # Setup of stuff used only in the tests
     if 'testing' in settings and asbool(settings['testing']):
@@ -169,6 +181,9 @@ def main(global_config, **settings):
 
     config.include('yithlibraryserver.persona')
 
+    # assets
+    config.include('yithlibraryserver.assets')
+
     includeme(config)
 
     # Subscribers
@@ -190,6 +205,7 @@ def includeme(config):
 
     Form.set_zpt_renderer(search_path, translator=deform_translator)
 
+    # setup views
     config.add_route('home', '/')
     config.add_route('contact', '/contact')
     config.add_route('tos', '/tos')

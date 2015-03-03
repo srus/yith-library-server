@@ -16,8 +16,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
     <link rel="shortcut icon" href="${request.static_path('yithlibraryserver:static/favicon.ico')}" />
-    <link rel="stylesheet" href="${request.static_path('yithlibraryserver:static/css/bootstrap-3.3.0.min.css')}"/>
-    <link rel="stylesheet" href="${request.static_path('yithlibraryserver:static/css/style.css')}"/>
+
+    <link tal:repeat="url request.webassets_env['yithlibrary_css'].urls()"
+	  tal:attributes="href url"
+	  rel="stylesheet" />
 
     <tal:block metal:define-slot="extra-styles"></tal:block>
 
@@ -121,15 +123,7 @@
           nextUrl: "${next}"
       };
     </script>
-    <script src="${request.static_path('yithlibraryserver:static/js/libs/jquery-2.1.1.min.js')}"></script>
-    <script src="${request.static_path('yithlibraryserver:static/js/libs/bootstrap-3.3.0.min.js')}"></script>
-    <script src="${request.static_path('yithlibraryserver:static/js/jquery.banner.js')}"></script>
-    <script src="${request.static_path('yithlibraryserver:static/js/jquery.checkAll.js')}"></script>
-    <script src="${request.static_path('yithlibraryserver:static/js/jquery.confirmForm.js')}"></script>
-    <script src="${request.static_path('yithlibraryserver:static/js/jquery.emailVerificationButton.js')}"></script>
-    <script src="${request.static_path('yithlibraryserver:static/js/jquery.googleAnalyticsPreferenceForm.js')}"></script>
-    <script src="${request.static_path('yithlibraryserver:static/js/jquery.persona.js')}"></script>
-    <script src="${request.static_path('yithlibraryserver:static/js/jquery.wizard.js')}"></script>
-    <script src="${request.static_path('yithlibraryserver:static/js/app.js')}"></script>
+    <script tal:repeat="url request.webassets_env['yithlibrary_js'].urls()"
+	    tal:attributes="src url"></script>
   </body>
 </html>
