@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -24,6 +24,7 @@ import unittest
 
 from yithlibraryserver.twitter.authorization import quote, nonce, timestamp
 from yithlibraryserver.twitter.authorization import sign, auth_header
+
 
 class AuthorizationTests(unittest.TestCase):
 
@@ -56,7 +57,7 @@ class AuthorizationTests(unittest.TestCase):
             ('oauth_timestamp', quote('1318622958')),
             ('oauth_token', quote('370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb')),
             ('oauth_version', quote('1.0')),
-            )
+        )
         consumer_secret = 'kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw'
         oauth_token = 'LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE'
 
@@ -70,10 +71,10 @@ class AuthorizationTests(unittest.TestCase):
         settings = {
             'twitter_consumer_key': 'cChZNFj6T5R0TigYB9yd1w',
             'twitter_consumer_secret': 'L8qq9PZyRg6ieKGEKhZolGC0vJWLw8iEJ88DRdyOg',
-            }
+        }
         params = (
             ('oauth_callback', 'http://localhost/sign-in-with-twitter/'),
-            )
+        )
         token = ''
         nc = 'ea9ec8429b68d6b77cd5600adbbb0456'
         ts = 1318467427
@@ -81,5 +82,3 @@ class AuthorizationTests(unittest.TestCase):
                           params, settings, token, nc, ts)
         expected = 'OAuth oauth_callback="http%3A%2F%2Flocalhost%2Fsign-in-with-twitter%2F", oauth_consumer_key="cChZNFj6T5R0TigYB9yd1w", oauth_nonce="ea9ec8429b68d6b77cd5600adbbb0456", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1318467427", oauth_version="1.0", oauth_signature="F1Li3tvehgcraF8DMJ7OyxO4w9Y%3D"'
         self.assertEqual(res, expected)
-
-

@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -62,12 +62,12 @@ class PasswordsManagerTests(unittest.TestCase):
         self.assertEqual(n_passwords + 1, self.db.passwords.count())
 
         passwords = [{
-                'secret1': 'abc',
-                }, {
-                'secret2': 'def',
-                }, {
-                'secret3': 'ghi',
-                }]
+            'secret1': 'abc',
+        }, {
+            'secret2': 'def',
+        }, {
+            'secret3': 'ghi',
+        }]
         created_passwords = self.pm.create(self.user, passwords)
         self.assertEqual(created_passwords[0]['owner'], self.user_id)
         self.assertEqual(created_passwords[1]['owner'], self.user_id)
@@ -79,44 +79,44 @@ class PasswordsManagerTests(unittest.TestCase):
 
     def test_retrieve(self):
         p1 = self.db.passwords.insert({
-                'secret': 'secret1',
-                'owner': self.user_id,
-                })
+            'secret': 'secret1',
+            'owner': self.user_id,
+        })
 
         password = self.pm.retrieve(self.user, p1)
         self.assertEqual(password, {
-                'secret': 'secret1',
-                'owner': self.user_id,
-                '_id': p1,
-                })
+            'secret': 'secret1',
+            'owner': self.user_id,
+            '_id': p1,
+        })
 
         p2 = self.db.passwords.insert({
-                'secret': 'secret2',
-                'owner': self.user_id,
-                })
+            'secret': 'secret2',
+            'owner': self.user_id,
+        })
         passwords = self.pm.retrieve(self.user)
         self.assertEqual(list(passwords), [{
-                    'secret': 'secret1',
-                    'owner': self.user_id,
-                    '_id': p1,
-                    }, {
-                    'secret': 'secret2',
-                    'owner': self.user_id,
-                    '_id': p2,
-                    }])
+            'secret': 'secret1',
+            'owner': self.user_id,
+            '_id': p1,
+        }, {
+            'secret': 'secret2',
+            'owner': self.user_id,
+            '_id': p2,
+        }])
 
     def test_update(self):
         p1 = self.db.passwords.insert({
-                'secret': 'secret1',
-                'owner': self.user_id,
-                })
+            'secret': 'secret1',
+            'owner': self.user_id,
+        })
         new_password = {'secret': 'new secret'}
         updated_password = self.pm.update(self.user, p1, new_password)
         self.assertEqual(updated_password, {
-                '_id': p1,
-                'owner': self.user_id,
-                'secret': 'new secret',
-                })
+            '_id': p1,
+            'owner': self.user_id,
+            'secret': 'new secret',
+        })
 
         fake_user = {'_id': '000000000000000000000000'}
         new_password['secret'] = 'another secret'
@@ -125,9 +125,9 @@ class PasswordsManagerTests(unittest.TestCase):
 
     def test_delete(self):
         p1 = self.db.passwords.insert({
-                'secret': 'secret1',
-                'owner': self.user_id,
-                })
+            'secret': 'secret1',
+            'owner': self.user_id,
+        })
         n_passwords = self.db.passwords.count()
 
         self.assertTrue(self.pm.delete(self.user, p1))
@@ -136,13 +136,13 @@ class PasswordsManagerTests(unittest.TestCase):
         self.assertEqual(None, password)
 
         p1 = self.db.passwords.insert({
-                'secret': 'secret1',
-                'owner': self.user_id,
-                })
+            'secret': 'secret1',
+            'owner': self.user_id,
+        })
         p2 = self.db.passwords.insert({
-                'secret': 'secret2',
-                'owner': self.user_id,
-                })
+            'secret': 'secret2',
+            'owner': self.user_id,
+        })
         n_passwords = self.db.passwords.count()
         self.assertTrue(self.pm.delete(self.user))
         self.assertEqual(n_passwords - 2, self.db.passwords.count())

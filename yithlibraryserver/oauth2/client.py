@@ -37,7 +37,7 @@ def oauth2_step1(request, auth_uri, client_id, redirect_url, scope):
         'redirect_uri': redirect_url,
         'scope': scope,
         'state': state,
-        }
+    }
 
     if 'next_url' in request.params:
         request.session['next_url'] = request.params['next_url']
@@ -75,7 +75,7 @@ def oauth2_step2(request, token_uri, client_id, client_secret, redirect_url,
         'code': code,
         'redirect_uri': redirect_url,
         'scope': scope,
-        }
+    }
 
     response = requests.post(token_uri, data=params)
 
@@ -92,7 +92,7 @@ def oauth2_step2(request, token_uri, client_id, client_secret, redirect_url,
 def get_user_info(info_uri, access_token):
     headers = {
         'Authorization': 'Bearer %s' % access_token,
-        }
+    }
 
     response = requests.get(info_uri, headers=headers)
 

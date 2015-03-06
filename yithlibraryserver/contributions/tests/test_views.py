@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2013-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -42,9 +42,9 @@ class TestViews(TestCase):
 
     def test_contributions_donate_bad_amount(self):
         res = self.testapp.post('/contribute/donate', {
-                'amount': 'five',
-                'submit': 'submit',
-                }, status=400)
+            'amount': 'five',
+            'submit': 'submit',
+        }, status=400)
         self.assertEqual(res.status, '400 Bad Request')
 
     def test_contributions_donate(self):
@@ -52,34 +52,33 @@ class TestViews(TestCase):
             fake.return_value.ok = True
             fake.return_value.text = 'ACK=Success&TOKEN=123'
             res = self.testapp.post('/contribute/donate', {
-                    'amount': '5',
-                    'submit': 'submit',
-                    }, status=302)
+                'amount': '5',
+                'submit': 'submit',
+            }, status=302)
 
             self.assertEqual(res.status, '302 Found')
             self.assertEqual(res.location, 'https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token=123')
 
             # USER, PWD, and SIGNATURE are Paypal testing values
             # They are set in yithlibrary.testing.TestCase.setUp
-            fake.assert_called_with('https://api-3t.sandbox.paypal.com/nvp',
-                                    data={
-                    'METHOD': 'SetExpressCheckout',
-                    'VERSION': '72.0',
-                    'USER': 'sdk-three_api1.sdk.com',
-                    'PWD': 'QFZCWN5HZM8VBG7Q',
-                    'SIGNATURE': 'A-IzJhZZjhg29XQ2qnhapuwxIDzyAZQ92FRP5dqBzVesOkzbdUONzmOU',
-                    'LOCALECODE': 'EN',
-                    'PAYMENTREQUEST_0_ITEMAMT': 5,
-                    'PAYMENTREQUEST_0_PAYMENTACTION': 'Sale',
-                    'PAYMENTREQUEST_0_CURRENCYCODE': 'USD',
-                    'PAYMENTREQUEST_0_AMT': 5,
-                    'PAYMENTREQUEST_0_DESC': 'Donation',
-                    'L_PAYMENTREQUEST_0_NAME0': 'Donation of $5',
-                    'L_PAYMENTREQUEST_0_AMT0': 5,
-                    'BRANDNAME': 'Yith Library',
-                    'RETURNURL': 'http://localhost/contribute/paypal-success-callback',
-                    'CANCELURL': 'http://localhost/contribute/paypal-cancel-callback',
-                    })
+            fake.assert_called_with('https://api-3t.sandbox.paypal.com/nvp', data={
+                'METHOD': 'SetExpressCheckout',
+                'VERSION': '72.0',
+                'USER': 'sdk-three_api1.sdk.com',
+                'PWD': 'QFZCWN5HZM8VBG7Q',
+                'SIGNATURE': 'A-IzJhZZjhg29XQ2qnhapuwxIDzyAZQ92FRP5dqBzVesOkzbdUONzmOU',
+                'LOCALECODE': 'EN',
+                'PAYMENTREQUEST_0_ITEMAMT': 5,
+                'PAYMENTREQUEST_0_PAYMENTACTION': 'Sale',
+                'PAYMENTREQUEST_0_CURRENCYCODE': 'USD',
+                'PAYMENTREQUEST_0_AMT': 5,
+                'PAYMENTREQUEST_0_DESC': 'Donation',
+                'L_PAYMENTREQUEST_0_NAME0': 'Donation of $5',
+                'L_PAYMENTREQUEST_0_AMT0': 5,
+                'BRANDNAME': 'Yith Library',
+                'RETURNURL': 'http://localhost/contribute/paypal-success-callback',
+                'CANCELURL': 'http://localhost/contribute/paypal-cancel-callback',
+            })
 
     def test_contributions_confirm_error(self):
         res = self.testapp.get('/contribute/paypal-success-callback',
@@ -97,16 +96,15 @@ class TestViews(TestCase):
             self.assertEqual(res.status, '200 OK')
             res.mustcontain('John', 'Doe', 'ExampleCity', 'ExampleCountry',
                             'ExampleState', 'ExampleStreet', '123456')
-            fake.assert_called_with('https://api-3t.sandbox.paypal.com/nvp',
-                                    data={
-                    'METHOD': 'GetExpressCheckoutDetails',
-                    'VERSION': '72.0',
-                    'USER': 'sdk-three_api1.sdk.com',
-                    'PWD': 'QFZCWN5HZM8VBG7Q',
-                    'SIGNATURE': 'A-IzJhZZjhg29XQ2qnhapuwxIDzyAZQ92FRP5dqBzVesOkzbdUONzmOU',
-                    'TOKEN': '123',
-                    'PAYERID': '456',
-                    })
+            fake.assert_called_with('https://api-3t.sandbox.paypal.com/nvp', data={
+                'METHOD': 'GetExpressCheckoutDetails',
+                'VERSION': '72.0',
+                'USER': 'sdk-three_api1.sdk.com',
+                'PWD': 'QFZCWN5HZM8VBG7Q',
+                'SIGNATURE': 'A-IzJhZZjhg29XQ2qnhapuwxIDzyAZQ92FRP5dqBzVesOkzbdUONzmOU',
+                'TOKEN': '123',
+                'PAYERID': '456',
+            })
 
     def test_contributions_confirm_bad_action(self):
         res = self.testapp.post('/contribute/paypal-success-callback',
@@ -115,24 +113,24 @@ class TestViews(TestCase):
 
     def test_contributions_confirm_bad_amount(self):
         res = self.testapp.post('/contribute/paypal-success-callback', {
-                'submit': 'Submit',
-                'token': '123',
-                'payerid': '456',
-                'amount': 'five',
-                }, status=400)
+            'submit': 'Submit',
+            'token': '123',
+            'payerid': '456',
+            'amount': 'five',
+        }, status=400)
         self.assertEqual(res.status, '400 Bad Request')
 
     def test_contributions_confirm_cancel(self):
         res = self.testapp.post('/contribute/paypal-success-callback', {
-                'cancel': 'Cancel',
-                }, status=302)
+            'cancel': 'Cancel',
+        }, status=302)
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/contribute/paypal-cancel-callback')
 
     def test_contributions_confirm_error2(self):
         res = self.testapp.post('/contribute/paypal-success-callback', {
-                'submit': 'Submit',
-                }, status=302)
+            'submit': 'Submit',
+        }, status=302)
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/contribute')
 
@@ -148,44 +146,43 @@ class TestViews(TestCase):
             self.assertEqual(self.db.donations.count(), 0)
 
             res = self.testapp.post('/contribute/paypal-success-callback', {
-                    'submit': 'Submit',
-                    'token': '123',
-                    'payerid': '456',
-                    'amount': '5',
-                    'firstname': 'John',
-                    'lastname': 'Doe',
-                    'city': 'ExampleCity',
-                    'country': 'ExampleCountry',
-                    'state': 'ExampleState',
-                    'street': 'ExampleStreet',
-                    'zip': '123456',
-                    'email': 'john@example.com',
-                    }, status=302)
+                'submit': 'Submit',
+                'token': '123',
+                'payerid': '456',
+                'amount': '5',
+                'firstname': 'John',
+                'lastname': 'Doe',
+                'city': 'ExampleCity',
+                'country': 'ExampleCountry',
+                'state': 'ExampleState',
+                'street': 'ExampleStreet',
+                'zip': '123456',
+                'email': 'john@example.com',
+            }, status=302)
             self.assertEqual(res.status, '302 Found')
             self.assertEqual(res.location, 'http://localhost/contribute')
 
             session = self.get_session(res)
             self.assertEqual(session['_f_success'], ['Thank you very much for your great contribution'])
 
-            fake.assert_called_with('https://api-3t.sandbox.paypal.com/nvp',
-                                    data={
-                    'METHOD': 'DoExpressCheckoutPayment',
-                    'VERSION': '72.0',
-                    'USER': 'sdk-three_api1.sdk.com',
-                    'PWD': 'QFZCWN5HZM8VBG7Q',
-                    'SIGNATURE': 'A-IzJhZZjhg29XQ2qnhapuwxIDzyAZQ92FRP5dqBzVesOkzbdUONzmOU',
-                    'TOKEN': '123',
-                    'PAYERID': '456',
-                    'LOCALECODE': 'EN',
-                    'PAYMENTREQUEST_0_ITEMAMT': 5,
-                    'PAYMENTREQUEST_0_PAYMENTACTION': 'Sale',
-                    'PAYMENTREQUEST_0_CURRENCYCODE': 'USD',
-                    'PAYMENTREQUEST_0_AMT': 5,
-                    'PAYMENTREQUEST_0_DESC': 'Donation',
-                    'L_PAYMENTREQUEST_0_NAME0': 'Donation of $5',
-                    'L_PAYMENTREQUEST_0_AMT0': 5,
-                    'BRANDNAME': 'Yith Library',
-                    })
+            fake.assert_called_with('https://api-3t.sandbox.paypal.com/nvp', data={
+                'METHOD': 'DoExpressCheckoutPayment',
+                'VERSION': '72.0',
+                'USER': 'sdk-three_api1.sdk.com',
+                'PWD': 'QFZCWN5HZM8VBG7Q',
+                'SIGNATURE': 'A-IzJhZZjhg29XQ2qnhapuwxIDzyAZQ92FRP5dqBzVesOkzbdUONzmOU',
+                'TOKEN': '123',
+                'PAYERID': '456',
+                'LOCALECODE': 'EN',
+                'PAYMENTREQUEST_0_ITEMAMT': 5,
+                'PAYMENTREQUEST_0_PAYMENTACTION': 'Sale',
+                'PAYMENTREQUEST_0_CURRENCYCODE': 'USD',
+                'PAYMENTREQUEST_0_AMT': 5,
+                'PAYMENTREQUEST_0_DESC': 'Donation',
+                'L_PAYMENTREQUEST_0_NAME0': 'Donation of $5',
+                'L_PAYMENTREQUEST_0_AMT0': 5,
+                'BRANDNAME': 'Yith Library',
+            })
 
             res.request.registry = self.testapp.app.registry
             mailer = get_mailer(res.request)

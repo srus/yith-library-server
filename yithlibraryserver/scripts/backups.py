@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2013-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -29,9 +29,9 @@ from yithlibraryserver.scripts.utils import get_user_display_name
 def get_all_users(request):
     day = datetime.date.today().day
     return request.db.users.find({
-            'send_passwords_periodically': True,
-            'email_verified': True,
-            '$where': '''
+        'send_passwords_periodically': True,
+        'email_verified': True,
+        '$where': '''
 function () {
     var i, sum, day;
     sum = 0;
@@ -42,14 +42,14 @@ function () {
     return day === %d;
 }
 ''' % day
-            }).sort('date_joined')
+    }).sort('date_joined')
 
 
 def get_selected_users(request, *emails):
     for email in emails:
         for user in request.db.users.find({
                 'email': email,
-                }).sort('date_joined'):
+        }).sort('date_joined'):
             yield user
 
 
@@ -57,7 +57,7 @@ def send_backups_via_email():
     result = setup_simple_command(
         "send_backups_via_email",
         "Report information about users and their passwords.",
-        )
+    )
     if isinstance(result, int):
         return result
     else:

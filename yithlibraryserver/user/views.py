@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -58,7 +58,7 @@ def login(request):
     return {
         'identity_providers': request.registry.identity_providers,
         'next_url': url_quote(came_from),
-        }
+    }
 
 
 @view_config(route_name='register_new_user',
@@ -93,13 +93,13 @@ def register_new_user(request):
                 'provider': user_info.get('provider', ''),
                 'email': user_info.get('email', ''),
                 'next_url': next_url,
-                }
+            }
 
         provider = user_info['provider']
         provider_key = provider + '_id'
 
-        if (appstruct['email'] != ''
-            and appstruct['email'] == user_info['email']):
+        email = appstruct['email']
+        if email != '' and email == user_info['email']:
             email_verified = True
         else:
             email_verified = False
@@ -107,16 +107,16 @@ def register_new_user(request):
         now = datetime.datetime.now(tz=utc)
 
         user_attrs = {
-                provider_key: user_info[provider_key],
-                'screen_name': appstruct['screen_name'],
-                'first_name': appstruct['first_name'],
-                'last_name': appstruct['last_name'],
-                'email': appstruct['email'],
-                'email_verified': email_verified,
-                'date_joined': now,
-                'last_login': now,
-                'send_passwords_periodically': False,
-            }
+            provider_key: user_info[provider_key],
+            'screen_name': appstruct['screen_name'],
+            'first_name': appstruct['first_name'],
+            'last_name': appstruct['last_name'],
+            'email': email,
+            'email_verified': email_verified,
+            'date_joined': now,
+            'last_login': now,
+            'send_passwords_periodically': False,
+        }
 
         if request.google_analytics.is_in_session():
             allow_analytics = request.google_analytics.show_in_session()
@@ -125,7 +125,7 @@ def register_new_user(request):
 
         _id = request.db.users.insert(user_attrs)
 
-        if not email_verified and appstruct['email'] != '':
+        if not email_verified and email != '':
             evc = EmailVerificationCode()
             user = request.db.users.find_one({'_id': _id})
             if evc.store(request.db, user):
@@ -148,15 +148,15 @@ def register_new_user(request):
 
     return {
         'form': form.render({
-                'first_name': user_info.get('first_name', ''),
-                'last_name': user_info.get('last_name', ''),
-                'screen_name': user_info.get('screen_name', ''),
-                'email': user_info.get('email', ''),
-                }),
+            'first_name': user_info.get('first_name', ''),
+            'last_name': user_info.get('last_name', ''),
+            'screen_name': user_info.get('screen_name', ''),
+            'email': user_info.get('email', ''),
+        }),
         'provider': user_info.get('provider', ''),
         'email': user_info.get('email', ''),
         'next_url': next_url,
-        }
+    }
 
 
 @view_config(route_name='logout', renderer='string')
@@ -189,7 +189,7 @@ def destroy(request):
     passwords_manager = PasswordsManager(request.db)
     context = {
         'passwords': passwords_manager.retrieve(request.user).count(),
-        }
+    }
 
     if 'submit' in request.POST:
 
@@ -210,14 +210,14 @@ def destroy(request):
         request.session.flash(
             _('Your account has been removed. Have a nice day!'),
             'success',
-            )
+        )
         return logout(request)
 
     elif 'cancel' in request.POST:
         request.session.flash(
             _('Thanks for reconsidering removing your account!'),
             'info',
-            )
+        )
         return HTTPFound(location=request.route_path('user_information'))
 
     context['form'] = form.render()
@@ -247,7 +247,7 @@ def user_information(request):
             'last_name': appstruct['last_name'],
             'screen_name': appstruct['screen_name'],
             'email': appstruct['email']['email'],
-            }
+        }
 
         if request.user['email'] != appstruct['email']['email']:
             changes['email_verified'] = False
@@ -259,26 +259,26 @@ def user_information(request):
             request.session.flash(
                 _('The changes were saved successfully'),
                 'success',
-                )
+            )
             return HTTPFound(location=request.route_path('user_information'))
         else:
             request.session.flash(
                 _('There were an error while saving your changes'),
                 'error',
-                )
+            )
             return {'form': appstruct}
 
     return {
         'form': form.render({
-                'first_name': request.user['first_name'],
-                'last_name': request.user['last_name'],
-                'screen_name': request.user['screen_name'],
-                'email': {
-                    'email': request.user['email'],
-                    'email_verified': request.user['email_verified'],
-                    },
-                }),
-        }
+            'first_name': request.user['first_name'],
+            'last_name': request.user['last_name'],
+            'screen_name': request.user['screen_name'],
+            'email': {
+                'email': request.user['email'],
+                'email_verified': request.user['email_verified'],
+            },
+        }),
+    }
 
 
 @view_config(route_name='user_preferences',
@@ -320,9 +320,9 @@ def preferences(request):
             return {'form': e.render(), 'day_to_send': day_to_send_msg}
 
         changes = dict([(pref, appstruct[pref]) for pref in (
-                    analytics.USER_ATTR,
-                    'send_passwords_periodically',
-                    )])
+            analytics.USER_ATTR,
+            'send_passwords_periodically',
+        )])
 
         result = request.db.users.update({'_id': request.user['_id']},
                                          {'$set': changes})
@@ -331,13 +331,13 @@ def preferences(request):
             request.session.flash(
                 _('The changes were saved successfully'),
                 'success',
-                )
+            )
             return HTTPFound(location=request.route_path('user_preferences'))
         else:
             request.session.flash(
                 _('There were an error while saving your changes'),
                 'error',
-                )
+            )
             return {'form': appstruct, 'day_to_send': day_to_send_msg}
 
     return {'form': form.render(request.user), 'day_to_send': day_to_send_msg}
@@ -382,13 +382,13 @@ def identity_providers(request):
                 merged,
                 domain=translation_domain,
                 mapping={'n_merged': merged},
-                )
+            )
             request.session.flash(msg, 'success')
         else:
             request.session.flash(
                 _('Not enough accounts for merging'),
                 'error',
-                )
+            )
 
         return HTTPFound(
             location=request.route_path('user_identity_providers'))
@@ -404,7 +404,7 @@ def send_email_verification_code(request):
         return {
             'status': 'bad',
             'error': 'You have not an email in your profile',
-            }
+        }
 
     if 'submit' in request.POST:
         evc = EmailVerificationCode()
@@ -416,7 +416,7 @@ def send_email_verification_code(request):
             return {
                 'status': 'bad',
                 'error': 'There were problems storing the verification code',
-                }
+            }
     else:
         return {'status': 'bad', 'error': 'Not a post'}
 
@@ -439,19 +439,19 @@ def verify_email(request):
         request.session.flash(
             _('Congratulations, your email has been successfully verified'),
             'success',
-            )
+        )
         evc.remove(request.db, email, True)
         return {
             'verified': True,
-            }
+        }
     else:
         request.session.flash(
             _('Sorry, your verification code is not correct or has expired'),
             'error',
-            )
+        )
         return {
             'verified': False,
-            }
+        }
 
 
 @view_config(route_name='user_google_analytics_preference', renderer='json')

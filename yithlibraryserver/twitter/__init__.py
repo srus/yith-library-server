@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -31,12 +31,11 @@ def includeme(config):
         ('access_token_url', 'https://api.twitter.com/oauth/access_token'),
         ('bearer_token_url', 'https://api.twitter.com/oauth2/token'),
         ('user_info_url', 'https://api.twitter.com/1.1/users/show.json'),
-       ):
+    ):
         option = 'twitter_%s' % key
         settings[option] = read_setting_from_env(settings, option, default)
 
-    if (settings['twitter_consumer_key']
-        and settings['twitter_consumer_secret']):
+    if settings['twitter_consumer_key'] and settings['twitter_consumer_secret']:
 
         config.add_route('twitter_login', '/twitter/login')
         config.add_view('.views.twitter_login',

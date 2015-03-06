@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2013-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -28,27 +28,27 @@ class UtilsTests(TestCase):
 
     def test_get_user_passwords(self):
         user_id = self.db.users.insert({
-                'first_name': 'John',
-                'last_name': 'Doe',
-                })
+            'first_name': 'John',
+            'last_name': 'Doe',
+        })
         user = self.db.users.find_one({'_id': user_id})
 
         self.assertEqual(get_user_passwords(self.db, user), [])
 
         self.db.passwords.insert({
-                'owner': user_id,
-                'password': 'secret1',
-                })
+            'owner': user_id,
+            'password': 'secret1',
+        })
         self.db.passwords.insert({
-                'owner': user_id,
-                'password': 'secret2',
-                })
+            'owner': user_id,
+            'password': 'secret2',
+        })
 
         self.assertEqual(get_user_passwords(self.db, user), [{
-                    'password': 'secret1',
-                    } ,{
-                    'password': 'secret2',
-                    }])
+            'password': 'secret1',
+        }, {
+            'password': 'secret2',
+        }])
 
     def test_get_backup_filename(self):
         self.assertEqual(get_backup_filename(datetime.date(2012, 10, 28)),

@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2013-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -143,8 +143,8 @@ class ViewTests(TestCase):
 
         # not really a file
         res = self.testapp.post('/backup/import', {
-                'passwords-file': '',
-                }, status=302)
+            'passwords-file': '',
+        }, status=302)
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/backup')
 

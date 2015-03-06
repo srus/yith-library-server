@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2013-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -102,9 +102,9 @@ def contributions_paypal_success(request):
             paypal = PayPalExpressCheckout(request)
             details = paypal.get_express_checkout_details(token, payerid)
             details.update({
-                    'token': token,
-                    'payerid': payerid,
-                    })
+                'token': token,
+                'payerid': payerid,
+            })
             amount = details['amount']
             details['include_sticker'] = include_sticker(amount)
             return details

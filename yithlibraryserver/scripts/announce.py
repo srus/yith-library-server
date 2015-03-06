@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2013-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -37,8 +37,8 @@ def get_all_users_with_passwords_and_email(db):
     all_passwords = list(db.passwords.find())
     passwords_map = get_passwords_map(all_passwords)
     for user in db.users.find({
-            'email_verified': True,
-            }):
+        'email_verified': True,
+    }):
         if not user['email']:
             continue
 
@@ -66,7 +66,7 @@ def announce():
     parser = optparse.OptionParser(
         usage=usage,
         description=textwrap.dedent(description)
-        )
+    )
     options, args = parser.parse_args(sys.argv[1:])
     if len(args) != 2:
         safe_print('You must provide two arguments. '

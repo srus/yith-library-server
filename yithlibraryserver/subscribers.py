@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -53,9 +53,9 @@ def add_base_templates(event):
         return renderer.implementation()
 
     event.update({
-            'base': get_template('base'),
-            'profile': get_template('profile'),
-            })
+        'base': get_template('base'),
+        'profile': get_template('profile'),
+    })
 
 
 def add_custom_functions(event):
@@ -63,8 +63,8 @@ def add_custom_functions(event):
     locale_name = get_locale_name(event['request'])
 
     event.update({
-            'dates_formatter': DatesFormatter(locale_name),
-            })
+        'dates_formatter': DatesFormatter(locale_name),
+    })
 
 
 def includeme(config):

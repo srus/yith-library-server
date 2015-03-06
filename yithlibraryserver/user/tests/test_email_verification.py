@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -48,10 +48,10 @@ class EmailVerificationCodeTests(unittest.TestCase):
         self.assertNotEqual(evc.code, None)
 
         user_id = self.db.users.insert({
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                })
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+        })
         user = self.db.users.find_one({'_id': user_id})
         evc.store(self.db, user)
 

@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2013-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -37,7 +37,7 @@ def setup_simple_command(name, description):
     parser = optparse.OptionParser(
         usage=usage,
         description=textwrap.dedent(description)
-        )
+    )
     options, args = parser.parse_args(sys.argv[1:])
     if not len(args) >= 1:
         safe_print('You must provide at least one argument')

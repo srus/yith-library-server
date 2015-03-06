@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -72,10 +72,10 @@ class ViewTests(testing.TestCase):
 
     def test_password_collection_get_non_empty(self):
         password_id = self.db.passwords.insert({
-                'service': 'testing',
-                'secret': 's3cr3t',
-                'owner': self.user_id,
-                })
+            'service': 'testing',
+            'secret': 's3cr3t',
+            'owner': self.user_id,
+        })
 
         res = self.testapp.get('/passwords', headers=self.auth_header)
         self.assertEqual(res.status, '200 OK')
@@ -128,10 +128,10 @@ class ViewTests(testing.TestCase):
                          b'{"message": "Password not found"}')
 
         password_id = self.db.passwords.insert({
-                'service': 'testing',
-                'secret': 's3cr3t',
-                'owner': self.user_id,
-                })
+            'service': 'testing',
+            'secret': 's3cr3t',
+            'owner': self.user_id,
+        })
         res = self.testapp.get('/passwords/%s' % str(password_id),
                                headers=self.auth_header)
         self.assertEqual(res.status, '200 OK')
@@ -159,10 +159,10 @@ class ViewTests(testing.TestCase):
                          b'{"message": "No JSON object could be decoded"}')
 
         password_id = self.db.passwords.insert({
-                'service': 'testing',
-                'secret': 's3cr3t',
-                'owner': self.user_id,
-                })
+            'service': 'testing',
+            'secret': 's3cr3t',
+            'owner': self.user_id,
+        })
         data = '{"password": {"service": "testing2", "secret": "sup3rs3cr3t", "_id": "%s"}}' % str(password_id)
         res = self.testapp.put('/passwords/%s' % str(password_id),
                                data, headers=self.auth_header)
@@ -211,7 +211,7 @@ class ViewTests(testing.TestCase):
             'secret': 's3cr3t',
             'service': 'myservice',
             'owner': self.user_id,
-            }
+        }
         _id = self.db.passwords.insert(password)
         count = self.db.passwords.count()
 

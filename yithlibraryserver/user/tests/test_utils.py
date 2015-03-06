@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -57,10 +57,10 @@ class UtilsTests(unittest.TestCase):
 
     def test_delete_user(self):
         user_id = self.db.users.insert({
-                'screen_name': 'John Doe',
-                'first_name': 'John',
-                'last_name': '',
-                })
+            'screen_name': 'John Doe',
+            'first_name': 'John',
+            'last_name': '',
+        })
         user = self.db.users.find_one({'_id': user_id})
         n_users = self.db.users.count()
         self.assertTrue(delete_user(self.db, user))
@@ -70,10 +70,10 @@ class UtilsTests(unittest.TestCase):
 
     def test_update_user(self):
         user_id = self.db.users.insert({
-                'screen_name': 'John Doe',
-                'first_name': 'John',
-                'last_name': '',
-                })
+            'screen_name': 'John Doe',
+            'first_name': 'John',
+            'last_name': '',
+        })
         user = self.db.users.find_one({'_id': user_id})
         update_user(self.db, user, {}, {})
 
@@ -115,41 +115,41 @@ class UtilsTests(unittest.TestCase):
         request.session = {}
         request.google_analytics = GoogleAnalytics(request)
         response = register_or_update(request, 'skynet', 1, {
-                'screen_name': 'JohnDoe',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'invented_attribute': 'foo',  # this will not be in the output
-                }, '/next')
+            'screen_name': 'JohnDoe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'invented_attribute': 'foo',  # this will not be in the output
+        }, '/next')
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location, '/register')
         self.assertEqual(request.session['next_url'], '/next')
         self.assertEqual(request.session['user_info'], {
-                'screen_name': 'JohnDoe',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': '',
-                'provider': 'skynet',
-                'skynet_id': 1,
-                })
+            'screen_name': 'JohnDoe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': '',
+            'provider': 'skynet',
+            'skynet_id': 1,
+        })
 
         # try with an existing user
         user_id = self.db.users.insert({
-                'skynet_id': 1,
-                'screen_name': 'JohnDoe',
-                'first_name': 'John',
-                'last_name': '',
-                })
+            'skynet_id': 1,
+            'screen_name': 'JohnDoe',
+            'first_name': 'John',
+            'last_name': '',
+        })
 
         request = testing.DummyRequest()
         request.db = self.db
         request.session = {USER_ATTR: True}
         request.google_analytics = GoogleAnalytics(request)
         response = register_or_update(request, 'skynet', 1, {
-                'screen_name': 'JohnDoe',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                }, '/next')
+            'screen_name': 'JohnDoe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+        }, '/next')
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location, '/next')
         user = self.db.users.find_one({'_id': user_id})
@@ -163,10 +163,10 @@ class UtilsTests(unittest.TestCase):
         request.session = {'next_url': '/foo'}
         request.google_analytics = GoogleAnalytics(request)
         response = register_or_update(request, 'skynet', 1, {
-                'screen_name': 'JohnDoe',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                }, '/next')
+            'screen_name': 'JohnDoe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+        }, '/next')
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location, '/foo')

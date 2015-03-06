@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -46,19 +46,19 @@ class LocaleNegotiatorTests(TestCase):
         self.assertEqual(locale_negotiator(request), 'en')
 
         request = TestRequest.blank('', {}, headers={
-                'Accept-Language': 'es',
-                })
+            'Accept-Language': 'es',
+        })
         request.registry = self.testapp.app.registry
         self.assertEqual(locale_negotiator(request), 'es')
 
         request = TestRequest.blank('', {}, headers={
-                'Accept-Language': 'de',  # german is not supported
-                })
+            'Accept-Language': 'de',  # german is not supported
+        })
         request.registry = self.testapp.app.registry
         self.assertEqual(locale_negotiator(request), None)
 
         request = TestRequest.blank('', {}, headers={
-                'Accept-Language': 'de, es',
-                })
+            'Accept-Language': 'de, es',
+        })
         request.registry = self.testapp.app.registry
         self.assertEqual(locale_negotiator(request), 'es')

@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2013-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -28,6 +28,7 @@ from yithlibraryserver.scripts.utils import get_user_display_name
 
 migration_registry = {}
 
+
 def migration(fnc):
     migration_registry[fnc.__name__] = fnc
     return fnc
@@ -39,7 +40,7 @@ def add_attribute(collection, obj, obj_repr, attribute, value):
         collection.update(
             {'_id': obj['_id']},
             {'$set': {attribute: value}},
-            )
+        )
 
 
 @migration
@@ -47,6 +48,7 @@ def add_send_email_preference(db):
     for user in db.users.find():
         add_attribute(db.users, user, get_user_display_name(user),
                       'send_passwords_periodically', True)
+
 
 @migration
 def new_authorized_apps_collection(db):
@@ -85,7 +87,7 @@ def migrate():
     parser = optparse.OptionParser(
         usage=usage,
         description=textwrap.dedent(description)
-        )
+    )
     options, args = parser.parse_args(sys.argv[1:])
     if len(args) != 2:
         safe_print('You must provide two arguments. '

@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2013-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -56,47 +56,47 @@ class AnnounceTests(ScriptTests):
 
     def test_announce_send_email(self):
         self.add_passwords(self.db.users.insert({
-                    'first_name': 'John0',
-                    'last_name': 'Doe',
-                    'email': '',
-                    'email_verified': False,
-                    'send_passwords_periodically': False,
-                    }), 10)
+            'first_name': 'John0',
+            'last_name': 'Doe',
+            'email': '',
+            'email_verified': False,
+            'send_passwords_periodically': False,
+        }), 10)
         self.add_passwords(self.db.users.insert({
-                    'first_name': 'John1',
-                    'last_name': 'Doe',
-                    'email': '',
-                    'email_verified': True,
-                    'send_passwords_periodically': False,
-                    }), 10)
+            'first_name': 'John1',
+            'last_name': 'Doe',
+            'email': '',
+            'email_verified': True,
+            'send_passwords_periodically': False,
+        }), 10)
         self.add_passwords(self.db.users.insert({
-                    'first_name': 'John2',
-                    'last_name': 'Doe',
-                    'email': 'john2@example.com',
-                    'email_verified': True,
-                    'send_passwords_periodically': False,
-                    }), 10)
+            'first_name': 'John2',
+            'last_name': 'Doe',
+            'email': 'john2@example.com',
+            'email_verified': True,
+            'send_passwords_periodically': False,
+        }), 10)
         self.add_passwords(self.db.users.insert({
-                    'first_name': 'John3',
-                    'last_name': 'Doe',
-                    'email': 'john3@example.com',
-                    'email_verified': True,
-                    'send_passwords_periodically': True,
-                    }), 10)
+            'first_name': 'John3',
+            'last_name': 'Doe',
+            'email': 'john3@example.com',
+            'email_verified': True,
+            'send_passwords_periodically': True,
+        }), 10)
         self.add_passwords(self.db.users.insert({
-                    'first_name': 'John4',
-                    'last_name': 'Doe',
-                    'email': 'john4@example.com',
-                    'email_verified': False,
-                    'send_passwords_periodically': True,
-                    }), 10)
+            'first_name': 'John4',
+            'last_name': 'Doe',
+            'email': 'john4@example.com',
+            'email_verified': False,
+            'send_passwords_periodically': True,
+        }), 10)
         self.db.users.insert({
-                    'first_name': 'John4',
-                    'last_name': 'Doe',
-                    'email': 'john4@example.com',
-                    'email_verified': True,
-                    'send_passwords_periodically': True,
-                    })
+            'first_name': 'John4',
+            'last_name': 'Doe',
+            'email': 'john4@example.com',
+            'email_verified': True,
+            'send_passwords_periodically': True,
+        })
 
         sys.argv = ['notused', self.conf_file_path, 'new_feature_send_passwords_via_email']
         sys.stdout = StringIO()

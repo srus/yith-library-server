@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -32,11 +32,11 @@ class ViewTests(testing.TestCase):
 
         # Log in
         user_id = self.db.users.insert({
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                'email_verified': True,
-                })
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+            'email_verified': True,
+        })
         self.testapp.get('/__login/' + str(user_id))
         res = self.testapp.get('/')
         self.assertEqual(res.status, '200 OK')
@@ -51,19 +51,19 @@ class ViewTests(testing.TestCase):
 
         # The three fields are required
         res = self.testapp.post('/contact', {
-                'submit': 'Send message',
-                })
+            'submit': 'Send message',
+        })
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('class="error" id="error-deformField1">Required')
         res.mustcontain('class="error" id="error-deformField2">Required')
         res.mustcontain('class="error" id="error-deformField3">Required')
 
         res = self.testapp.post('/contact', {
-                'name': 'John',
-                'email': 'john@example.com',
-                'message': 'Testing message',
-                'submit': 'Send message',
-                })
+            'name': 'John',
+            'email': 'john@example.com',
+            'message': 'Testing message',
+            'submit': 'Send message',
+        })
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/')
         # check that the email was sent
@@ -81,11 +81,11 @@ class ViewTests(testing.TestCase):
         # email fields
         # Log in
         user_id = self.db.users.insert({
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                'email_verified': True,
-                })
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+            'email_verified': True,
+        })
         self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/contact')
@@ -96,8 +96,8 @@ class ViewTests(testing.TestCase):
 
         # simulate a cancel
         res = self.testapp.post('/contact', {
-                'cancel': 'Cancel',
-                }, status=302)
+            'cancel': 'Cancel',
+        }, status=302)
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/')
 
@@ -105,11 +105,11 @@ class ViewTests(testing.TestCase):
         self.testapp.app.registry.settings['admin_emails'] = []
 
         res = self.testapp.post('/contact', {
-                'name': 'John',
-                'email': 'john@example.com',
-                'message': 'Testing message',
-                'submit': 'Send message',
-                })
+            'name': 'John',
+            'email': 'john@example.com',
+            'message': 'Testing message',
+            'submit': 'Send message',
+        })
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/')
         # check that the email was *not* sent
@@ -127,20 +127,20 @@ class ViewTests(testing.TestCase):
         res.mustcontain('Frequently Asked Questions')
 
         res = self.testapp.get('/faq', headers={
-                'Accept-Language': 'en',
-                })
+            'Accept-Language': 'en',
+        })
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Frequently Asked Questions')
 
         res = self.testapp.get('/faq', headers={
-                'Accept-Language': 'es',
-                })
+            'Accept-Language': 'es',
+        })
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Preguntas Frecuentes')
 
         res = self.testapp.get('/faq', headers={
-                'Accept-Language': 'de',  # German is not supported
-                })
+            'Accept-Language': 'de',  # German is not supported
+        })
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Frequently Asked Questions')
 

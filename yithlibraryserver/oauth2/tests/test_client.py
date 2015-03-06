@@ -42,19 +42,19 @@ class Oauth2ClientTests(unittest.TestCase):
                 client_id='1234',
                 redirect_url='http://localhost/oauth2/callback',
                 scope='scope1 scope2'
-                )
+            )
             self.assertEqual(response.status, '302 Found')
             url = urlparse.urlparse(response.location)
             self.assertEqual(url.netloc, 'example.com')
             self.assertEqual(url.path, '/oauth2/auth')
             query = urlparse.parse_qs(url.query)
             self.assertEqual(query, {
-                    'scope': ['scope1 scope2'],
-                    'state': ['random-string'],
-                    'redirect_uri': ['http://localhost/oauth2/callback'],
-                    'response_type': ['code'],
-                    'client_id': ['1234'],
-                    })
+                'scope': ['scope1 scope2'],
+                'state': ['random-string'],
+                'redirect_uri': ['http://localhost/oauth2/callback'],
+                'response_type': ['code'],
+                'client_id': ['1234'],
+            })
             self.assertEqual(request.session['next_url'], 'http://localhost/')
 
     def test_oauth2_step2(self):
@@ -101,7 +101,7 @@ class Oauth2ClientTests(unittest.TestCase):
             fake.return_value.status_code = 200
             fake.return_value.json = lambda: {
                 'access_token': 'qwerty'
-                }
+            }
             request.session['state'] = 'random-string'
             response = oauth2_step2(request, token_uri,
                                     client_id, client_secret,
@@ -132,10 +132,10 @@ class Oauth2ClientTests(unittest.TestCase):
             fake.return_value.json = lambda: {
                 'name': 'John',
                 'surname': 'Doe',
-                }
+            }
 
             response = get_user_info('http://example.com/info', 'qwerty')
             self.assertEqual(response, {
-                    'name': 'John',
-                    'surname': 'Doe',
-                    })
+                'name': 'John',
+                'surname': 'Doe',
+            })

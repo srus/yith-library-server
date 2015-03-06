@@ -24,7 +24,7 @@ def includeme(config):
 
     for key, default in (
         ('verifier_url', 'https://verifier.login.persona.org/verify'),
-        ):
+    ):
 
         option = 'persona_%s' % key
         settings[option] = read_setting_from_env(settings, option, default)

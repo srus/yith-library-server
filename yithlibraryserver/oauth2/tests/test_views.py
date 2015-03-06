@@ -36,12 +36,12 @@ class BaseEndpointTests(testing.TestCase):
 
     def _login(self):
         user_id = self.db.users.insert({
-                'twitter_id': 'twitter1',
-                'screen_name': 'John Doe',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                })
+            'twitter_id': 'twitter1',
+            'screen_name': 'John Doe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+        })
         self.testapp.get('/__login/' + str(user_id))
         return user_id
 
@@ -434,12 +434,12 @@ class ApplicationViewTests(testing.TestCase):
 
         # Log in
         user_id = self.db.users.insert({
-                'twitter_id': 'twitter1',
-                'screen_name': 'John Doe',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                })
+            'twitter_id': 'twitter1',
+            'screen_name': 'John Doe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+        })
         self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/oauth2/applications')
@@ -459,12 +459,12 @@ class ApplicationViewTests(testing.TestCase):
 
         # Log in
         user_id = self.db.users.insert({
-                'twitter_id': 'twitter1',
-                'screen_name': 'John Doe',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                })
+            'twitter_id': 'twitter1',
+            'screen_name': 'John Doe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+        })
         self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/oauth2/applications/new')
@@ -479,23 +479,23 @@ class ApplicationViewTests(testing.TestCase):
         res.mustcontain('Description')
 
         res = self.testapp.post('/oauth2/applications/new', {
-                'name': 'Test Application',
-                'main_url': 'http://example.com',
-                'callback_url': 'http://example.com/callback',
-                'authorized_origins': '''http://example.com
+            'name': 'Test Application',
+            'main_url': 'http://example.com',
+            'callback_url': 'http://example.com/callback',
+            'authorized_origins': '''http://example.com
 https://example.com''',
-                'submit': 'submit',
-                })
+            'submit': 'submit',
+        })
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/oauth2/applications')
 
         app = self.db.applications.find_one({
-                'name': 'Test Application',
-                'main_url': 'http://example.com',
-                'callback_url': 'http://example.com/callback',
-                'authorized_origins': ['http://example.com',
-                                       'https://example.com'],
-                })
+            'name': 'Test Application',
+            'main_url': 'http://example.com',
+            'callback_url': 'http://example.com/callback',
+            'authorized_origins': ['http://example.com',
+                                   'https://example.com'],
+        })
         self.assertNotEqual(app, None)
         self.assertTrue('client_id' in app)
         self.assertTrue('client_secret' in app)
@@ -511,17 +511,17 @@ https://example.com''',
 
         # error if we don't fill all fields
         res = self.testapp.post('/oauth2/applications/new', {
-                'name': 'Test Application',
-                'callback_url': 'http://example.com/callback',
-                'submit': 'submit',
-                })
+            'name': 'Test Application',
+            'callback_url': 'http://example.com/callback',
+            'submit': 'submit',
+        })
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('There was a problem with your submission')
 
         # The user hit the cancel button
         res = self.testapp.post('/oauth2/applications/new', {
-                'cancel': 'Cancel',
-                })
+            'cancel': 'Cancel',
+        })
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/oauth2/applications')
 
@@ -533,12 +533,12 @@ https://example.com''',
 
         # Log in
         user_id = self.db.users.insert({
-                'twitter_id': 'twitter1',
-                'screen_name': 'John Doe',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                })
+            'twitter_id': 'twitter1',
+            'screen_name': 'John Doe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+        })
         self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/oauth2/applications/xxx/delete',
@@ -552,20 +552,20 @@ https://example.com''',
 
         # create a valid app
         app_id = self.db.applications.insert({
-                'owner': bson.ObjectId(),
-                'name': 'Test Application',
-                'client_id': '123456',
-                'callback_url': 'https://example.com/callback',
-                'production_ready': False,
-                })
+            'owner': bson.ObjectId(),
+            'name': 'Test Application',
+            'client_id': '123456',
+            'callback_url': 'https://example.com/callback',
+            'production_ready': False,
+        })
 
         res = self.testapp.get('/oauth2/applications/%s/delete' % str(app_id),
                                status=401)
         self.assertEqual(res.status, '401 Unauthorized')
 
         self.db.applications.update({'_id': app_id}, {
-                '$set': {'owner': user_id},
-                })
+            '$set': {'owner': user_id},
+        })
         res = self.testapp.get('/oauth2/applications/%s/delete' % str(app_id))
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Delete Application <span>Test Application</span>')
@@ -590,12 +590,12 @@ https://example.com''',
 
         # Log in
         user_id = self.db.users.insert({
-                'twitter_id': 'twitter1',
-                'screen_name': 'John Doe',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                })
+            'twitter_id': 'twitter1',
+            'screen_name': 'John Doe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+        })
         self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/oauth2/applications/xxx/edit',
@@ -605,31 +605,32 @@ https://example.com''',
 
         res = self.testapp.get(
             '/oauth2/applications/000000000000000000000000/edit',
-            status=404)
+            status=404,
+        )
         self.assertEqual(res.status, '404 Not Found')
 
         # create a valid app
         app_id = self.db.applications.insert({
-                'owner': bson.ObjectId(),
-                'name': 'Test Application',
-                'main_url': 'http://example.com',
-                'callback_url': 'http://example.com/callback',
-                'authorized_origins': ['http://example.com',
-                                       'https://example.com'],
-                'production_ready': False,
-                'image_url': 'http://example.com/image.png',
-                'description': 'example description',
-                'client_id': '123456',
-                'client_secret': 'secret',
-                })
+            'owner': bson.ObjectId(),
+            'name': 'Test Application',
+            'main_url': 'http://example.com',
+            'callback_url': 'http://example.com/callback',
+            'authorized_origins': ['http://example.com',
+                                   'https://example.com'],
+            'production_ready': False,
+            'image_url': 'http://example.com/image.png',
+            'description': 'example description',
+            'client_id': '123456',
+            'client_secret': 'secret',
+        })
 
         res = self.testapp.get('/oauth2/applications/%s/edit' % str(app_id),
                                status=401)
         self.assertEqual(res.status, '401 Unauthorized')
 
         self.db.applications.update({'_id': app_id}, {
-                '$set': {'owner': user_id},
-                })
+            '$set': {'owner': user_id},
+        })
         res = self.testapp.get('/oauth2/applications/%s/edit' % str(app_id))
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Edit application <span>Test Application</span>')
@@ -658,17 +659,17 @@ https://example.com""")
         # Let's make some changes
         old_count = self.db.applications.count()
         res = self.testapp.post('/oauth2/applications/%s/edit' % str(app_id), {
-                'name': 'Test Application 2',
-                'main_url': 'http://example.com/new',
-                'callback_url': 'http://example.com/new/callback',
-                'authorized_origins': 'http://client.example.com',
-                'production_ready': 'true',
-                'image_url': 'http://example.com/image2.png',
-                'description': 'example description 2',
-                'client_id': '123456-2',
-                'client_secret': 'secret2',
-                'submit': 'Save changes',
-                })
+            'name': 'Test Application 2',
+            'main_url': 'http://example.com/new',
+            'callback_url': 'http://example.com/new/callback',
+            'authorized_origins': 'http://client.example.com',
+            'production_ready': 'true',
+            'image_url': 'http://example.com/image2.png',
+            'description': 'example description 2',
+            'client_id': '123456-2',
+            'client_secret': 'secret2',
+            'submit': 'Save changes',
+        })
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/oauth2/applications')
         new_app = self.db.applications.find_one(app_id)
@@ -689,16 +690,16 @@ https://example.com""")
 
         # Try and invalid change
         res = self.testapp.post('/oauth2/applications/%s/edit' % str(app_id), {
-                'submit': 'Save changes',
-                })
+            'submit': 'Save changes',
+        })
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('There was a problem with your submission')
         res.mustcontain('Required')
 
         # The user hit the delete button
         res = self.testapp.post('/oauth2/applications/%s/edit' % str(app_id), {
-                'delete': 'Delete',
-                })
+            'delete': 'Delete',
+        })
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location,
                          'http://localhost/oauth2/applications/%s/delete'
@@ -706,8 +707,8 @@ https://example.com""")
 
         # The user hit the cancel button
         res = self.testapp.post('/oauth2/applications/%s/edit' % str(app_id), {
-                'cancel': 'Cancel',
-                })
+            'cancel': 'Cancel',
+        })
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/oauth2/applications')
 
@@ -719,12 +720,12 @@ https://example.com""")
 
         # Log in
         user_id = self.db.users.insert({
-                'twitter_id': 'twitter1',
-                'screen_name': 'John Doe',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                })
+            'twitter_id': 'twitter1',
+            'screen_name': 'John Doe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+        })
         self.testapp.get('/__login/' + str(user_id))
 
         # let's create a couple of authorized apps
@@ -737,7 +738,7 @@ https://example.com""")
             'description': 'Test description 1',
             'client_id': '123456',
             'client_secret': 'secret',
-                })
+        })
         self.db.authorized_apps.insert({
             'user': user_id,
             'client_id': '123456',
@@ -777,12 +778,12 @@ https://example.com""")
 
         # Log in
         user_id = self.db.users.insert({
-                'twitter_id': 'twitter1',
-                'screen_name': 'John Doe',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                })
+            'twitter_id': 'twitter1',
+            'screen_name': 'John Doe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+        })
         self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/oauth2/applications/xxx/revoke',
@@ -797,13 +798,13 @@ https://example.com""")
 
         # create a valid app
         app_id = self.db.applications.insert({
-                'owner': bson.ObjectId(),
-                'name': 'Test Application',
-                'main_url': 'http://example.com',
-                'callback_url': 'http://example.com/callback',
-                'client_id': '123456',
-                'client_secret': 'secret',
-                })
+            'owner': bson.ObjectId(),
+            'name': 'Test Application',
+            'main_url': 'http://example.com',
+            'callback_url': 'http://example.com/callback',
+            'client_id': '123456',
+            'client_secret': 'secret',
+        })
 
         authorizator = Authorizator(self.db)
         credentials = {
@@ -819,8 +820,8 @@ https://example.com""")
         res.mustcontain('Revoke authorization to application <span>Test Application</span>')
 
         res = self.testapp.post('/oauth2/applications/%s/revoke' % str(app_id), {
-                'submit': 'Yes, I am sure',
-                })
+            'submit': 'Yes, I am sure',
+        })
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/oauth2/authorized-applications')
         self.assertFalse(authorizator.is_app_authorized(['read-passwords'],
@@ -833,21 +834,21 @@ https://example.com""")
 
         # create a couple of apps
         self.db.applications.insert({
-                'client_id': '123456',
-                'name': 'Example app 1',
-                'main_url': 'https://example.com',
-                'callback_url': 'https://example.com/callback',
-                'production_ready': True,
-                'image_url': 'https://example.com/image.png',
-                'description': 'example description',
-                })
+            'client_id': '123456',
+            'name': 'Example app 1',
+            'main_url': 'https://example.com',
+            'callback_url': 'https://example.com/callback',
+            'production_ready': True,
+            'image_url': 'https://example.com/image.png',
+            'description': 'example description',
+        })
         self.db.applications.insert({
-                'client_id': '654321',
-                'name': 'Example app 2',
-                'main_url': 'https://2.example.com',
-                'callback_url': 'https://2.example.com/callback',
-                'production_ready': False,
-                })
+            'client_id': '654321',
+            'name': 'Example app 2',
+            'main_url': 'https://2.example.com',
+            'callback_url': 'https://2.example.com/callback',
+            'production_ready': False,
+        })
 
         res = self.testapp.get('/oauth2/clients')
         self.assertEqual(res.status, '200 OK')
@@ -855,4 +856,4 @@ https://example.com""")
             'Available Clients', 'Example app 1', 'https://example.com',
             'https://example.com/image.png', 'example description',
             no=('Example app 2', 'https://2.example.com'),
-            )
+        )

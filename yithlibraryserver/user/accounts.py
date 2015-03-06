@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -38,24 +38,24 @@ def get_providers(user, current):
         key = provider + '_id'
         if key in user and user[key] is not None:
             result.append({
-                    'name': provider,
-                    'is_current': current == provider,
-                    })
+                'name': provider,
+                'is_current': current == provider,
+            })
     return result
 
 
 def get_n_passwords(db, user):
     return db.passwords.find({
-            'owner': user.get('_id', None),
-            }).count()
+        'owner': user.get('_id', None),
+    }).count()
 
 
 def get_accounts(db, current_user, current_provider):
     email = current_user.get('email', None)
     results = db.users.find({
-            'email': email,
-            '_id': {'$ne': current_user.get('_id', None)},
-            })
+        'email': email,
+        '_id': {'$ne': current_user.get('_id', None)},
+    })
 
     if current_user:
         results = [current_user] + list(results)
@@ -70,7 +70,7 @@ def get_accounts(db, current_user, current_provider):
             'passwords': get_n_passwords(db, user),
             'id': str(user['_id']),
             'is_verified': user.get('email_verified', False),
-            })
+        })
     return accounts
 
 

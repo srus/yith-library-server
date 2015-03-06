@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -28,7 +28,7 @@ from yithlibraryserver.testing import MONGO_URI, clean_db
 from yithlibraryserver.user.security import (
     get_user,
     assert_authenticated_user_is_registered,
-    )
+)
 
 
 class SecurityTests(unittest.TestCase):
@@ -55,9 +55,9 @@ class SecurityTests(unittest.TestCase):
         user_id = self.db.users.insert({'screen_name': 'John Doe'})
         self.config.testing_securitypolicy(userid=str(user_id))
         self.assertEqual(get_user(request), {
-                '_id': user_id,
-                'screen_name': 'John Doe',
-                })
+            '_id': user_id,
+            'screen_name': 'John Doe',
+        })
 
     def test_assert_authenticated_user_is_registered(self):
         self.config.testing_securitypolicy(userid='john')

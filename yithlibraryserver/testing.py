@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2014 Yaco Sistemas
 # Copyright (C) 2012-2014 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -76,7 +76,7 @@ class TestCase(unittest.TestCase):
             'admin_emails': 'admin1@example.com admin2@example.com',
             'public_url_root': 'http://localhost:6543/',
             'webassets.debug': 'True',
-            }
+        }
         app = main({}, **settings)
         self.testapp = TestApp(app)
         self.db = app.registry.settings['db_conn'][DB_NAME]

@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2013-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -57,16 +57,16 @@ class ModelTests(unittest.TestCase):
         self.request.user = None
 
         donation = create_donation(self.request, {
-                'amount': 1,
-                'firstname': 'John',
-                'lastname': 'Doe',
-                'city': 'Springfield',
-                'country': 'Exampleland',
-                'state': 'Example',
-                'street': 'Main Street 10',
-                'zip': '12345678',
-                'email': 'john@example.com',
-                })
+            'amount': 1,
+            'firstname': 'John',
+            'lastname': 'Doe',
+            'city': 'Springfield',
+            'country': 'Exampleland',
+            'state': 'Example',
+            'street': 'Main Street 10',
+            'zip': '12345678',
+            'email': 'john@example.com',
+        })
 
         self.assertEqual(donation['firstname'], 'John')
         self.assertEqual(donation['lastname'], 'Doe')
@@ -85,16 +85,16 @@ class ModelTests(unittest.TestCase):
         self.request.user = None
 
         donation = create_donation(self.request, {
-                'amount': 5,
-                'firstname': 'John',
-                'lastname': 'Doe',
-                'city': 'Springfield',
-                'country': 'Exampleland',
-                'state': 'Example',
-                'street': 'Main Street 10',
-                'zip': '12345678',
-                'email': 'john@example.com',
-                })
+            'amount': 5,
+            'firstname': 'John',
+            'lastname': 'Doe',
+            'city': 'Springfield',
+            'country': 'Exampleland',
+            'state': 'Example',
+            'street': 'Main Street 10',
+            'zip': '12345678',
+            'email': 'john@example.com',
+        })
 
         self.assertEqual(donation['firstname'], 'John')
         self.assertEqual(donation['lastname'], 'Doe')
@@ -113,16 +113,16 @@ class ModelTests(unittest.TestCase):
         self.request.user = {'_id': 'fake_user_id'}
 
         donation = create_donation(self.request, {
-                'amount': 10,
-                'firstname': 'John',
-                'lastname': 'Doe',
-                'city': 'Springfield',
-                'country': 'Exampleland',
-                'state': 'Example',
-                'street': 'Main Street 10',
-                'zip': '12345678',
-                'email': 'john@example.com',
-                })
+            'amount': 10,
+            'firstname': 'John',
+            'lastname': 'Doe',
+            'city': 'Springfield',
+            'country': 'Exampleland',
+            'state': 'Example',
+            'street': 'Main Street 10',
+            'zip': '12345678',
+            'email': 'john@example.com',
+        })
 
         self.assertEqual(donation['firstname'], 'John')
         self.assertEqual(donation['lastname'], 'Doe')

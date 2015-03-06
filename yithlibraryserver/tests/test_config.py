@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -32,7 +32,7 @@ class ConfigTests(unittest.TestCase):
     def test_read_setting_from_env(self):
         settings = {
             'foo_bar': '1',
-            }
+        }
 
         self.assertEqual('1', read_setting_from_env(settings, 'foo_bar'))
 
@@ -50,13 +50,13 @@ class ConfigTests(unittest.TestCase):
 
         settings = {
             'auth_tk_secret': '1234',
-            }
+        }
         self.assertRaises(ConfigurationError, main, {}, **settings)
 
         settings = {
             'auth_tk_secret': '1234',
             'mongo_uri': 'mongodb://localhost:27017/test',
-            }
+        }
         app = main({}, **settings)
         self.assertEqual(settings['auth_tk_secret'],
                          app.registry.settings['auth_tk_secret'])

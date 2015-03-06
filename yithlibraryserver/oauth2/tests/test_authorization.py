@@ -355,8 +355,8 @@ class VerifyRequestTests(testing.TestCase):
     @freeze_time('2014-02-23 08:00:00')
     def test_valid_user(self):
         user_id = self.db.users.insert({
-                'username': 'user1',
-                })
+            'username': 'user1',
+        })
 
         expiration = datetime.datetime(2014, 2, 23, 9, 0, tzinfo=utc)
         self.db.access_codes.insert({

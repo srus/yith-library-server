@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -68,9 +68,9 @@ class PasswordsManager(object):
             return self.db.passwords.find({'owner': user['_id']})
         else:
             return self.db.passwords.find_one({
-                    '_id': _id,
-                    'owner': user['_id'],
-                    })
+                '_id': _id,
+                'owner': user['_id'],
+            })
 
     def update(self, user, _id, password):
         """Update a password in the database.
@@ -81,9 +81,9 @@ class PasswordsManager(object):
         new_password = dict(password)  # copy since we are changing this object
         new_password['owner'] = user['_id']
         result = self.db.passwords.update({
-                '_id': _id,
-                'owner': user['_id'],
-                }, new_password)
+            '_id': _id,
+            'owner': user['_id'],
+        }, new_password)
         new_password['_id'] = _id
 
         # result['n'] is the number of documents updated

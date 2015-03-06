@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -35,7 +35,7 @@ class InformationTests(unittest.TestCase):
             'twitter_consumer_secret': 'secret',
             'twitter_bearer_token_url': 'https://api.twitter.com/oauth2/token',
             'twitter_user_info_url': 'https://api.twitter.com/1.1/users/show.json'
-            }
+        }
 
     def test_get_user_info(self):
         with patch('requests.post') as fake:

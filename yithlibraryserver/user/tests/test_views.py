@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2014 Yaco Sistemas
 # Copyright (C) 2012-2014 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -112,11 +112,11 @@ class ViewTests(TestCase):
 
         self.assertEqual(self.db.users.count(), 0)
         res = self.testapp.post('/register', {
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                'submit': 'Register into Yith Library',
-                }, status=302)
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+            'submit': 'Register into Yith Library',
+        }, status=302)
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/foo/bar')
         self.assertEqual(self.db.users.count(), 1)
@@ -142,11 +142,11 @@ class ViewTests(TestCase):
         # if no email is provided at registration, the email is
         # not verified
         res = self.testapp.post('/register', {
-                'first_name': 'John2',
-                'last_name': 'Doe2',
-                'email': '',
-                'submit': 'Register into Yith Library',
-                }, status=302)
+            'first_name': 'John2',
+            'last_name': 'Doe2',
+            'email': '',
+            'submit': 'Register into Yith Library',
+        }, status=302)
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/foo/bar')
         self.assertEqual(self.db.users.count(), 2)
@@ -199,7 +199,6 @@ class ViewTests(TestCase):
         self.assertEqual(mailer.outbox[0].recipients,
                          ['john@example.com'])
 
-
         # the next_url and user_info keys are cleared at this point
         self.testapp.post('/__session', {
             'next_url': 'http://localhost/foo/bar',
@@ -244,8 +243,8 @@ class ViewTests(TestCase):
 
         # simulate a cancel
         res = self.testapp.post('/register', {
-                'cancel': 'Cancel',
-                }, status=302)
+            'cancel': 'Cancel',
+        }, status=302)
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/foo/bar')
 
@@ -260,8 +259,8 @@ class ViewTests(TestCase):
         }, status=302)
 
         res = self.testapp.post('/register', {
-                'cancel': 'Cancel',
-                }, status=302)
+            'cancel': 'Cancel',
+        }, status=302)
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/oauth2/clients')
 
@@ -278,8 +277,8 @@ class ViewTests(TestCase):
         with patch('deform.Form.validate') as fake:
             fake.side_effect = DummyValidationFailure('f', 'c', 'e')
             res = self.testapp.post('/register', {
-                    'submit': 'Register into Yith Library',
-                    })
+                'submit': 'Register into Yith Library',
+            })
             self.assertEqual(res.status, '200 OK')
 
     def test_logout(self):
@@ -338,11 +337,11 @@ class ViewTests(TestCase):
         res.mustcontain('Save changes')
 
         res = self.testapp.post('/profile', {
-                'submit': 'Save changes',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                })
+            'submit': 'Save changes',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+        })
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/profile')
         # check that the user has changed
@@ -355,19 +354,19 @@ class ViewTests(TestCase):
         with patch('deform.Form.validate') as fake:
             fake.side_effect = DummyValidationFailure('f', 'c', 'e')
             res = self.testapp.post('/profile', {
-                    'submit': 'Save Changes',
-                    })
+                'submit': 'Save Changes',
+            })
             self.assertEqual(res.status, '200 OK')
 
         # make the db fail
         with patch('yithlibraryserver.db.MongoDB.get_database') as fake:
             fake.return_value = BadDB(new_user)
             res = self.testapp.post('/profile', {
-                    'submit': 'Save changes',
-                    'first_name': 'John',
-                    'last_name': 'Doe',
-                    'email': 'john@example.com',
-                    })
+                'submit': 'Save changes',
+                'first_name': 'John',
+                'last_name': 'Doe',
+                'email': 'john@example.com',
+            })
             self.assertEqual(res.status, '200 OK')
             res.mustcontain('There were an error while saving your changes')
 
@@ -394,8 +393,8 @@ class ViewTests(TestCase):
 
         # simulate a cancel
         res = self.testapp.post('/destroy', {
-                'cancel': 'Cancel',
-                }, status=302)
+            'cancel': 'Cancel',
+        }, status=302)
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/profile')
 
@@ -403,16 +402,16 @@ class ViewTests(TestCase):
         with patch('deform.Form.validate') as fake:
             fake.side_effect = DummyValidationFailure('f', 'c', 'e')
             res = self.testapp.post('/destroy', {
-                    'reason': '',
-                    'submit': 'Yes, I am sure. Destroy my account',
-                    })
+                'reason': '',
+                'submit': 'Yes, I am sure. Destroy my account',
+            })
             self.assertEqual(res.status, '200 OK')
 
         # now the real one
         res = self.testapp.post('/destroy', {
-                'reason': 'I do not need a password manager',
-                'submit': 'Yes, I am sure. Destroy my account',
-                }, status=302)
+            'reason': 'I do not need a password manager',
+            'submit': 'Yes, I am sure. Destroy my account',
+        }, status=302)
         self.assertEqual(res.location, 'http://localhost/')
         self.assertClearAuthCookie(res.headers)
 
@@ -427,7 +426,6 @@ class ViewTests(TestCase):
         self.assertEqual(mailer.outbox[0].recipients,
                          ['admin1@example.com', 'admin2@example.com'])
         self.assertTrue('I do not need a password manager' in mailer.outbox[0].body)
-
 
     def test_send_email_verification_code(self):
         # this view required authentication
@@ -449,9 +447,9 @@ class ViewTests(TestCase):
         res = self.testapp.get('/send-email-verification-code')
         self.assertEqual(res.status, '200 OK')
         self.assertEqual(res.json, {
-                'status': 'bad',
-                'error': 'You have not an email in your profile',
-                })
+            'status': 'bad',
+            'error': 'You have not an email in your profile',
+        })
 
         # let's give the user an email
         self.db.users.update({'_id': user_id},
@@ -461,19 +459,18 @@ class ViewTests(TestCase):
         res = self.testapp.get('/send-email-verification-code')
         self.assertEqual(res.status, '200 OK')
         self.assertEqual(res.json, {
-                'status': 'bad',
-                'error': 'Not a post',
-                })
-
+            'status': 'bad',
+            'error': 'Not a post',
+        })
 
         # now a good request
         res = self.testapp.post('/send-email-verification-code', {
-                'submit': 'Send verification code'})
+            'submit': 'Send verification code'})
         self.assertEqual(res.status, '200 OK')
         self.assertEqual(res.json, {
-                'status': 'ok',
-                'error': None,
-                })
+            'status': 'ok',
+            'error': None,
+        })
         res.request.registry = self.testapp.app.registry
         mailer = get_mailer(res.request)
         self.assertEqual(len(mailer.outbox), 1)
@@ -486,12 +483,12 @@ class ViewTests(TestCase):
         with patch('yithlibraryserver.user.email_verification.EmailVerificationCode.store') as fake:
             fake.return_value = False
             res = self.testapp.post('/send-email-verification-code', {
-                    'submit': 'Send verification code'})
+                'submit': 'Send verification code'})
             self.assertEqual(res.status, '200 OK')
             self.assertEqual(res.json, {
-                    'status': 'bad',
-                    'error': 'There were problems storing the verification code',
-                    })
+                'status': 'bad',
+                'error': 'There were problems storing the verification code',
+            })
 
     def test_verify_email(self):
         res = self.testapp.get('/verify-email', status=400)
@@ -812,10 +809,10 @@ class PreferencesTests(TestCase):
     def test_save_changes(self):
         user_id = self._login()
         res = self.testapp.post('/preferences', {
-                'submit': 'Save changes',
-                'allow_google_analytics': 'true',
-                'send_passwords_periodically': 'false',
-                })
+            'submit': 'Save changes',
+            'allow_google_analytics': 'true',
+            'send_passwords_periodically': 'false',
+        })
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/preferences')
         # check that the user has changed

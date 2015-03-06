@@ -29,6 +29,7 @@ from yithlibraryserver.oauth2.utils import (
     response_from_error,
 )
 
+
 class Error(object):
 
     def __init__(self, error):
@@ -49,7 +50,6 @@ class ExtractParamsTests(unittest.TestCase):
         self.assertEqual(method, 'GET')
         self.assertEqual(body, 'loren ipsum')
         self.assertEqual(headers, {})
-
 
     def test_create_response(self):
         response = create_response({'Content-Type': 'text/html'}, 'body', 200)

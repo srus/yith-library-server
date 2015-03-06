@@ -29,13 +29,13 @@ class AuthorizedOriginsNode(colander.SchemaNode):
     """Converts a node of type string into and from a list of strings"""
 
     def serialize(self, appstruct=colander.null):
-        if not appstruct is colander.null and isinstance(appstruct, list):
+        if appstruct is not colander.null and isinstance(appstruct, list):
             appstruct = '\n'.join(appstruct)
         return super(AuthorizedOriginsNode, self).serialize(appstruct)
 
     def deserialize(self, cstruct=colander.null):
         result = super(AuthorizedOriginsNode, self).deserialize(cstruct)
-        if not result is colander.null and isinstance(result, string_types):
+        if result is not colander.null and isinstance(result, string_types):
             result = [item.strip() for item in result.split('\n')
                       if item.strip()]
 

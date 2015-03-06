@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -57,8 +57,8 @@ def contact(request):
 
         context = {'link': request.route_url('contact')}
         context.update(appstruct)
-        subject= ("%s sent a message from Yith's contact form"
-                  % appstruct['name'])
+        subject = ("%s sent a message from Yith's contact form"
+                   % appstruct['name'])
 
         result = send_email_to_admins(
             request,
@@ -75,13 +75,13 @@ def contact(request):
                     appstruct['name'],
                     appstruct['email'],
                     appstruct['message'],
-                    )
                 )
+            )
 
         request.session.flash(
             _('Thank you very much for sharing your opinion'),
             'info',
-            )
+        )
 
         return HTTPFound(location=request.route_path('home'))
 

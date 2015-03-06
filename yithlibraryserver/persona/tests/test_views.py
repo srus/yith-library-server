@@ -36,9 +36,9 @@ class ViewTests(testing.TestCase):
         with patch('requests.post') as fake_post:
             fake_post.return_value.ok = False
             res = self.testapp.post('/persona/login', {
-                    'assertion': 'test-assertion',
-                    'next_url': 'http://localhost/oauth2/clients',
-                    }, status=500)
+                'assertion': 'test-assertion',
+                'next_url': 'http://localhost/oauth2/clients',
+            }, status=500)
             self.assertEqual(res.status, '500 Internal Server Error')
             res.mustcontain('Mozilla Persona verifier is not working properly')
 
@@ -46,11 +46,11 @@ class ViewTests(testing.TestCase):
             fake_post.return_value.ok = True
             fake_post.return_value.json = lambda: {
                 'status': 'failure',
-                }
+            }
             res = self.testapp.post('/persona/login', {
-                    'assertion': 'test-assertion',
-                    'next_url': 'http://localhost/oauth2/clients',
-                    }, status=403)
+                'assertion': 'test-assertion',
+                'next_url': 'http://localhost/oauth2/clients',
+            }, status=403)
             self.assertEqual(res.status, '403 Forbidden')
             res.mustcontain('Mozilla Persona verifier can not verify your identity')
 
@@ -59,10 +59,10 @@ class ViewTests(testing.TestCase):
             fake_post.return_value.json = lambda: {
                 'status': 'okay',
                 'email': 'john@example.com',
-                }
+            }
             res = self.testapp.post('/persona/login', {
-                    'assertion': 'test-assertion',
-                    'next_url': 'http://localhost/oauth2/clients',
-                    })
+                'assertion': 'test-assertion',
+                'next_url': 'http://localhost/oauth2/clients',
+            })
             self.assertEqual(res.status, '302 Found')
             self.assertEqual(res.location, 'http://localhost/register')

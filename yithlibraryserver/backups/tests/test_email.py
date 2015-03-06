@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2013-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2013-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -82,10 +82,10 @@ class SendPasswordsTests(unittest.TestCase):
         preferences_link = 'http://localhost/preferences'
         backups_link = 'http://localhost/backups'
         user_id = self.db.users.insert({
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'email': 'john@example.com',
-                })
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com',
+        })
         user = self.db.users.find_one({'_id': user_id})
 
         request = DummyRequest()
@@ -98,13 +98,13 @@ class SendPasswordsTests(unittest.TestCase):
 
         # add some passwords
         self.db.passwords.insert({
-                'owner': user_id,
-                'password': 'secret1',
-                })
+            'owner': user_id,
+            'password': 'secret1',
+        })
         self.db.passwords.insert({
-                'owner': user_id,
-                'password': 'secret2',
-                })
+            'owner': user_id,
+            'password': 'secret2',
+        })
 
         request = DummyRequest()
         request.db = self.db

@@ -159,8 +159,8 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         if client.client_secret != client_secret:
             return False
 
-        #if client.client_type != 'confidential':
-        #    return False
+        # if client.client_type != 'confidential':
+        #     return False
 
         return True
 

@@ -48,7 +48,7 @@ def main(global_config, **settings):
         ('username', None),
         ('password', None),
         ('default_sender', 'no-reply@yithlibrary.com')
-        ):
+    ):
         option = 'mail_' + key
         settings[option] = read_setting_from_env(settings, option, default)
 
@@ -77,7 +77,7 @@ def main(global_config, **settings):
 
     settings['available_languages'] = [
         lang for lang in available_languages.split(' ') if lang
-        ]
+    ]
 
     # Public URL root
     settings['public_url_root'] = read_setting_from_env(
@@ -107,9 +107,9 @@ def main(global_config, **settings):
             settings['auth_tk_secret'],
             wild_domain=False,
             hashalg='sha512',
-            ),
+        ),
         locale_negotiator=locale_negotiator,
-        )
+    )
     config.add_renderer('json', json_renderer)
     config.add_static_view('static', 'static', cache_max_age=3600)
 
@@ -201,7 +201,7 @@ def includeme(config):
     search_path = (
         resolver.resolve('templates').abspath(),
         deform_templates,
-        )
+    )
 
     Form.set_zpt_renderer(search_path, translator=deform_translator)
 

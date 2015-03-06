@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -54,12 +54,12 @@ class UtilsTests(unittest.TestCase):
         password, errors = validate_password(b'{"password": {"secret": "s3cr3t", "service": "myservice"}}', _id='1')
         self.assertEqual(errors, [])
         self.assertEqual(password, {
-                'secret': 's3cr3t',
-                'service': 'myservice',
-                'account': None,
-                'expiration': None,
-                'notes': None,
-                'tags': None,
-                'creation': None,
-                'last_modification': None,
-                })
+            'secret': 's3cr3t',
+            'service': 'myservice',
+            'account': None,
+            'expiration': None,
+            'notes': None,
+            'tags': None,
+            'creation': None,
+            'last_modification': None,
+        })

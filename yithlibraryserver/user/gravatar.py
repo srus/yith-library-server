@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -41,7 +41,7 @@ class Gravatar(object):
         parameters = {
             'd': default_image_url,
             's': size,
-            }
+        }
         gravatar_url = 'https://www.gravatar.com/avatar/%s?%s' % (
             email_hash, url_encode(parameters))
 
@@ -66,4 +66,3 @@ def get_gravatar(request):
     default_image_url = request.static_url(
         'yithlibraryserver:static/img/default_gravatar.png')
     return Gravatar(request, default_image_url)
-

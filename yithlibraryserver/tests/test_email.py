@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2013-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -97,8 +97,8 @@ class SendEmailTests(unittest.TestCase):
     def setUp(self):
         self.admin_emails = ['admin1@example.com', 'admin2@example.com']
         self.config = testing.setUp(settings={
-                'admin_emails': self.admin_emails,
-                })
+            'admin_emails': self.admin_emails,
+        })
         self.config.include('pyramid_mailer.testing')
         self.config.include('pyramid_chameleon')
 
@@ -150,8 +150,8 @@ class SendEmailNoAdminsTests(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp(settings={
-                'admin_emails': [],
-                })
+            'admin_emails': [],
+        })
         self.config.include('pyramid_mailer.testing')
         self.config.include('pyramid_chameleon')
         super(SendEmailNoAdminsTests, self).setUp()

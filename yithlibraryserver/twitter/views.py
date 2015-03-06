@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -36,7 +36,7 @@ def twitter_login(request):
 
     params = (
         ('oauth_callback', oauth_callback_url),
-        )
+    )
 
     auth = auth_header('POST', request_token_url, params, settings)
 
@@ -50,7 +50,7 @@ def twitter_login(request):
     if response_args['oauth_callback_confirmed'] != 'true':
         return HTTPUnauthorized('oauth_callback_confirmed is not true')
 
-    #oauth_token_secret = response_args['oauth_token_secret']
+    # oauth_token_secret = response_args['oauth_token_secret']
     oauth_token = response_args['oauth_token']
     request.session['oauth_token'] = oauth_token
     if 'next_url' in request.params:
@@ -58,7 +58,7 @@ def twitter_login(request):
 
     authorize_url = '%s?oauth_token=%s' % (
         settings['twitter_authenticate_url'], oauth_token
-        )
+    )
     return HTTPFound(location=authorize_url)
 
 
@@ -89,7 +89,7 @@ def twitter_callback(request):
 
     params = (
         ('oauth_token', oauth_token),
-        )
+    )
 
     auth = auth_header('POST', access_token_url, params, settings, oauth_token)
 
@@ -101,7 +101,7 @@ def twitter_callback(request):
         return HTTPUnauthorized(response.text)
 
     response_args = dict(urlparse.parse_qsl(response.text))
-    #oauth_token_secret = response_args['oauth_token_secret']
+    # moauth_token_secret = response_args['oauth_token_secret']
     oauth_token = response_args['oauth_token']
     user_id = response_args['user_id']
     screen_name = response_args['screen_name']
@@ -117,7 +117,7 @@ def twitter_callback(request):
             'screen_name': screen_name,
             'first_name': first_name,
             'last_name': last_name,
-            }
+        }
     else:
         info = {}
 

@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -47,7 +47,7 @@ def sign(method, url, original_params, consumer_secret, oauth_token):
     # 2. create signature base string
     signature_base = '%s&%s&%s' % (
         method.upper(), quote(url), quote(param_string),
-        )
+    )
 
     # 3. create the signature key
     key = '%s&%s' % (quote(consumer_secret), quote(oauth_token))
@@ -67,7 +67,7 @@ def auth_header(method, url, original_params, settings, oauth_token='',
         ('oauth_signature_method', 'HMAC-SHA1'),
         ('oauth_timestamp', str(timestamp_ or timestamp())),
         ('oauth_version', '1.0'),
-        ]
+    ]
     params = [(quote(key), quote(value)) for key, value in params]
 
     signature = sign(method, url, params,

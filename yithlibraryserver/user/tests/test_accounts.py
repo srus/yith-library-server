@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2014 Yaco Sistemas
 # Copyright (C) 2012-2014 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -42,21 +42,23 @@ class AccountTests(TestCase):
 
     def test_get_providers(self):
         self.assertEqual([], get_providers({}, ''))
-        self.assertEqual([{'name': 'facebook', 'is_current': True}],
-                         get_providers({'facebook_id': 1234}, 'facebook'))
+        self.assertEqual([
+            {'name': 'facebook', 'is_current': True}
+        ], get_providers({'facebook_id': 1234}, 'facebook'))
         self.assertEqual([{
-                    'name': 'facebook',
-                    'is_current': True,
-                    }, {
-                    'name': 'google',
-                    'is_current': False,
-                    }, {
-                    'name': 'twitter',
-                    'is_current': False,
-                    }],
-                          get_providers({'facebook_id': 1234,
-                                         'google_id': 4321,
-                                         'twitter_id': 6789}, 'facebook'))
+            'name': 'facebook',
+            'is_current': True,
+        }, {
+            'name': 'google',
+            'is_current': False,
+        }, {
+            'name': 'twitter',
+            'is_current': False,
+        }], get_providers({
+            'facebook_id': 1234,
+            'google_id': 4321,
+            'twitter_id': 6789
+        }, 'facebook'))
         self.assertEqual([], get_providers({'myspace_id': 1234}, ''))
 
     def test_n_passwords(self):
@@ -367,8 +369,8 @@ class AccountRemovalNotificationTests(unittest.TestCase):
     def setUp(self):
         self.admin_emails = ['admin1@example.com', 'admin2@example.com']
         self.config = testing.setUp(settings={
-                'admin_emails': self.admin_emails,
-                })
+            'admin_emails': self.admin_emails,
+        })
         self.config.include('pyramid_mailer.testing')
         self.config.include('pyramid_chameleon')
         self.config.add_route('home', '/')
@@ -388,7 +390,7 @@ class AccountRemovalNotificationTests(unittest.TestCase):
 
         self.assertEqual(len(mailer.outbox), 1)
         self.assertEqual(mailer.outbox[0].subject,
-                        'A user has destroyed his Yith Library account')
+                         'A user has destroyed his Yith Library account')
         self.assertEqual(mailer.outbox[0].recipients, self.admin_emails)
         self.assertTrue('John Doe <john@example.com' in mailer.outbox[0].body)
         self.assertTrue('I do not trust free services' in mailer.outbox[0].body)

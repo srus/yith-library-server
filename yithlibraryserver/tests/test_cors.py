@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -35,9 +35,9 @@ class CORSManagerTests(testing.TestCase):
         cm.add_cors_header(request, response)
 
         self.assertEqual(response.headers, {
-                'Content-Type': 'text/html; charset=UTF-8',
-                'Content-Length': '0',
-                })
+            'Content-Type': 'text/html; charset=UTF-8',
+            'Content-Length': '0',
+        })
 
     def test_cors_headers_global_origins(self):
         cm = CORSManager('http://localhost')
@@ -48,19 +48,19 @@ class CORSManagerTests(testing.TestCase):
         cm.add_cors_header(request, response)
 
         self.assertEqual(response.headers, {
-                'Content-Type': 'text/html; charset=UTF-8',
-                'Content-Length': '0',
-                'Access-Control-Allow-Origin': 'http://localhost',
-                })
+            'Content-Type': 'text/html; charset=UTF-8',
+            'Content-Length': '0',
+            'Access-Control-Allow-Origin': 'http://localhost',
+        })
 
     def test_cors_headers_app_origins_access_denied(self):
         cm = CORSManager('')
 
         self.db.applications.insert({
-                'name': 'test-app',
-                'client_id': 'client1',
-                'authorized_origins': ['http://localhost'],
-                })
+            'name': 'test-app',
+            'client_id': 'client1',
+            'authorized_origins': ['http://localhost'],
+        })
 
         request = DummyRequest(headers={'Origin': 'http://localhost'},
                                params={'client_id': 'client2'})
@@ -70,18 +70,18 @@ class CORSManagerTests(testing.TestCase):
         cm.add_cors_header(request, response)
 
         self.assertEqual(response.headers, {
-                'Content-Type': 'text/html; charset=UTF-8',
-                'Content-Length': '0',
-                })
+            'Content-Type': 'text/html; charset=UTF-8',
+            'Content-Length': '0',
+        })
 
     def test_cors_headers_app_origins(self):
         cm = CORSManager('')
 
         self.db.applications.insert({
-                'name': 'test-app',
-                'client_id': 'client1',
-                'authorized_origins': ['http://localhost'],
-                })
+            'name': 'test-app',
+            'client_id': 'client1',
+            'authorized_origins': ['http://localhost'],
+        })
 
         request = DummyRequest(headers={'Origin': 'http://localhost'},
                                params={'client_id': 'client1'})
@@ -91,7 +91,7 @@ class CORSManagerTests(testing.TestCase):
         cm.add_cors_header(request, response)
 
         self.assertEqual(response.headers, {
-                'Content-Type': 'text/html; charset=UTF-8',
-                'Content-Length': '0',
-                'Access-Control-Allow-Origin': 'http://localhost',
-                })
+            'Content-Type': 'text/html; charset=UTF-8',
+            'Content-Length': '0',
+            'Access-Control-Allow-Origin': 'http://localhost',
+        })

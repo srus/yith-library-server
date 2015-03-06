@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2013-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2013-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -162,4 +162,3 @@ Storing authorized app "app1" for user John2 Doe2 <john2@example.com>
         self.assertFalse('authorized_apps' in user2)
         auths = authorizator.get_user_authorizations({'_id': u2_id})
         self.assertEqual(auths.count(), 1)
-

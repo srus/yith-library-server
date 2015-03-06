@@ -92,28 +92,34 @@ class ReportTests(ScriptTests):
         result = users()
         self.assertEqual(result, None)
         stdout = sys.stdout.getvalue()
-        expected_output = """John Doe <john@example.com> (%s)
-	Passwords: 0
-	Providers: 
-	Verified: False
-	Date joined: Unknown
-	Last login: Unknown
+        context = {
+            'u1': u1_id,
+            'u2': u2_id,
+            'u3': u3_id,
+            'tab': '\t',
+        }
+        expected_output = """John Doe <john@example.com> (%(u1)s)
+%(tab)sPasswords: 0
+%(tab)sProviders:
+%(tab)sVerified: False
+%(tab)sDate joined: Unknown
+%(tab)sLast login: Unknown
 
-John2 Doe2 <john2@example.com> (%s)
-	Passwords: 1
-	Providers: twitter
-	Verified: True
-	Date joined: Unknown
-	Last login: Unknown
+John2 Doe2 <john2@example.com> (%(u2)s)
+%(tab)sPasswords: 1
+%(tab)sProviders: twitter
+%(tab)sVerified: True
+%(tab)sDate joined: Unknown
+%(tab)sLast login: Unknown
 
-John3 Doe3 <john3@example.com> (%s)
-	Passwords: 2
-	Providers: facebook, google, twitter
-	Verified: True
-	Date joined: 2012-12-12 12:12:12+00:00
-	Last login: 2012-12-12 12:12:12+00:00
+John3 Doe3 <john3@example.com> (%(u3)s)
+%(tab)sPasswords: 2
+%(tab)sProviders: facebook, google, twitter
+%(tab)sVerified: True
+%(tab)sDate joined: 2012-12-12 12:12:12+00:00
+%(tab)sLast login: 2012-12-12 12:12:12+00:00
 
-""" % (u1_id, u2_id, u3_id)
+""" % context
         self.assertEqual(stdout, expected_output)
 
         # Restore sys.values
@@ -148,7 +154,7 @@ John3 Doe3 <john3@example.com> (%s)
             'first_name': 'John',
             'last_name': 'Doe',
             'email': 'john@example.com',
-                })
+        })
         self.db.applications.insert({
             'name': 'Test application 1',
             'owner': u1_id,
@@ -169,18 +175,18 @@ John3 Doe3 <john3@example.com> (%s)
         self.assertEqual(result, None)
         stdout = sys.stdout.getvalue()
         expected_output = """Test application 1
-	Owner: John Doe <john@example.com>
-	Main URL: http://example.com/
-	Callback URL: http://example.com/callback
-	Users: 0
+%(tab)sOwner: John Doe <john@example.com>
+%(tab)sMain URL: http://example.com/
+%(tab)sCallback URL: http://example.com/callback
+%(tab)sUsers: 0
 
 Test application 2
-	Owner: Unknown owner (000000000000000000000000)
-	Main URL: http://2.example.com/
-	Callback URL: http://2.example.com/callback
-	Users: 0
+%(tab)sOwner: Unknown owner (000000000000000000000000)
+%(tab)sMain URL: http://2.example.com/
+%(tab)sCallback URL: http://2.example.com/callback
+%(tab)sUsers: 0
 
-"""
+""" % {'tab': '\t'}
         self.assertEqual(stdout, expected_output)
 
         # Restore sys.values
@@ -307,23 +313,23 @@ Test application 2
 
         expected_output = """Number of users: 10
 Number of passwords: 45
-Verified users: 30.00% (3)
-Users that allow Google Analytics cookie: 10.00% (1)
+Verified users: 30.00%% (3)
+Users that allow Google Analytics cookie: 10.00%% (1)
 Identity providers:
-	google: 40.00% (4)
-	twitter: 30.00% (3)
-	persona: 20.00% (2)
-	facebook: 10.00% (1)
+%(tab)sgoogle: 40.00%% (4)
+%(tab)stwitter: 30.00%% (3)
+%(tab)spersona: 20.00%% (2)
+%(tab)sfacebook: 10.00%% (1)
 Email providers:
-	example.com: 66.67% (2)
-	Others: 33.33% (1)
-Users without email: 70.00% (7)
+%(tab)sexample.com: 66.67%% (2)
+%(tab)sOthers: 33.33%% (1)
+Users without email: 70.00%% (7)
 Most active users:
-	Peter Doe <peter@example.com>: 20
-	Susan Doe <susan@example2.com>: 15
-	John Doe <john@example.com>: 10
-Users without passwords: 70.00% (7)
-"""
+%(tab)sPeter Doe <peter@example.com>: 20
+%(tab)sSusan Doe <susan@example2.com>: 15
+%(tab)sJohn Doe <john@example.com>: 10
+Users without passwords: 70.00%% (7)
+""" % {'tab': '\t'}
         self.assertEqual(stdout, expected_output)
 
         # Restore sys.values

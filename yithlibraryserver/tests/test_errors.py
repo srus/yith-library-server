@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -37,7 +37,6 @@ class ErrorsTests(unittest.TestCase):
         # try a different message
         result = password_not_found('test')
         self.assertTrue(result.body, '{"message": "test"}')
-
 
     def test_invalid_password_id(self):
         result = invalid_password_id()

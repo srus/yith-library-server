@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -36,25 +36,25 @@ class EmailVerificationCode(object):
 
     def store(self, db, user):
         result = db.users.update({'_id': user['_id']}, {
-                '$set': {'email_verification_code': self.code},
-                })
+            '$set': {'email_verification_code': self.code},
+        })
         return result['n'] == 1
 
     def remove(self, db, email, verified):
         result = db.users.update({
-                'email_verification_code': self.code,
-                'email': email,
-                }, {
-                '$unset': {'email_verification_code': 1},
-                '$set': {'email_verified': verified},
-                })
+            'email_verification_code': self.code,
+            'email': email,
+        }, {
+            '$unset': {'email_verification_code': 1},
+            '$set': {'email_verified': verified},
+        })
         return result['n'] == 1
 
     def verify(self, db, email):
         result = db.users.find_one({
-                'email': email,
-                'email_verification_code': self.code,
-                })
+            'email': email,
+            'email_verification_code': self.code,
+        })
         return result is not None
 
     def send(self, request, user, url):

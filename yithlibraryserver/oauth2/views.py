@@ -58,7 +58,7 @@ def developer_applications(request):
     owned_apps_filter = {'owner': request.user['_id']}
     return {
         'applications': request.db.applications.find(owned_apps_filter)
-        }
+    }
 
 
 @view_config(route_name='oauth2_developer_application_new',
@@ -90,7 +90,7 @@ def developer_application_new(request):
             'production_ready': appstruct['production_ready'],
             'image_url': appstruct['image_url'],
             'description': appstruct['description'],
-            }
+        }
         create_client_id_and_secret(application)
 
         request.session.flash(
@@ -155,7 +155,7 @@ def developer_application_edit(request):
             'description': appstruct['description'],
             'client_id': app['client_id'],
             'client_secret': app['client_secret'],
-            }
+        }
 
         request.db.applications.update({'_id': app['_id']},
                                        application)
@@ -200,7 +200,7 @@ def developer_application_delete(request):
             _('The application ${app} was deleted successfully',
               mapping={'app': app['name']}),
             'success',
-            )
+        )
         return HTTPFound(
             location=request.route_path('oauth2_developer_applications'))
 
@@ -345,7 +345,7 @@ def revoke_application(request):
             _('The access to application ${app} has been revoked',
               mapping={'app': app['name']}),
             'success',
-            )
+        )
         return HTTPFound(
             location=request.route_path('oauth2_authorized_applications'))
 
