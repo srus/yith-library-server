@@ -7,7 +7,7 @@ Chameleon==2.18          # required by deform, pyramid_chameleon, lingua
 nose==1.3.4              # required by pymongo
 PasteDeploy==1.5.2       # required by pyramid
 peppercorn==0.5          # required by deform
-polib==1.0.5             # required by lingua
+polib==1.0.6             # required by lingua
 pytz==2014.9             # required by Babel
 repoze.lru==0.6          # required by pyramid
 repoze.sendmail==4.2     # required by pyramid_mailer
@@ -22,10 +22,10 @@ zope.interface==4.1.1    # required by pyramid
 # direct dependencies
 Babel==1.3
 deform==0.9.9
-lingua==3.4
+lingua==3.9
 oauthlib==0.7.2
 pymongo==2.7.2
-pyramid==1.5.1
+pyramid==1.5.4
 pyramid_beaker==0.8
 pyramid_chameleon==0.3
 pyramid_mailer==0.13
