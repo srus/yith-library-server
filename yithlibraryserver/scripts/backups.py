@@ -26,28 +26,18 @@ from yithlibraryserver.scripts.utils import safe_print, setup_simple_command
 from yithlibraryserver.scripts.utils import get_user_display_name
 
 
-def get_all_users(request):
-    day = datetime.date.today().day
-    return request.db.users.find({
+def get_all_users(db, when):
+    hour = when.hour
+    return db.users.find({
         'send_passwords_periodically': True,
         'email_verified': True,
-        '$where': '''
-function () {
-    var i, sum, day;
-    sum = 0;
-    for (i = 0; i < this._id.str.length; i += 1) {
-        sum += this._id.str.charCodeAt(i);
-    }
-    day = (sum %% 28) + 1;
-    return day === %d;
-}
-''' % day
+        '$where': 'this.date_joined.getUTCHours() === %d' % hour,
     }).sort('date_joined')
 
 
-def get_selected_users(request, *emails):
+def get_selected_users(db, *emails):
     for email in emails:
-        for user in request.db.users.find({
+        for user in db.users.find({
                 'email': email,
         }).sort('date_joined'):
             yield user
@@ -56,7 +46,7 @@ def get_selected_users(request, *emails):
 def send_backups_via_email():
     result = setup_simple_command(
         "send_backups_via_email",
-        "Report information about users and their passwords.",
+        "Send a password backup to users.",
     )
     if isinstance(result, int):
         return result
@@ -67,9 +57,13 @@ def send_backups_via_email():
         request = env['request']
 
         if len(args) == 0:
-            user_iterator = get_all_users(request)
+            now = datetime.datetime.utcnow()
+            if now.day == 1:
+                user_iterator = get_all_users(request.db, now)
+            else:
+                user_iterator = tuple()
         else:
-            user_iterator = get_selected_users(request, *args)
+            user_iterator = get_selected_users(request.db, *args)
 
         tx = transaction.begin()
 

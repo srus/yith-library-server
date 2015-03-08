@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -19,7 +19,7 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import colander
-from deform.widget import CheckboxWidget, TextAreaWidget, TextInputWidget
+from deform.widget import TextAreaWidget, TextInputWidget
 
 from yithlibraryserver.i18n import TranslationString as _
 
@@ -119,5 +119,5 @@ class UserPreferencesSchema(colander.MappingSchema):
         colander.Boolean(),
         title=_('Send my passwords to my email monthly'),
         missing=False,
-        widget=CheckboxWidget(css_class='send-passwords-periodically'),
+        description=_('You will receive your passwords backup on the first day of the month'),
     )

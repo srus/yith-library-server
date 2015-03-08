@@ -20,7 +20,6 @@
 
 import datetime
 
-import bson
 from bson.tz_util import utc
 from freezegun import freeze_time
 
@@ -30,7 +29,6 @@ from mock import patch
 
 from pyramid_mailer import get_mailer
 
-from yithlibraryserver.backups.email import get_day_to_send
 from yithlibraryserver.compat import url_quote
 from yithlibraryserver.oauth2.authorization import Authorizator
 from yithlibraryserver.testing import TestCase
@@ -750,8 +748,6 @@ class PreferencesTests(TestCase):
         date = datetime.datetime(2012, 12, 12, 12, 12)
 
         user_id = self.db.users.insert({
-            # we choose the _id so get_day_to_send returns 26
-            '_id': bson.objectid.ObjectId('00000000000000000000000a'),
             'twitter_id': 'twitter1',
             'screen_name': 'John Doe',
             'first_name': 'John',
@@ -762,50 +758,22 @@ class PreferencesTests(TestCase):
             'last_login': date,
             'allow_google_analytics': False,
         })
-        day = get_day_to_send({'_id': user_id}, 28)
-        self.assertEqual(day, 26)
 
         self.testapp.get('/__login/' + str(user_id))
 
         return user_id
 
-    @freeze_time('2012-10-27')
-    def test_backup_next_month(self):
+    def test_backup_form_messages(self):
         self._login()
         res = self.testapp.get('/preferences')
         self.assertEqual(res.status, '200 OK')
         res.mustcontain(
             'Preferences',
             'Allow statistics cookie',
-            'You will receive your passwords backup on the day 26 of next month',
+            'You will receive your passwords backup on the first day of the month',
             'Save changes',
         )
 
-    @freeze_time('2012-10-25')
-    def test_backup_this_month(self):
-        self._login()
-        res = self.testapp.get('/preferences')
-        self.assertEqual(res.status, '200 OK')
-        res.mustcontain(
-            'Preferences',
-            'Allow statistics cookie',
-            'You will receive your passwords backup on the day 26 of this month',
-            'Save changes',
-        )
-
-    @freeze_time('2012-10-26')
-    def test_backup_today(self):
-        self._login()
-        res = self.testapp.get('/preferences')
-        self.assertEqual(res.status, '200 OK')
-        res.mustcontain(
-            'Preferences',
-            'Allow statistics cookie',
-            'You will receive your passwords backup today',
-            'Save changes',
-        )
-
-    @freeze_time('2012-10-27')
     def test_save_changes(self):
         user_id = self._login()
         res = self.testapp.post('/preferences', {
@@ -820,7 +788,6 @@ class PreferencesTests(TestCase):
         self.assertEqual(new_user['allow_google_analytics'], True)
         self.assertEqual(new_user['send_passwords_periodically'], False)
 
-    @freeze_time('2012-10-27')
     def test_form_fail(self):
         self._login()
         # make the form fail
@@ -831,7 +798,6 @@ class PreferencesTests(TestCase):
             })
             self.assertEqual(res.status, '200 OK')
 
-    @freeze_time('2012-10-27')
     def test_db_fail(self):
         user_id = self._login()
         new_user = self.db.users.find_one({'_id': user_id})

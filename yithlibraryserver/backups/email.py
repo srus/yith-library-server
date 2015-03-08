@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2013-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -23,12 +23,6 @@ from pyramid_mailer.message import Attachment
 from yithlibraryserver.backups.utils import get_backup_filename
 from yithlibraryserver.backups.utils import get_user_passwords, compress
 from yithlibraryserver.email import send_email
-
-
-def get_day_to_send(user, days_of_month):
-    """Sum the ordinal of each character in user._id % days_of_month"""
-    day = sum([ord(char) for char in str(user['_id'])]) % days_of_month
-    return day + 1
 
 
 def send_passwords(request, user, preferences_link, backups_link):
