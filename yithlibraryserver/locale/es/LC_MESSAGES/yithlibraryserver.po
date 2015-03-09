@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: yith-library-server 0.0\n"
 "Report-Msgid-Bugs-To: lorenzo.gil.sanchez@gmail.com\n"
-"POT-Creation-Date: 2015-02-08 21:04-0800\n"
-"PO-Revision-Date: 2015-02-08 21:11-0800\n"
+"POT-Creation-Date: 2015-03-08 21:13-0700\n"
+"PO-Revision-Date: 2015-03-08 21:15-0700\n"
 "Last-Translator: Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>\n"
 "Language-Team: es <LL@li.org>\n"
 "Language: \n"
@@ -24,9 +24,9 @@ msgid "Send message"
 msgstr "Enviar mensaje"
 
 #: yithlibraryserver/views.py:46
-#: yithlibraryserver/backups/templates/backups_index.pt:112
-#: yithlibraryserver/user/views.py:77 yithlibraryserver/user/views.py:175
-#: yithlibraryserver/oauth2/views.py:73 yithlibraryserver/oauth2/views.py:136
+#: yithlibraryserver/backups/templates/backups_index.pt:64
+#: yithlibraryserver/user/views.py:79 yithlibraryserver/user/views.py:183
+#: yithlibraryserver/oauth2/views.py:72 yithlibraryserver/oauth2/views.py:135
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -34,17 +34,17 @@ msgstr "Cancelar"
 msgid "Thank you very much for sharing your opinion"
 msgstr "Muchas gracias por compartir tu opinión"
 
-#: yithlibraryserver/schemas.py:36 yithlibraryserver/oauth2/schemas.py:49
-#: yithlibraryserver/oauth2/templates/developer_applications.pt:26
+#: yithlibraryserver/schemas.py:29 yithlibraryserver/oauth2/schemas.py:49
+#: yithlibraryserver/oauth2/templates/developer_applications.pt:21
 msgid "Name"
 msgstr "Nombre"
 
-#: yithlibraryserver/schemas.py:41 yithlibraryserver/user/schemas.py:87
-#: yithlibraryserver/user/schemas.py:97
+#: yithlibraryserver/schemas.py:33 yithlibraryserver/user/schemas.py:84
+#: yithlibraryserver/user/schemas.py:94
 msgid "Email"
 msgstr "Email"
 
-#: yithlibraryserver/schemas.py:46
+#: yithlibraryserver/schemas.py:38
 msgid "Message"
 msgstr "Mensaje"
 
@@ -68,15 +68,15 @@ msgstr ""
 msgid "Thank you very much for your great contribution"
 msgstr "Muchas gracias por tu gran contribución"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:4
+#: yithlibraryserver/contributions/templates/contributions_index.pt:9
 msgid "Contribute"
 msgstr "Contribuye"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:28
+#: yithlibraryserver/contributions/templates/contributions_index.pt:32
 msgid "We need your help!"
 msgstr "¡Necesitamos tu ayuda!"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:31
+#: yithlibraryserver/contributions/templates/contributions_index.pt:33
 msgid ""
 "We need your help to make Yith Library a truly awesome service. There are "
 "several things you can do to show your love."
@@ -85,44 +85,44 @@ msgstr ""
 "increible. Hay\n"
 "varias cosas que puedes hacer para mostrar tu amor."
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:42
+#: yithlibraryserver/contributions/templates/contributions_index.pt:39
 msgid "Spread the word"
 msgstr "Corre la voz"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:50
+#: yithlibraryserver/contributions/templates/contributions_index.pt:43
 msgid "Add a banner from your site ..."
 msgstr "Añade un cartel en tu sitio ..."
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:57
+#: yithlibraryserver/contributions/templates/contributions_index.pt:46
 msgid "1. Pick a banner type:"
 msgstr "1. Escoge un tipo de cartel:"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:62
+#: yithlibraryserver/contributions/templates/contributions_index.pt:48
 msgid "Small 1"
 msgstr "Pequeño 1"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:65
+#: yithlibraryserver/contributions/templates/contributions_index.pt:49
 msgid "Small 2"
 msgstr "Pequeño 2"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:68
-#: yithlibraryserver/contributions/templates/contributions_index.pt:455
+#: yithlibraryserver/contributions/templates/contributions_index.pt:50
+#: yithlibraryserver/contributions/templates/contributions_index.pt:232
 msgid "Medium"
 msgstr "Mediano"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:79
+#: yithlibraryserver/contributions/templates/contributions_index.pt:55
 msgid "2. Copy and paste this into your website:"
 msgstr "2. Copia y pega esto en tu sitio web:"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:93
+#: yithlibraryserver/contributions/templates/contributions_index.pt:62
 msgid "... or add a line about us in your favourite social network:"
 msgstr "... o escribe una linea sobre nosotros en tu red social favorita:"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:152
+#: yithlibraryserver/contributions/templates/contributions_index.pt:96
 msgid "Translate"
 msgstr "Traduce"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:155
+#: yithlibraryserver/contributions/templates/contributions_index.pt:97
 msgid ""
 "Yith Library is currently available in English and Spanish. If you speak any "
 "other languages it would be awesome if you could contribute a translation "
@@ -132,32 +132,38 @@ msgstr ""
 "otro idioma sería increible si pudieras contribuir una traducción para\n"
 "ese idioma."
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:160
+#: yithlibraryserver/contributions/templates/contributions_index.pt:99
 msgid "Current translations"
 msgstr "Traducciones actuales"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:173
+#: yithlibraryserver/contributions/templates/contributions_index.pt:105
 msgid "English (USA)"
 msgstr "Inglés (EEUU)"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:191
-#: yithlibraryserver/contributions/templates/contributions_index.pt:223
+#: yithlibraryserver/contributions/templates/contributions_index.pt:113
+#: yithlibraryserver/contributions/templates/contributions_index.pt:127
 msgid "By"
 msgstr "Por"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:205
+#: yithlibraryserver/contributions/templates/contributions_index.pt:119
 msgid "Spanish (Spain)"
 msgstr "Español (España)"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:234
+#. Used in sentence: "${this-is-the-file} you need to translate. Please
+#. ${contact-us} if you need any help!"
+#: yithlibraryserver/contributions/templates/contributions_index.pt:132
 msgid "This is the file"
 msgstr "Este es el fichero"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:236
+#. Used in sentence: "${this-is-the-file} you need to translate. Please
+#. ${contact-us} if you need any help!"
+#: yithlibraryserver/contributions/templates/contributions_index.pt:132
 msgid "contact us"
 msgstr "contacta con nosotros"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:234
+#. Canonical text for ${this-is-the-file} is: "This is the file"
+#. Canonical text for ${contact-us} is: "contact us"
+#: yithlibraryserver/contributions/templates/contributions_index.pt:132
 msgid ""
 "${this-is-the-file} you need to translate. Please ${contact-us} if you need "
 "any help!"
@@ -165,11 +171,11 @@ msgstr ""
 "${this-is-the-file} que tienes que traducir. ¡Por favor ${contact-us} si\n"
 "necesitas ayuda!"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:250
+#: yithlibraryserver/contributions/templates/contributions_index.pt:139
 msgid "Write some code"
 msgstr "Escribe código"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:253
+#: yithlibraryserver/contributions/templates/contributions_index.pt:140
 msgid ""
 "If you know how to program your help will be very much appreciated since "
 "there a lot of room for improvement in Yith Library. The source code is on "
@@ -179,11 +185,11 @@ msgstr ""
 "que mejorar en Yith Library. El código fuente está en Github y puedes\n"
 "leer la documentación para poder empezar fácilmente."
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:353
+#: yithlibraryserver/contributions/templates/contributions_index.pt:188
 msgid "Give us your money"
 msgstr "Danos tu dinero"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:356
+#: yithlibraryserver/contributions/templates/contributions_index.pt:189
 msgid ""
 "Well, not all of them, but it would be great if you could contribute a very "
 "small amount of money to maintain this service."
@@ -191,15 +197,15 @@ msgstr ""
 "Bueno, no todo, pero sería estupendo si pudieras contribuir con un poco de\n"
 "dinero para mantener este servicio."
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:359
+#: yithlibraryserver/contributions/templates/contributions_index.pt:190
 msgid "This is how we will spend that money:"
 msgstr "Así es como nos gastaremos ese dinero:"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:364
+#: yithlibraryserver/contributions/templates/contributions_index.pt:192
 msgid "Hosting"
 msgstr "Alojamiento"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:367
+#: yithlibraryserver/contributions/templates/contributions_index.pt:193
 msgid ""
 "Right now we are using ${heroku} as our hosting provider because their "
 "starter plan is free. We are really grateful to them but we realize that we "
@@ -210,11 +216,11 @@ msgstr ""
 "somos conscientes de que estamos creciendo lentamente y en algún punto\n"
 "ese plan no será suficiente para nosotros."
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:372
+#: yithlibraryserver/contributions/templates/contributions_index.pt:194
 msgid "SSL Certificate"
 msgstr "Certificado SSL"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:375
+#: yithlibraryserver/contributions/templates/contributions_index.pt:195
 msgid ""
 "Having a strong SSL Certificate to serve all Yith Library resources is quite "
 "important in an application like this. We are using Heroku's wildcard "
@@ -232,11 +238,11 @@ msgstr ""
 "com\n"
 "(el cuál es simplemente una redirección ahora mismo)."
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:378
+#: yithlibraryserver/contributions/templates/contributions_index.pt:196
 msgid "Email services"
 msgstr "Servicios de correo electrónico"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:381
+#: yithlibraryserver/contributions/templates/contributions_index.pt:197
 msgid ""
 "Yith Library can email you with a ciphered backup of your password "
 "collection once a month. We need to thank ${sendgrid} for allowing us to do "
@@ -252,15 +258,20 @@ msgstr ""
 "de estos emails. Desgraciadamente el plan gratuito no es suficiente\n"
 "para esto y tendríamos que cambiarnos a un plan superior."
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:386
+#: yithlibraryserver/contributions/templates/contributions_index.pt:198
 msgid "Branding assets"
 msgstr "Activos de marca"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:390
+#. Used in sentence: "We would like Yith Library to look really awesome and
+#. unfortunately the two yithians that run the service are not very good with
+#. brushes and pencils. We bought the famous ${yithian-image} but we'd like to
+#. get it more friends."
+#: yithlibraryserver/contributions/templates/contributions_index.pt:199
 msgid "yithian image"
 msgstr "imágen del yithian"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:389
+#. Canonical text for ${yithian-image} is: "yithian image"
+#: yithlibraryserver/contributions/templates/contributions_index.pt:199
 msgid ""
 "We would like Yith Library to look really awesome and unfortunately the two "
 "yithians that run the service are not very good with brushes and pencils. We "
@@ -272,11 +283,11 @@ msgstr ""
 "lápices. Compramos la famosa ${yithian-image} pero nos gustaría conseguirle\n"
 "más amigos."
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:394
+#: yithlibraryserver/contributions/templates/contributions_index.pt:200
 msgid "Domain"
 msgstr "Dominio"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:397
+#: yithlibraryserver/contributions/templates/contributions_index.pt:201
 msgid ""
 "Once a year the domain yithlibrary.com must be renewed. It's not a big "
 "expense but it adds :-)"
@@ -284,7 +295,7 @@ msgstr ""
 "Una vez al año hay que renovar el dominio yithlibrary.com. No es un gran\n"
 "gastos pero suma :-) "
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:403
+#: yithlibraryserver/contributions/templates/contributions_index.pt:204
 msgid ""
 "We also have some cool stickers waiting to be placed on your laptop, your "
 "car or maybe your boss' back. Some of our donation packages include a "
@@ -296,43 +307,43 @@ msgstr ""
 "una pegatina a no ser que digas lo contrario para utilizar todo el importe\n"
 "de tu donación en Yith Library."
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:418
+#: yithlibraryserver/contributions/templates/contributions_index.pt:213
 msgid "Packages"
 msgstr "Paquetes"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:429
+#: yithlibraryserver/contributions/templates/contributions_index.pt:219
 msgid "Small"
 msgstr "Pequeño"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:432
+#: yithlibraryserver/contributions/templates/contributions_index.pt:220
 msgid "A personal thank you from the yithians"
 msgstr "Un agradecimiento personal de los yithians"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:440
+#: yithlibraryserver/contributions/templates/contributions_index.pt:224
 msgid "Donate $1"
 msgstr "Dona $1"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:442
-#: yithlibraryserver/contributions/templates/contributions_index.pt:468
-#: yithlibraryserver/contributions/templates/contributions_index.pt:494
+#: yithlibraryserver/contributions/templates/contributions_index.pt:225
+#: yithlibraryserver/contributions/templates/contributions_index.pt:238
+#: yithlibraryserver/contributions/templates/contributions_index.pt:251
 msgid "Donate via PayPal"
 msgstr "Dona via PayPal"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:458
+#: yithlibraryserver/contributions/templates/contributions_index.pt:233
 msgid "A cool Yith Library sticker and a personal thank you from the yithians"
 msgstr ""
 "Una pegatina chula de Yith Library y un agradecimiento personal de los "
 "yithians"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:466
+#: yithlibraryserver/contributions/templates/contributions_index.pt:237
 msgid "Donate $5"
 msgstr "Dona $5"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:481
+#: yithlibraryserver/contributions/templates/contributions_index.pt:245
 msgid "Big"
 msgstr "Grande"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:484
+#: yithlibraryserver/contributions/templates/contributions_index.pt:246
 msgid ""
 "A cool Yith Library sticker, a personal thank you from the yithians and "
 "daily backups of your passwords if you want them"
@@ -341,27 +352,31 @@ msgstr ""
 "yithians\n"
 "y copias de seguridad de tus contraseñas diarias si así lo quieres"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:492
+#: yithlibraryserver/contributions/templates/contributions_index.pt:250
 msgid "Donate $10"
 msgstr "Dona $10"
 
-#: yithlibraryserver/contributions/templates/contributions_index.pt:511
+#: yithlibraryserver/contributions/templates/contributions_index.pt:261
 msgid "Stickers"
 msgstr "Pegatinas"
 
-#: yithlibraryserver/contributions/templates/contributions_confirm.pt:4
+#: yithlibraryserver/contributions/templates/contributions_confirm.pt:9
 msgid "Confirm donation"
 msgstr "Confirmar la donación"
 
-#: yithlibraryserver/contributions/templates/contributions_confirm.pt:13
+#: yithlibraryserver/contributions/templates/contributions_confirm.pt:15
 msgid "Confirm your donation"
 msgstr "Confirma tu donación"
 
-#: yithlibraryserver/contributions/templates/contributions_confirm.pt:23
+#. Used in sentence: "Hey ${firstname}, this is the final step for your
+#. donation. Thanks a lot for your patiente and generosity. ${you-are-
+#. donating}"
+#: yithlibraryserver/contributions/templates/contributions_confirm.pt:19
 msgid "You are donating ${amount}."
 msgstr "Estas donando ${amount}."
 
-#: yithlibraryserver/contributions/templates/contributions_confirm.pt:20
+#. Canonical text for ${you-are-donating} is: "You are donating ${amount}."
+#: yithlibraryserver/contributions/templates/contributions_confirm.pt:19
 msgid ""
 "Hey ${firstname}, this is the final step for your donation. Thanks a lot for "
 "your patiente and generosity. ${you-are-donating}"
@@ -369,15 +384,15 @@ msgstr ""
 "Oye ${firstname}, este es el último paso de tu donación. Muchas gracias\n"
 "por tu paciencia y generosidad. ${you-are-donating}"
 
-#: yithlibraryserver/contributions/templates/contributions_confirm.pt:31
+#: yithlibraryserver/contributions/templates/contributions_confirm.pt:22
 msgid "We are going to send you a cool sticker to this address:"
 msgstr "Vamos a mandarte una pegatina guay a esta dirección:"
 
-#: yithlibraryserver/contributions/templates/contributions_confirm.pt:36
+#: yithlibraryserver/contributions/templates/contributions_confirm.pt:24
 msgid "Shipping address"
 msgstr "Dirección de envío"
 
-#: yithlibraryserver/contributions/templates/contributions_confirm.pt:57
+#: yithlibraryserver/contributions/templates/contributions_confirm.pt:33
 msgid ""
 "I want to use all the money to make Yith Library awesome. Do not send me the "
 "sticker"
@@ -385,43 +400,43 @@ msgstr ""
 "Quiero usar todo el dinero para hacer Yith Library increíble. No me envies\n"
 "la pegatina"
 
-#: yithlibraryserver/contributions/templates/contributions_confirm.pt:92
+#: yithlibraryserver/contributions/templates/contributions_confirm.pt:51
 msgid "Ok, take my money"
 msgstr "Ok, coge mi dinero"
 
-#: yithlibraryserver/contributions/templates/contributions_confirm.pt:94
+#: yithlibraryserver/contributions/templates/contributions_confirm.pt:52
 msgid "No, maybe later"
 msgstr "No, quizás después"
 
-#: yithlibraryserver/backups/views.py:88 yithlibraryserver/backups/views.py:83
+#: yithlibraryserver/backups/views.py:90 yithlibraryserver/backups/views.py:85
 msgid "The passwords file is required to upload the passwords"
 msgstr "El fichero de contraseñas es necesario para subir las contraseñas"
 
-#: yithlibraryserver/backups/views.py:74
+#: yithlibraryserver/backups/views.py:76
 #, python-format
 msgid "Congratulations, ${n_passwords} password has been imported"
 msgstr "Enhorabuena, ${n_passwords} contraseña ha sido importada"
 
-#: yithlibraryserver/backups/views.py:75
+#: yithlibraryserver/backups/views.py:77
 #, python-format
 msgid "Congratulations, ${n_passwords} passwords have been imported"
 msgstr "Enhorabuena, ${n_passwords} contraseñas han sido importadas"
 
-#: yithlibraryserver/backups/views.py:67
+#: yithlibraryserver/backups/views.py:69
 msgid "There was a problem reading your passwords file"
 msgstr "Hubo un problema releyendo su fichero de contraseñas"
 
-#: yithlibraryserver/backups/templates/backups_index.pt:4
-#: yithlibraryserver/backups/templates/backups_index.pt:12
-#: yithlibraryserver/templates/profile.pt:34
+#: yithlibraryserver/backups/templates/backups_index.pt:9
+#: yithlibraryserver/backups/templates/backups_index.pt:14
+#: yithlibraryserver/templates/profile.pt:30
 msgid "Backup"
 msgstr "Copia de seguridad"
 
-#: yithlibraryserver/backups/templates/backups_index.pt:24
+#: yithlibraryserver/backups/templates/backups_index.pt:21
 msgid "Export passwords"
 msgstr "Exportar contraseñas"
 
-#: yithlibraryserver/backups/templates/backups_index.pt:30
+#: yithlibraryserver/backups/templates/backups_index.pt:24
 msgid ""
 "By clicking in the following button you will get a backup file with your "
 "password collection."
@@ -429,15 +444,15 @@ msgstr ""
 "Al hacer click en el siguiente botón recibirás una copia de seguridad de tu\n"
 "colección de contraseñas."
 
-#: yithlibraryserver/backups/templates/backups_index.pt:36
+#: yithlibraryserver/backups/templates/backups_index.pt:27
 msgid "Download my passwords"
 msgstr "Descargar mis contraseñas"
 
-#: yithlibraryserver/backups/templates/backups_index.pt:45
+#: yithlibraryserver/backups/templates/backups_index.pt:32
 msgid "Import passwords"
 msgstr "Importar contraseñas"
 
-#: yithlibraryserver/backups/templates/backups_index.pt:54
+#: yithlibraryserver/backups/templates/backups_index.pt:37
 msgid ""
 "By uploading a backup file you will replace your existing password "
 "collection with the contents of that file."
@@ -445,28 +460,31 @@ msgstr ""
 "Al subir un fichero de respaldo sustituirás tu colección de contraseñas\n"
 "actual con los contenidos  de ese fichero."
 
-#: yithlibraryserver/backups/templates/backups_index.pt:57
+#: yithlibraryserver/backups/templates/backups_index.pt:38
 msgid "Select a file:"
 msgstr "Selecciona un fichero:"
 
-#: yithlibraryserver/backups/templates/backups_index.pt:65
+#: yithlibraryserver/backups/templates/backups_index.pt:42
 msgid "Upload my passwords"
 msgstr "Subir mis contraseñas"
 
-#: yithlibraryserver/backups/templates/backups_index.pt:87
+#: yithlibraryserver/backups/templates/backups_index.pt:53
 msgid "Import confirmation"
 msgstr "Confirmación de importación"
 
-#: yithlibraryserver/backups/templates/backups_index.pt:95
+#: yithlibraryserver/backups/templates/backups_index.pt:57
 msgid "Are you sure you want to import a password backup file?"
 msgstr ""
 "¿Estás seguro de que quieres importar un fichero de respaldo de contraseñas?"
 
-#: yithlibraryserver/backups/templates/backups_index.pt:99
+#. Used in sentence: "This action will ${replace} your current password
+#. collection with the contents of the file you are uploading."
+#: yithlibraryserver/backups/templates/backups_index.pt:58
 msgid "replace"
 msgstr "sustituirá"
 
-#: yithlibraryserver/backups/templates/backups_index.pt:98
+#. Canonical text for ${replace} is: "replace"
+#: yithlibraryserver/backups/templates/backups_index.pt:58
 msgid ""
 "This action will ${replace} your current password collection with the "
 "contents of the file you are uploading."
@@ -474,71 +492,54 @@ msgstr ""
 "Esta acción ${replace} tu colección de contraseñas actual con el contenido\n"
 "del fichero que estás subiendo."
 
-#: yithlibraryserver/backups/templates/backups_index.pt:103
+#: yithlibraryserver/backups/templates/backups_index.pt:59
 msgid "This action can not be undone."
 msgstr "Esta acción no se puede deshacer."
 
-#: yithlibraryserver/backups/templates/backups_index.pt:115
-#: yithlibraryserver/oauth2/templates/application_revoke_authorization.pt:29
-#: yithlibraryserver/oauth2/templates/developer_application_delete.pt:29
+#: yithlibraryserver/backups/templates/backups_index.pt:65
+#: yithlibraryserver/oauth2/templates/application_revoke_authorization.pt:20
+#: yithlibraryserver/oauth2/templates/developer_application_delete.pt:20
 msgid "Yes, I am sure"
 msgstr "Sí, estoy seguro"
 
-#: yithlibraryserver/user/views.py:75
+#: yithlibraryserver/user/views.py:77
 msgid "Register into Yith Library"
 msgstr "Registrarme en Yith Library"
 
-#: yithlibraryserver/user/views.py:173
+#: yithlibraryserver/user/views.py:181
 msgid "Yes, I am sure. Destroy my account"
 msgstr "Sí, estoy seguro. Destruye mi cuenta"
 
-#: yithlibraryserver/user/views.py:223 yithlibraryserver/user/views.py:280
+#: yithlibraryserver/user/views.py:231 yithlibraryserver/user/views.py:288
 msgid "Save changes"
 msgstr "Guardar cambios"
 
-#: yithlibraryserver/user/views.py:292
-#, python-format
-msgid "You will receive your passwords backup on the day ${day} of this month"
-msgstr ""
-"Recibirás la copia de seguridad de tus contraseñas el día ${day} de este mes"
-
-#: yithlibraryserver/user/views.py:202
+#: yithlibraryserver/user/views.py:210
 msgid "Your account has been removed. Have a nice day!"
 msgstr "Tu cuenta ha sido eliminada. ¡Que tengas un buen día!"
 
-#: yithlibraryserver/user/views.py:296
-#, python-format
-msgid "You will receive your passwords backup on the day ${day} of next month"
-msgstr ""
-"Recibirás la copia de seguridad de tus contraseñas el día ${day} del próximo "
-"mes"
-
-#: yithlibraryserver/user/views.py:300
-msgid "You will receive your passwords backup today!"
-msgstr "¡Recibirás la copia de seguridad de tus contraseñas hoy mismo!"
-
-#: yithlibraryserver/user/views.py:429
+#: yithlibraryserver/user/views.py:418
 msgid "Congratulations, your email has been successfully verified"
 msgstr "Enhorabuena, tu email ha sido verificado correctamente"
 
-#: yithlibraryserver/user/views.py:438
+#: yithlibraryserver/user/views.py:427
 msgid "Sorry, your verification code is not correct or has expired"
 msgstr "Lo siento, tu código de verificación no es correcto o ha caducado"
 
-#: yithlibraryserver/user/views.py:209
+#: yithlibraryserver/user/views.py:217
 msgid "Thanks for reconsidering removing your account!"
 msgstr "¡Gracias por reconsiderar la eliminación de tu cuenta!"
 
-#: yithlibraryserver/user/views.py:251 yithlibraryserver/user/views.py:321
-#: yithlibraryserver/oauth2/views.py:164
+#: yithlibraryserver/user/views.py:259 yithlibraryserver/user/views.py:310
+#: yithlibraryserver/oauth2/views.py:163
 msgid "The changes were saved successfully"
 msgstr "Los cambios fueron guardados correctamente"
 
-#: yithlibraryserver/user/views.py:257 yithlibraryserver/user/views.py:327
+#: yithlibraryserver/user/views.py:265 yithlibraryserver/user/views.py:316
 msgid "There were an error while saving your changes"
 msgstr "Hubo un error al guardar tus cambios"
 
-#: yithlibraryserver/user/views.py:369
+#: yithlibraryserver/user/views.py:358
 #, python-format
 msgid ""
 "Congratulations, ${n_merged} of your accounts has been merged into the "
@@ -547,7 +548,7 @@ msgstr ""
 "Enhorabuena, ${n_merged} de tus cuentas ha sido mezclada correctamente con\n"
 "la cuenta actual"
 
-#: yithlibraryserver/user/views.py:370
+#: yithlibraryserver/user/views.py:359
 #, python-format
 msgid ""
 "Congratulations, ${n_merged} of your accounts have been merged into the "
@@ -557,7 +558,7 @@ msgstr ""
 "con\n"
 "la cuenta actual"
 
-#: yithlibraryserver/user/views.py:378
+#: yithlibraryserver/user/views.py:367
 msgid "Not enough accounts for merging"
 msgstr "No hay suficientes cuentas para mezclar"
 
@@ -565,137 +566,147 @@ msgstr "No hay suficientes cuentas para mezclar"
 msgid "First name"
 msgstr "Nombre"
 
-#: yithlibraryserver/user/schemas.py:72
+#: yithlibraryserver/user/schemas.py:71
 msgid "Last name"
 msgstr "Apellidos"
 
-#: yithlibraryserver/user/schemas.py:78
+#: yithlibraryserver/user/schemas.py:76
 msgid "Screen name"
 msgstr "Nombre a mostrar"
 
-#: yithlibraryserver/user/schemas.py:108
+#: yithlibraryserver/user/schemas.py:105
 msgid "Do you mind telling us your reasons?"
 msgstr "¿Te importa decirnos tus razones?"
 
-#: yithlibraryserver/user/schemas.py:109
+#: yithlibraryserver/user/schemas.py:106
 msgid "We want to get better!"
 msgstr "¡Queremos mejorar!"
 
-#: yithlibraryserver/user/schemas.py:118
+#: yithlibraryserver/user/schemas.py:114
 msgid "Allow statistics cookie"
 msgstr "Permitir cookie de estadísticas"
 
-#: yithlibraryserver/user/schemas.py:125
+#: yithlibraryserver/user/schemas.py:120
 msgid "Send my passwords to my email monthly"
 msgstr "Enviar mis contraseñas a mi email mensualmente"
+
+#: yithlibraryserver/user/schemas.py:122
+msgid "You will receive your passwords backup on the first day of the month"
+msgstr "Recibirás la copia de seguridad de tus contraseñas el primer día del mes"
 
 #: yithlibraryserver/user/idp.py:42
 #, python-format
 msgid "Log in with ${idp}"
 msgstr "Entrar con ${idp}"
 
-#: yithlibraryserver/user/templates/preferences.pt:4
-#: yithlibraryserver/user/templates/preferences.pt:12
-#: yithlibraryserver/templates/profile.pt:31
+#: yithlibraryserver/user/templates/preferences.pt:9
+#: yithlibraryserver/user/templates/preferences.pt:14
+#: yithlibraryserver/templates/profile.pt:28
 msgid "Preferences"
 msgstr "Preferencias"
 
-#: yithlibraryserver/user/templates/destroy.pt:4
-#: yithlibraryserver/user/templates/destroy.pt:12
-#: yithlibraryserver/templates/profile.pt:67
+#: yithlibraryserver/user/templates/destroy.pt:9
+#: yithlibraryserver/user/templates/destroy.pt:14
+#: yithlibraryserver/templates/profile.pt:49
 msgid "Destroy account"
 msgstr "Destruir cuenta"
 
-#: yithlibraryserver/user/templates/destroy.pt:20
+#: yithlibraryserver/user/templates/destroy.pt:19
 msgid "I am tired of using Yith Library"
 msgstr "Estoy cansado de usar Yith Library"
 
-#: yithlibraryserver/user/templates/destroy.pt:23
+#: yithlibraryserver/user/templates/destroy.pt:20
 msgid "We are very sorry to hear that, but hey, it's your decission!"
 msgstr "Sentimos mucho oir eso, pero ¡hey, es tu decisión!"
 
-#: yithlibraryserver/user/templates/destroy.pt:26
+#: yithlibraryserver/user/templates/destroy.pt:21
 msgid "Destroy my account ..."
 msgstr "Destruye mi cuenta ..."
 
-#: yithlibraryserver/user/templates/destroy.pt:34
+#: yithlibraryserver/user/templates/destroy.pt:25
 msgid "Do you really really really want to destroy your account?"
 msgstr "¿De verdad de la buena quieres destruir tu cuenta?"
 
-#: yithlibraryserver/user/templates/destroy.pt:43
+#: yithlibraryserver/user/templates/destroy.pt:29
 msgid ""
 "All your personal information and passwords will be removed from this server."
 msgstr ""
 "Toda tu información personal y contraseñas se eliminarán de este\n"
 "servidor."
 
-#: yithlibraryserver/user/templates/destroy.pt:47
+#: yithlibraryserver/user/templates/destroy.pt:31
 msgid "You will not be able to undo this operation. Think about it."
 msgstr "No podrás deshacer esta operación. Piensa en ello."
 
-#: yithlibraryserver/user/templates/login.pt:4
-#: yithlibraryserver/user/templates/login.pt:14
-#: yithlibraryserver/templates/base.pt:88
+#: yithlibraryserver/user/templates/login.pt:9
+#: yithlibraryserver/user/templates/login.pt:15
+#: yithlibraryserver/templates/base.pt:42
 msgid "Log in"
 msgstr "Entrar"
 
-#: yithlibraryserver/user/templates/user_information.pt:4
+#: yithlibraryserver/user/templates/user_information.pt:9
 msgid "User information"
 msgstr "Información de usuario"
 
-#: yithlibraryserver/user/templates/user_information.pt:12
-#: yithlibraryserver/templates/profile.pt:28
+#: yithlibraryserver/user/templates/user_information.pt:14
+#: yithlibraryserver/templates/profile.pt:26
 msgid "Personal information"
 msgstr "Información personal"
 
-#: yithlibraryserver/user/templates/user_information.pt:33
+#: yithlibraryserver/user/templates/user_information.pt:24
 msgid "Member since:"
 msgstr "Miembro desde:"
 
-#: yithlibraryserver/user/templates/user_information.pt:40
+#: yithlibraryserver/user/templates/user_information.pt:29
 msgid "Last seen:"
 msgstr "Visto por última vez:"
 
-#: yithlibraryserver/user/templates/user_information.pt:49
+#: yithlibraryserver/user/templates/user_information.pt:35
 msgid "Change your avatar at gravatar.com"
 msgstr "Cambia tu avatar en gravatar.com"
 
-#: yithlibraryserver/user/templates/user_information.pt:52
+#: yithlibraryserver/user/templates/user_information.pt:36
 msgid "Set your avatar at gravatar.com"
 msgstr "Pon tu avatar en gravatar.com"
 
-#: yithlibraryserver/user/templates/verify_email.pt:4
-#: yithlibraryserver/user/templates/email_verification_dialog.pt:12
+#: yithlibraryserver/user/templates/verify_email.pt:9
+#: yithlibraryserver/user/templates/email_verification_dialog.pt:6
 msgid "Email verification"
 msgstr "Verificación de email"
 
-#: yithlibraryserver/user/templates/verify_email.pt:12
-#: yithlibraryserver/user/templates/identity_providers.pt:84
+#: yithlibraryserver/user/templates/verify_email.pt:14
+#: yithlibraryserver/user/templates/identity_providers.pt:55
 msgid "Email verified"
 msgstr "Email verificado"
 
 #: yithlibraryserver/user/templates/verify_email.pt:15
-#: yithlibraryserver/user/templates/identity_providers.pt:87
+#: yithlibraryserver/user/templates/identity_providers.pt:56
 msgid "Email not verified"
 msgstr "Email no verificado"
 
-#: yithlibraryserver/user/templates/verify_email.pt:23
+#: yithlibraryserver/user/templates/verify_email.pt:19
 msgid "Now you can link several accounts to identify yourself."
 msgstr "Ahora puedes enlazar varias cuentas para identificarte."
 
-#: yithlibraryserver/user/templates/verify_email.pt:28
+#. Used in sentence: "Go to your ${identity-providers} and follow the
+#. instructions."
+#: yithlibraryserver/user/templates/verify_email.pt:21
 msgid "identity providers page"
 msgstr "página de proveedores de identidad"
 
-#: yithlibraryserver/user/templates/verify_email.pt:27
+#. Canonical text for ${identity-providers} is: "identity providers page"
+#: yithlibraryserver/user/templates/verify_email.pt:21
 msgid "Go to your ${identity-providers} and follow the instructions."
 msgstr "Ve a tu ${identity-providers} y sigue las instrucciones."
 
-#: yithlibraryserver/user/templates/verify_email.pt:39
+#. Used in sentence: "It looks that your verification code is not correct.
+#. Please go to your ${profile-page} and generate a new one."
+#: yithlibraryserver/user/templates/verify_email.pt:26
 msgid "profile page"
 msgstr "página del perfil"
 
-#: yithlibraryserver/user/templates/verify_email.pt:37
+#. Canonical text for ${profile-page} is: "profile page"
+#: yithlibraryserver/user/templates/verify_email.pt:25
 msgid ""
 "It looks that your verification code is not correct. Please go to your "
 "${profile-page} and generate a new one."
@@ -703,23 +714,27 @@ msgstr ""
 "Parece que tu código de verificación no es correcto. Por favor ve a tu\n"
 "${profile-page} y genera uno nuevo."
 
-#: yithlibraryserver/user/templates/register.pt:4
+#: yithlibraryserver/user/templates/register.pt:9
 msgid "Register new user"
 msgstr "Registro de nuevo usuario"
 
-#: yithlibraryserver/user/templates/register.pt:14
+#: yithlibraryserver/user/templates/register.pt:15
 msgid "Welcome to the Yith Library!"
 msgstr "¡Bienvenido a Yith Library!"
 
-#: yithlibraryserver/user/templates/register.pt:20
+#: yithlibraryserver/user/templates/register.pt:18
 msgid "It looks like it's the first time you log into the Yith Library."
 msgstr "Parece que es la primera vez que entras en Yith Library"
 
-#: yithlibraryserver/user/templates/register.pt:25
+#. Used in sentence: "Click on the ${register} button to finish the
+#. registration process. Don't worry, we will not ask you for a new password.
+#. You already have enough of them."
+#: yithlibraryserver/user/templates/register.pt:20
 msgid "register"
 msgstr "registrarme"
 
-#: yithlibraryserver/user/templates/register.pt:24
+#. Canonical text for ${register} is: "register"
+#: yithlibraryserver/user/templates/register.pt:20
 msgid ""
 "Click on the ${register} button to finish the registration process. Don't "
 "worry, we will not ask you for a new password. You already have enough of "
@@ -728,7 +743,7 @@ msgstr ""
 "Haz click en el botón ${register} para finalizar el proceso de registro.\n"
 "No te preocupes, no te pediremos una nueva contraseña. Ya tienes bastantes."
 
-#: yithlibraryserver/user/templates/email_verification_dialog.pt:19
+#: yithlibraryserver/user/templates/email_verification_dialog.pt:9
 msgid ""
 "An email with a verification link will be sent to ${user-email} to verify "
 "that you are its legitimate owner."
@@ -736,12 +751,16 @@ msgstr ""
 "Un email con un enlace de verificación será enviado a ${user-email} para\n"
 "verificar que tú eres su dueño legítimo."
 
-#: yithlibraryserver/user/templates/email_verification_dialog.pt:27
-#: yithlibraryserver/user/templates/email_verification_dialog.pt:55
+#. Used in sentence: "All you need to do is click on the ${send-verification-
+#. email} button, go to your inbox and follow the instructions in the email."
+#.
+#: yithlibraryserver/user/templates/email_verification_dialog.pt:12
+#: yithlibraryserver/user/templates/email_verification_dialog.pt:26
 msgid "Send verification email"
 msgstr "Enviar email de verificación"
 
-#: yithlibraryserver/user/templates/email_verification_dialog.pt:26
+#. Canonical text for ${send-verification-email} is: "Send verification email"
+#: yithlibraryserver/user/templates/email_verification_dialog.pt:12
 msgid ""
 "All you need to do is click on the ${send-verification-email} button, go to "
 "your inbox and follow the instructions in the email."
@@ -749,11 +768,14 @@ msgstr ""
 "Sólo necesitas hacer click en el botón ${send-verification-email}, ir\n"
 "a tu bandeja de entrada y seguir las instrucciones en el email."
 
-#: yithlibraryserver/user/templates/email_verification_dialog.pt:35
+#. Used in sentence: "The email message with the verification link has been
+#. sent. ${check-your-inbox}"
+#: yithlibraryserver/user/templates/email_verification_dialog.pt:15
 msgid "Go and check your inbox!"
 msgstr "¡Ve y comprueba tu bandeja de entrada!"
 
-#: yithlibraryserver/user/templates/email_verification_dialog.pt:34
+#. Canonical text for ${check-your-inbox} is: "Go and check your inbox!"
+#: yithlibraryserver/user/templates/email_verification_dialog.pt:15
 msgid ""
 "The email message with the verification link has been sent. ${check-your-"
 "inbox}"
@@ -761,72 +783,72 @@ msgstr ""
 "El mensaje de email con el enlace de verificación ha sido enviado. ${check-"
 "your-inbox}"
 
-#: yithlibraryserver/user/templates/email_verification_dialog.pt:42
+#: yithlibraryserver/user/templates/email_verification_dialog.pt:18
 msgid "There was an error sending the verification link to your email address."
 msgstr ""
 "Hubo un error al enviar el enlace de verificación a tu dirección de email."
 
-#: yithlibraryserver/user/templates/email_verification_dialog.pt:52
+#: yithlibraryserver/user/templates/email_verification_dialog.pt:22
 msgid "Close"
 msgstr "Cerrar"
 
-#: yithlibraryserver/user/templates/identity_providers.pt:4
-#: yithlibraryserver/user/templates/identity_providers.pt:12
-#: yithlibraryserver/templates/profile.pt:37
+#: yithlibraryserver/user/templates/identity_providers.pt:9
+#: yithlibraryserver/user/templates/identity_providers.pt:14
+#: yithlibraryserver/templates/profile.pt:32
 msgid "Identity providers"
 msgstr "Proveedores de identidad"
 
-#: yithlibraryserver/user/templates/identity_providers.pt:18
+#: yithlibraryserver/user/templates/identity_providers.pt:17
 msgid "You are registered with the following accounts:"
 msgstr "Estas registrado con las siguientes cuentas:"
 
-#: yithlibraryserver/user/templates/identity_providers.pt:31
+#: yithlibraryserver/user/templates/identity_providers.pt:24
 msgid "Provider"
 msgstr "Proveedor"
 
-#: yithlibraryserver/user/templates/identity_providers.pt:34
+#: yithlibraryserver/user/templates/identity_providers.pt:25
 msgid "Passwords"
 msgstr "Contraseñas"
 
-#: yithlibraryserver/user/templates/identity_providers.pt:37
+#: yithlibraryserver/user/templates/identity_providers.pt:26
 msgid "Is current?"
 msgstr "¿Es la actual?"
 
-#: yithlibraryserver/user/templates/identity_providers.pt:40
+#: yithlibraryserver/user/templates/identity_providers.pt:27
 msgid "Is email verified?"
 msgstr "¿Está verificado el email?"
 
-#: yithlibraryserver/user/templates/identity_providers.pt:43
+#: yithlibraryserver/user/templates/identity_providers.pt:28
 msgid "Available actions"
 msgstr "Acciones disponibles"
 
-#: yithlibraryserver/user/templates/identity_providers.pt:70
+#: yithlibraryserver/user/templates/identity_providers.pt:49
 msgid "Number of passwords"
 msgstr "Número de contraseñas"
 
-#: yithlibraryserver/user/templates/identity_providers.pt:77
+#: yithlibraryserver/user/templates/identity_providers.pt:52
 msgid "Current"
 msgstr "Actual"
 
-#: yithlibraryserver/user/templates/identity_providers.pt:90
+#: yithlibraryserver/user/templates/identity_providers.pt:57
 msgid "No email available"
 msgstr "No hay email disponible"
 
-#: yithlibraryserver/user/templates/identity_providers.pt:99
-#: yithlibraryserver/user/templates/identity_providers.pt:103
-#: yithlibraryserver/templates/email_verified.pt:11
+#: yithlibraryserver/user/templates/identity_providers.pt:61
+#: yithlibraryserver/user/templates/identity_providers.pt:63
+#: yithlibraryserver/templates/email_verified.pt:13
 msgid "Verify email address"
 msgstr "Verificar dirección de email"
 
-#: yithlibraryserver/user/templates/identity_providers.pt:119
+#: yithlibraryserver/user/templates/identity_providers.pt:73
 msgid "Merge my accounts"
 msgstr "Mezclar mis cuentas"
 
-#: yithlibraryserver/user/templates/identity_providers.pt:132
+#: yithlibraryserver/user/templates/identity_providers.pt:85
 msgid "Tip:"
 msgstr "Pista:"
 
-#: yithlibraryserver/user/templates/identity_providers.pt:134
+#: yithlibraryserver/user/templates/identity_providers.pt:85
 msgid ""
 "If you merge your accounts you will be able to access your passwords in a "
 "unified way: no matter which provider you use to log in you will always see "
@@ -836,59 +858,59 @@ msgstr ""
 " unificada: no importa con que proveedor accedas siempre verás el mismo\n"
 "conjunto de contraseñas."
 
-#: yithlibraryserver/templates/contact.pt:4
-#: yithlibraryserver/templates/base.pt:173
+#: yithlibraryserver/templates/contact.pt:9
+#: yithlibraryserver/templates/base.pt:103
 msgid "Contact"
 msgstr "Contacto"
 
-#: yithlibraryserver/templates/contact.pt:14
+#: yithlibraryserver/templates/contact.pt:15
 msgid "Contact us"
 msgstr "Contacta con nosotros"
 
-#: yithlibraryserver/templates/credits.pt:4
-#: yithlibraryserver/templates/credits.pt:15
-#: yithlibraryserver/templates/base.pt:176
+#: yithlibraryserver/templates/credits.pt:9
+#: yithlibraryserver/templates/credits.pt:16
+#: yithlibraryserver/templates/base.pt:104
 msgid "Credits"
 msgstr "Créditos"
 
-#: yithlibraryserver/templates/credits.pt:21
+#: yithlibraryserver/templates/credits.pt:19
 msgid "Software"
 msgstr "Software"
 
-#: yithlibraryserver/templates/credits.pt:25
+#: yithlibraryserver/templates/credits.pt:21
 msgid "Yith Library is copyright of:"
 msgstr "El copyright de Yith Library es de:"
 
-#: yithlibraryserver/templates/credits.pt:49
+#: yithlibraryserver/templates/credits.pt:29
 msgid "Media"
 msgstr "Imágenes"
 
-#: yithlibraryserver/templates/email_verified.pt:3
+#: yithlibraryserver/templates/email_verified.pt:4
 msgid "Verified"
 msgstr "Verificado"
 
-#: yithlibraryserver/templates/email_verified.pt:8
+#: yithlibraryserver/templates/email_verified.pt:6
 msgid "Unverified"
 msgstr "No verificado"
 
-#: yithlibraryserver/templates/form.pt:11
+#: yithlibraryserver/templates/form.pt:15
 msgid "There was a problem with your submission."
 msgstr "Hubo un problema con su petición"
 
-#: yithlibraryserver/templates/form.pt:14
+#: yithlibraryserver/templates/form.pt:16
 msgid "Errors have been highlighted below"
 msgstr "Los errores han sido destacados abajo"
 
-#: yithlibraryserver/templates/tos.pt:4 yithlibraryserver/templates/tos.pt:15
-#: yithlibraryserver/templates/base.pt:170
+#: yithlibraryserver/templates/tos.pt:9 yithlibraryserver/templates/tos.pt:16
+#: yithlibraryserver/templates/base.pt:102
 msgid "Terms of service"
 msgstr "Términos de servicio"
 
-#: yithlibraryserver/templates/tos.pt:26
+#: yithlibraryserver/templates/tos.pt:22
 msgid "Free software"
 msgstr "Software libre"
 
-#: yithlibraryserver/templates/tos.pt:30
+#: yithlibraryserver/templates/tos.pt:24
 msgid ""
 "Yith Library Server is free software: you can redistribute it and/or modify "
 "it under the terms of the GNU Affero General Public License as published by "
@@ -901,7 +923,7 @@ msgstr ""
 "y como la publica la Fundación de Software Libre, tanto la versión 3 de la\n"
 "licencia, como (a tu gusto) cualquier versión posterior."
 
-#: yithlibraryserver/templates/tos.pt:38
+#: yithlibraryserver/templates/tos.pt:30
 msgid ""
 "Among many things being free software means Yith Library users have four "
 "essential freedoms:"
@@ -909,16 +931,24 @@ msgstr ""
 "Entre otras muchas cosas, ser software libre significa que los usuarios\n"
 "de Yith Library tienen cuatro libertades esenciales:"
 
-#: yithlibraryserver/templates/tos.pt:45
+#: yithlibraryserver/templates/tos.pt:34
 msgid "The freedom to run the program, for any purpose (freedom 0)."
 msgstr ""
 "La libertad de ejecutar el programa, para cualquier propósito (libertad 0)"
 
-#: yithlibraryserver/templates/tos.pt:53 yithlibraryserver/templates/tos.pt:66
+#. Used in sentence: "The freedom to study how the program works, and change it
+#. so it does your computing as you wish (freedom 1). Access to the ${github-
+#. url} is a precondition for this."
+#. Used in sentence: "The freedom to distribute copies of your modified
+#. versions to others (freedom 3). By doing this you can give the whole
+#. community a chance to benefit from your changes. Access to the ${github-url}
+#. is a precondition for this."
+#: yithlibraryserver/templates/tos.pt:39 yithlibraryserver/templates/tos.pt:46
 msgid "source code"
 msgstr "código fuente"
 
-#: yithlibraryserver/templates/tos.pt:49
+#. Canonical text for ${github-url} is: "source code"
+#: yithlibraryserver/templates/tos.pt:36
 msgid ""
 "The freedom to study how the program works, and change it so it does your "
 "computing as you wish (freedom 1). Access to the ${github-url} is a "
@@ -928,7 +958,7 @@ msgstr ""
 "lo que tú quieras (libertad 1). El acceso al ${github-url} es una\n"
 "precondición para esto."
 
-#: yithlibraryserver/templates/tos.pt:58
+#: yithlibraryserver/templates/tos.pt:41
 msgid ""
 "The freedom to redistribute copies so you can help your neighbor (freedom 2)."
 msgstr ""
@@ -936,7 +966,8 @@ msgstr ""
 "(libertad\n"
 " 2)."
 
-#: yithlibraryserver/templates/tos.pt:62
+#. Canonical text for ${github-url} is: "source code"
+#: yithlibraryserver/templates/tos.pt:43
 msgid ""
 "The freedom to distribute copies of your modified versions to others "
 "(freedom 3). By doing this you can give the whole community a chance to "
@@ -948,15 +979,15 @@ msgstr ""
 "de beneficiarse de tus cambios. El acceso al ${github-url} es una\n"
 "precondición para esto."
 
-#: yithlibraryserver/templates/tos.pt:74
+#: yithlibraryserver/templates/tos.pt:50
 msgid "You can read the GNU Affero General Public License at ${agpl-url}"
 msgstr "Puedes leer la Licencia Pública General GNU Affero en ${agpl-url}"
 
-#: yithlibraryserver/templates/tos.pt:82
+#: yithlibraryserver/templates/tos.pt:54
 msgid "Data ownership"
 msgstr "Pertenencia de los datos"
 
-#: yithlibraryserver/templates/tos.pt:86
+#: yithlibraryserver/templates/tos.pt:56
 msgid ""
 "You own your personal data and all the passwords stored in your account "
 "belongs only to you."
@@ -964,7 +995,7 @@ msgstr ""
 "Tus datos personales te pertenecen y todos las contraseñas almacenadas\n"
 "en tu cuenta te pertenecen sólo a tí."
 
-#: yithlibraryserver/templates/tos.pt:91
+#: yithlibraryserver/templates/tos.pt:59
 msgid ""
 "You can export such data in a machine readable format any time you want. If "
 "you want, we will send you a backup of your passwords once a month."
@@ -973,11 +1004,11 @@ msgstr ""
 "cualquier momento. Si quieres, te mandaremos una copia de respaldo de\n"
 "tus contraseñas una vez al mes."
 
-#: yithlibraryserver/templates/tos.pt:102
+#: yithlibraryserver/templates/tos.pt:66
 msgid "No warranty"
 msgstr "Sin garantía"
 
-#: yithlibraryserver/templates/tos.pt:106
+#: yithlibraryserver/templates/tos.pt:68
 msgid ""
 "Yith Library Server is distributed in the hope that it will be useful, but "
 "WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY "
@@ -989,19 +1020,27 @@ msgstr ""
 "MERCHANTABILITY o FITNESS FOR A PARTICULAR PURPOSE. Mira la Licencia\n"
 "Pública General GNU para más detalles."
 
-#: yithlibraryserver/templates/tos.pt:113
+#: yithlibraryserver/templates/tos.pt:73
 msgid "Cookies usage. No tracking"
 msgstr "Uso de Cookies. Sin rastreo"
 
-#: yithlibraryserver/templates/tos.pt:120
+#. Used in sentence: "We use cookies for the sole purpose of managing a session
+#. for you (${beaker-cookie}) and remembering your identity after you
+#. succesfully finish the authentication process (${auth-cookie})."
+#: yithlibraryserver/templates/tos.pt:77
 msgid "beaker.session.id"
 msgstr "beaker.session.id"
 
-#: yithlibraryserver/templates/tos.pt:125
+#. Used in sentence: "We use cookies for the sole purpose of managing a session
+#. for you (${beaker-cookie}) and remembering your identity after you
+#. succesfully finish the authentication process (${auth-cookie})."
+#: yithlibraryserver/templates/tos.pt:80
 msgid "auth_tkt"
 msgstr "auth_tkt"
 
-#: yithlibraryserver/templates/tos.pt:117
+#. Canonical text for ${beaker-cookie} is: "beaker.session.id"
+#. Canonical text for ${auth-cookie} is: "auth_tkt"
+#: yithlibraryserver/templates/tos.pt:75
 msgid ""
 "We use cookies for the sole purpose of managing a session for you (${beaker-"
 "cookie}) and remembering your identity after you succesfully finish the "
@@ -1011,7 +1050,7 @@ msgstr ""
 "(${beaker-cookie}) y recordar tu identidad una vez que terminas el\n"
 "proceso de autenticación con éxito (${auth-cookie})."
 
-#: yithlibraryserver/templates/tos.pt:130
+#: yithlibraryserver/templates/tos.pt:82
 msgid ""
 "Optionally and if you allow it, we use Google Analytics to learn more about "
 "our users. This way we can optimize Yith Library and priorize our changes so "
@@ -1024,11 +1063,11 @@ msgstr ""
 "nuestros\n"
 "usuarios también nos ayuda a escalar nuestra infraestructua mejor."
 
-#: yithlibraryserver/templates/tos.pt:137
+#: yithlibraryserver/templates/tos.pt:87
 msgid "Account termination"
 msgstr "Finalización de la cuenta"
 
-#: yithlibraryserver/templates/tos.pt:141
+#: yithlibraryserver/templates/tos.pt:89
 msgid ""
 "You are free to remove your account and all the data associated with it "
 "whenever you want. It's a sad event for us but you must have the rights to "
@@ -1038,11 +1077,11 @@ msgstr ""
 "cuando tú quieras. Es algo triste para nosotros pero debes tener el\n"
 "derecho de tomar esa decisión."
 
-#: yithlibraryserver/templates/tos.pt:147
+#: yithlibraryserver/templates/tos.pt:93
 msgid "We won't sell your data, ever"
 msgstr "No venderemos tus datos nunca"
 
-#: yithlibraryserver/templates/tos.pt:151
+#: yithlibraryserver/templates/tos.pt:95
 msgid ""
 "We don't sell your data to any third party company. We do this just for fun "
 "and because we believe a web password manager is needed to make the Internet "
@@ -1052,11 +1091,14 @@ msgstr ""
 "porque creemos que un gestor de contraseñas web es necesario para hacer\n"
 "la Internet un lugar más seguro."
 
-#: yithlibraryserver/templates/tos.pt:165
+#. Used in sentence: "Sorry if some of these terms are a little imprecise and
+#. sloppy. We are hackers, not lawyers. If in doubt, ${contact-url}."
+#: yithlibraryserver/templates/tos.pt:104
 msgid "just drop us a line"
 msgstr "envíanos un mensaje"
 
-#: yithlibraryserver/templates/tos.pt:162
+#. Canonical text for ${contact-url} is: "just drop us a line"
+#: yithlibraryserver/templates/tos.pt:102
 msgid ""
 "Sorry if some of these terms are a little imprecise and sloppy. We are "
 "hackers, not lawyers. If in doubt, ${contact-url}."
@@ -1064,15 +1106,23 @@ msgstr ""
 "Perdón si estos términos son algo imprecisos y vagos. Somos programadores,\n"
 "no abogados. Si tienes dudas, ${contact-url}."
 
-#: yithlibraryserver/templates/base.pt:48
+#: yithlibraryserver/templates/base.pt:51
+msgid "My passwords"
+msgstr "Mis contraseñas"
+
+#: yithlibraryserver/templates/base.pt:54
+msgid "Log out"
+msgstr "Salir"
+
+#: yithlibraryserver/templates/base.pt:62
 msgid "Welcome, new visitor!"
 msgstr "¡Bienvenido, visitante!"
 
-#: yithlibraryserver/templates/base.pt:51
+#: yithlibraryserver/templates/base.pt:63
 msgid "Welcome ${current-user}"
 msgstr "Bienvenido ${current-user}"
 
-#: yithlibraryserver/templates/base.pt:55
+#: yithlibraryserver/templates/base.pt:64
 msgid ""
 "We are using cookies to get statistics about the usage of Yith Library. This "
 "is completely optional and we want to ask you if this is ok with you."
@@ -1081,31 +1131,23 @@ msgstr ""
 "Library.\n"
 "Esto es completamente opcional y nos gustaría preguntarte si te parece bien."
 
-#: yithlibraryserver/templates/base.pt:60
+#: yithlibraryserver/templates/base.pt:66
 msgid "Ok, I can handle one more cookie"
 msgstr "Ok, puedo soportar otra cookie"
 
-#: yithlibraryserver/templates/base.pt:62
+#: yithlibraryserver/templates/base.pt:67
 msgid "No, I don't want to be tracked"
 msgstr "No, no quiero ser rastreado"
 
-#: yithlibraryserver/templates/base.pt:106
-msgid "My passwords"
-msgstr "Mis contraseñas"
-
-#: yithlibraryserver/templates/base.pt:113
-msgid "Log out"
-msgstr "Salir"
-
-#: yithlibraryserver/templates/base.pt:158
+#: yithlibraryserver/templates/base.pt:98
 msgid "Follow us on Twitter!"
 msgstr "¡Síguenos en Twitter!"
 
-#: yithlibraryserver/templates/base.pt:160
+#: yithlibraryserver/templates/base.pt:98
 msgid "Fork us on GitHub!"
 msgstr "¡Copianos en Github!"
 
-#: yithlibraryserver/templates/base.pt:167
+#: yithlibraryserver/templates/base.pt:101
 msgid "FAQ"
 msgstr "Preguntas frecuentes"
 
@@ -1113,27 +1155,27 @@ msgstr "Preguntas frecuentes"
 msgid "Account"
 msgstr "Cuenta"
 
-#: yithlibraryserver/templates/profile.pt:47
+#: yithlibraryserver/templates/profile.pt:37
 msgid "Applications"
 msgstr "Aplicaciones"
 
-#: yithlibraryserver/templates/profile.pt:52
+#: yithlibraryserver/templates/profile.pt:40
 msgid "Authorized clients"
 msgstr "Clientes autorizados"
 
-#: yithlibraryserver/templates/profile.pt:55
+#: yithlibraryserver/templates/profile.pt:42
 msgid "Developer apps"
 msgstr "Aplicaciones de desarrolladores"
 
-#: yithlibraryserver/templates/home.pt:4
+#: yithlibraryserver/templates/home.pt:9
 msgid "Home"
 msgstr "Inicio"
 
-#: yithlibraryserver/templates/home.pt:14
+#: yithlibraryserver/templates/home.pt:15
 msgid "Web password manager"
 msgstr "Gestor de contraseñas web"
 
-#: yithlibraryserver/templates/home.pt:17
+#: yithlibraryserver/templates/home.pt:16
 msgid ""
 "Yith Library is an online password manager. It will help you to keep your "
 "secrets under control in a secure and easy way. Your online data is too "
@@ -1143,26 +1185,26 @@ msgstr ""
 "tus secretos bajo control de una forma segura y fácil. Tus datos en línea\n"
 "son demasiado valiosos para no protegerlos seriamente."
 
-#: yithlibraryserver/templates/home.pt:26
-#: yithlibraryserver/templates/home.pt:459
+#: yithlibraryserver/templates/home.pt:21
+#: yithlibraryserver/templates/home.pt:243
 msgid "Start using it today"
 msgstr "Empieza a usarlo hoy mismo"
 
-#: yithlibraryserver/templates/home.pt:29
-#: yithlibraryserver/templates/home.pt:462
+#: yithlibraryserver/templates/home.pt:22
+#: yithlibraryserver/templates/home.pt:244
 msgid "at no cost"
 msgstr "sin coste alguno"
 
-#: yithlibraryserver/templates/home.pt:36
-#: yithlibraryserver/templates/home.pt:469
+#: yithlibraryserver/templates/home.pt:25
+#: yithlibraryserver/templates/home.pt:247
 msgid "Get your passwords"
 msgstr "Accede a tus contraseñas"
 
-#: yithlibraryserver/templates/home.pt:57
+#: yithlibraryserver/templates/home.pt:36
 msgid "Why do you need it?"
 msgstr "¿Por qué lo necesitas?"
 
-#: yithlibraryserver/templates/home.pt:60
+#: yithlibraryserver/templates/home.pt:37
 msgid ""
 "It will allow you to manage your credentials and other passwords using best "
 "security practices without the need to be a cryptographer or a paranoid nerd."
@@ -1171,17 +1213,17 @@ msgstr ""
 "las mejores prácticas de seguridad sin necesidad de ser un\n"
 "criptográfo o un empollón paranoico."
 
-#: yithlibraryserver/templates/home.pt:63
-#: yithlibraryserver/templates/home.pt:79
-#: yithlibraryserver/templates/home.pt:95
+#: yithlibraryserver/templates/home.pt:38
+#: yithlibraryserver/templates/home.pt:45
+#: yithlibraryserver/templates/home.pt:52
 msgid "View details &raquo;"
 msgstr "Ver detalles &raquo;"
 
-#: yithlibraryserver/templates/home.pt:73
+#: yithlibraryserver/templates/home.pt:43
 msgid "How does it work?"
 msgstr "¿Cómo funciona?"
 
-#: yithlibraryserver/templates/home.pt:76
+#: yithlibraryserver/templates/home.pt:44
 msgid ""
 "Each password that you manage in Yith Library is encrypted with a special "
 "secret: the master password. That's the only one you need to remember."
@@ -1190,11 +1232,11 @@ msgstr ""
 "secreto especial: la contraseña maestra. Esto es lo único que\n"
 "necesitarás recordar."
 
-#: yithlibraryserver/templates/home.pt:89
+#: yithlibraryserver/templates/home.pt:50
 msgid "Where does it work?"
 msgstr "¿Dónde funciona?"
 
-#: yithlibraryserver/templates/home.pt:92
+#: yithlibraryserver/templates/home.pt:51
 msgid ""
 "Your passwords are saved in a secure server and you can access them from any "
 "place using a range of easy to use web apps optimized for different devices."
@@ -1203,15 +1245,17 @@ msgstr ""
 "desde cualquier lugar utilizando varias aplicaciones web optimizadas\n"
 "para distintos aparatos."
 
-#: yithlibraryserver/templates/home.pt:122
+#. Used in sentence: "Using one ${password} for everything is a bad idea"
+#: yithlibraryserver/templates/home.pt:66
 msgid "password"
 msgstr "contraseña"
 
-#: yithlibraryserver/templates/home.pt:120
+#. Canonical text for ${password} is: "password"
+#: yithlibraryserver/templates/home.pt:65
 msgid "Using one ${password} for everything is a bad idea"
 msgstr "Usar una ${password} para todo es una mala idea"
 
-#: yithlibraryserver/templates/home.pt:127
+#: yithlibraryserver/templates/home.pt:68
 msgid ""
 "Today, most Internet services force you to use an username and a password as "
 "your credentials to identify yourself. Since we are not very good at "
@@ -1228,19 +1272,27 @@ msgstr ""
 "ese servicio? Bueno, eso significa que el atacante puede acceder a todos\n"
 "los servicios en los que uses la misma contraseña. Da miedo, ¿no?"
 
-#: yithlibraryserver/templates/home.pt:151
+#. Used in sentence: "Manage your passwords ${easily}"
+#: yithlibraryserver/templates/home.pt:84
 msgid "easily"
 msgstr "fácilmente"
 
-#: yithlibraryserver/templates/home.pt:149
+#. Canonical text for ${easily} is: "easily"
+#: yithlibraryserver/templates/home.pt:83
 msgid "Manage your passwords ${easily}"
 msgstr "Gestiona tus contraseñas ${easily}"
 
-#: yithlibraryserver/templates/home.pt:160
+#. Used in sentence: "It's not as easy as using the same password for
+#. everything but you already know you should never do that. The Yith Library
+#. is super easy to use: just remember your master password is only stored in
+#. your brain and you should always use the same one. You can access your
+#. passwords from ${any-device}"
+#: yithlibraryserver/templates/home.pt:90
 msgid "any device!"
 msgstr "¡cualquier aparato!"
 
-#: yithlibraryserver/templates/home.pt:154
+#. Canonical text for ${any-device} is: "any device!"
+#: yithlibraryserver/templates/home.pt:85
 msgid ""
 "It's not as easy as using the same password for everything but you already "
 "know you should never do that. The Yith Library is super easy to use: just "
@@ -1254,15 +1306,17 @@ msgstr ""
 "contraseñas\n"
 "desde ${any-device}"
 
-#: yithlibraryserver/templates/home.pt:192
+#. Used in sentence: "Keep your secrets ${secure}"
+#: yithlibraryserver/templates/home.pt:107
 msgid "secure"
 msgstr "de forma segura"
 
-#: yithlibraryserver/templates/home.pt:190
+#. Canonical text for ${secure} is: "secure"
+#: yithlibraryserver/templates/home.pt:106
 msgid "Keep your secrets ${secure}"
 msgstr "Manten tus secretos ${secure}"
 
-#: yithlibraryserver/templates/home.pt:195
+#: yithlibraryserver/templates/home.pt:108
 msgid ""
 "Your passwords are transmitted over the network using the TLS protocol and "
 "they are stored on the server encrypted. Even the yithians who run this "
@@ -1272,63 +1326,68 @@ msgstr ""
 "almacenan cifradas en el servidor. ¡Ni siquiera los yithians que llevan\n"
 "este servicio pueden leerlas! Ni con su máquina del tiempo..."
 
-#: yithlibraryserver/templates/home.pt:216
+#. Used in sentence: "Yith Library is a ${free} service"
+#: yithlibraryserver/templates/home.pt:121
 msgid "free"
 msgstr "gratuito"
 
-#: yithlibraryserver/templates/home.pt:214
+#. Canonical text for ${free} is: "free"
+#: yithlibraryserver/templates/home.pt:120
 msgid "Yith Library is a ${free} service"
 msgstr "Yith Library es un servicio ${free}"
 
-#: yithlibraryserver/templates/home.pt:224
+#: yithlibraryserver/templates/home.pt:124
 msgid "Free as in freedom"
 msgstr "Libre"
 
-#: yithlibraryserver/templates/home.pt:229
+#: yithlibraryserver/templates/home.pt:126
 msgid "You can use it any way you want"
 msgstr "Puedes usarlo de cualquier manera"
 
-#: yithlibraryserver/templates/home.pt:232
+#: yithlibraryserver/templates/home.pt:127
 msgid "You can run your own server or clients"
 msgstr "Puedes ejecutar tu propio servidor o clientes"
 
-#: yithlibraryserver/templates/home.pt:235
+#: yithlibraryserver/templates/home.pt:128
 msgid "You can modify it"
 msgstr "Puedes modificarlo"
 
-#: yithlibraryserver/templates/home.pt:238
+#: yithlibraryserver/templates/home.pt:129
 msgid "You can distribute it"
 msgstr "Puedes distribuirlo"
 
-#: yithlibraryserver/templates/home.pt:241
+#: yithlibraryserver/templates/home.pt:130
 msgid "We are happy with all of this"
 msgstr "Nos parece bien todo esto"
 
-#: yithlibraryserver/templates/home.pt:250
+#: yithlibraryserver/templates/home.pt:134
 msgid "Free as in beer"
 msgstr "Gratuito"
 
-#: yithlibraryserver/templates/home.pt:255
+#: yithlibraryserver/templates/home.pt:136
 msgid "You can use our server and clients without paying a dime"
 msgstr "Puedes usar nuestro servidor y clientes sin pagarnos ni un céntimo"
 
-#: yithlibraryserver/templates/home.pt:260
+#. Used in sentence: "If you like it a lot, we are happy to accept
+#. ${donations}"
+#: yithlibraryserver/templates/home.pt:138
 msgid "donations"
 msgstr "donaciones"
 
-#: yithlibraryserver/templates/home.pt:258
+#. Canonical text for ${donations} is: "donations"
+#: yithlibraryserver/templates/home.pt:137
 msgid "If you like it a lot, we are happy to accept ${donations}"
 msgstr "Si te gusta mucho, nos encantaría aceptar ${donations}"
 
-#: yithlibraryserver/templates/home.pt:288
+#: yithlibraryserver/templates/home.pt:153
 msgid "How it works"
 msgstr "Cómo funciona"
 
-#: yithlibraryserver/templates/home.pt:300
+#: yithlibraryserver/templates/home.pt:158
 msgid "Safely transfer the data with secure protocols"
 msgstr "Transporta los datos de forma fiable con protocolos seguros"
 
-#: yithlibraryserver/templates/home.pt:305
+#: yithlibraryserver/templates/home.pt:160
 msgid ""
 "When you access the Yith Library the server sends your ciphered password "
 "collection to your browser using secure protocols such as TLS. This means "
@@ -1338,15 +1397,20 @@ msgstr ""
 "cifradas a tu navegador usando protocolos seguros como TLS. Esto significa\n"
 "que nadie podrá analizar este tráfico y ver tus secretos cifrados."
 
-#: yithlibraryserver/templates/home.pt:321
+#: yithlibraryserver/templates/home.pt:169
 msgid "Only you can access your data"
 msgstr "Sólo tú puedes acceder a tus datos"
 
-#: yithlibraryserver/templates/home.pt:329
+#. Used in sentence: "Yith Library asks you for the ${master-password}
+#. everytime you open an existing password or create a new one. As the browser
+#. does not keep the master password in memory, it is safe against malicious
+#. programs or plugins."
+#: yithlibraryserver/templates/home.pt:173
 msgid "master password"
 msgstr "contraseña maestra"
 
-#: yithlibraryserver/templates/home.pt:326
+#. Canonical text for ${master-password} is: "master password"
+#: yithlibraryserver/templates/home.pt:171
 msgid ""
 "Yith Library asks you for the ${master-password} everytime you open an "
 "existing password or create a new one. As the browser does not keep the "
@@ -1357,11 +1421,11 @@ msgstr ""
 "navegador no almacena la contraseña maestra en memoria, es\n"
 "seguro ante programas o complementos maliciosos."
 
-#: yithlibraryserver/templates/home.pt:346
+#: yithlibraryserver/templates/home.pt:182
 msgid "Accessible anytime, anywhere"
 msgstr "¡Cuando sea, donde sea!"
 
-#: yithlibraryserver/templates/home.pt:351
+#: yithlibraryserver/templates/home.pt:184
 msgid ""
 "After making changes, the data is sent back to the server where it's "
 "persisted and it is ready to be fetched from your other devices. Since it is "
@@ -1373,19 +1437,26 @@ msgstr ""
 "en la cache de tu navegador, puedes acceder a ellos cuando estes\n"
 "desconectado."
 
-#: yithlibraryserver/templates/home.pt:394
+#. Used in sentence: "Access your data from ${any-device}"
+#: yithlibraryserver/templates/home.pt:209
 msgid "any device"
 msgstr "cualquier aparato"
 
-#: yithlibraryserver/templates/home.pt:392
+#. Canonical text for ${any-device} is: "any device"
+#: yithlibraryserver/templates/home.pt:208
 msgid "Access your data from ${any-device}"
 msgstr "Accede a tus datos desde ${any-device}"
 
-#: yithlibraryserver/templates/home.pt:401
+#. Used in sentence: "Your passwords are a very critical piece of data since
+#. they are the keys that open your digital accounts. You should be able to
+#. access them at home, on the run, in a foreign country without Internet
+#. connection... ${anytime-anywhere}"
+#: yithlibraryserver/templates/home.pt:213
 msgid "Anytime, anywhere!"
 msgstr "¡Cuando sea, donde sea!"
 
-#: yithlibraryserver/templates/home.pt:397
+#. Canonical text for ${anytime-anywhere} is: "Anytime, anywhere!"
+#: yithlibraryserver/templates/home.pt:210
 msgid ""
 "Your passwords are a very critical piece of data since they are the keys "
 "that open your digital accounts. You should be able to access them at home, "
@@ -1396,11 +1467,11 @@ msgstr ""
 "tus identidades digitales. Debes poder acceder a ellas en casa, de viaje,\n"
 "en un pais extranjero sin conexión a Internet... ${anytime-anywhere}"
 
-#: yithlibraryserver/templates/home.pt:416
+#: yithlibraryserver/templates/home.pt:221
 msgid "About the great library of Yith"
 msgstr "Sobre la gran biblioteca Yith"
 
-#: yithlibraryserver/templates/home.pt:419
+#: yithlibraryserver/templates/home.pt:222
 msgid ""
 "Those captive minds who cooperated with the Great Race were allowed to "
 "wander the Yithian cities at will and to browse the Yithians' gigantic "
@@ -1414,109 +1485,109 @@ msgstr ""
 "de un material increiblemente duradero, que almacenaba las historias de\n"
 "incontables razas alienígenas, incluida la humanidad."
 
-#: yithlibraryserver/templates/home.pt:440
+#: yithlibraryserver/templates/home.pt:234
 msgid "I couldn't live a week without a private library."
 msgstr "No podía vivir una semana sin una biblioteca privada."
 
-#: yithlibraryserver/oauth2/views.py:71 yithlibraryserver/oauth2/views.py:132
+#: yithlibraryserver/oauth2/views.py:70 yithlibraryserver/oauth2/views.py:131
 msgid "Save application"
 msgstr "Guardar aplicación"
 
-#: yithlibraryserver/oauth2/views.py:134
+#: yithlibraryserver/oauth2/views.py:133
 msgid "Delete application"
 msgstr "Borrar aplicación"
 
-#: yithlibraryserver/oauth2/views.py:98
+#: yithlibraryserver/oauth2/views.py:97
 #, python-format
 msgid "The application ${app} was created successfully"
 msgstr "La aplicación ${app} fue creada correctamente"
 
-#: yithlibraryserver/oauth2/views.py:201
+#: yithlibraryserver/oauth2/views.py:200
 #, python-format
 msgid "The application ${app} was deleted successfully"
 msgstr "La aplicación ${app} fue borrada correctamente"
 
-#: yithlibraryserver/oauth2/views.py:346
+#: yithlibraryserver/oauth2/views.py:345
 #, python-format
 msgid "The access to application ${app} has been revoked"
 msgstr "El acceso a la aplicación ${app} ha sido revocado"
 
-#: yithlibraryserver/oauth2/validator.py:43
+#: yithlibraryserver/oauth2/validator.py:45
 msgid "Access your passwords"
 msgstr "Acceder a tus contraseñas"
 
-#: yithlibraryserver/oauth2/validator.py:44
+#: yithlibraryserver/oauth2/validator.py:46
 msgid "Modify your passwords"
 msgstr "Modificar tus contraseñas"
 
-#: yithlibraryserver/oauth2/validator.py:45
+#: yithlibraryserver/oauth2/validator.py:47
 msgid "Access your user information"
 msgstr "Acceder tu información de usuario"
 
-#: yithlibraryserver/oauth2/schemas.py:54
-#: yithlibraryserver/oauth2/templates/developer_applications.pt:29
+#: yithlibraryserver/oauth2/schemas.py:53
+#: yithlibraryserver/oauth2/templates/developer_applications.pt:22
 msgid "Main URL"
 msgstr "URL Principal"
 
-#: yithlibraryserver/oauth2/schemas.py:59
-#: yithlibraryserver/oauth2/templates/developer_applications.pt:32
+#: yithlibraryserver/oauth2/schemas.py:57
+#: yithlibraryserver/oauth2/templates/developer_applications.pt:23
 msgid "Callback URL"
 msgstr "URL de retrollamada"
 
-#: yithlibraryserver/oauth2/schemas.py:64
+#: yithlibraryserver/oauth2/schemas.py:61
 msgid "Authorized Origins"
 msgstr "Orígenes autorizados"
 
-#: yithlibraryserver/oauth2/schemas.py:65
+#: yithlibraryserver/oauth2/schemas.py:62
 msgid "One per line. For example https://example.com"
 msgstr "Uno por linea. Por ejemplo https://example.com"
 
-#: yithlibraryserver/oauth2/schemas.py:71
+#: yithlibraryserver/oauth2/schemas.py:68
 msgid "Production ready"
 msgstr "Listo para producción"
 
-#: yithlibraryserver/oauth2/schemas.py:77
+#: yithlibraryserver/oauth2/schemas.py:73
 msgid "Image URL"
 msgstr "URL de la imagen"
 
-#: yithlibraryserver/oauth2/schemas.py:83
+#: yithlibraryserver/oauth2/schemas.py:78
 msgid "Description"
 msgstr "Descripción"
 
-#: yithlibraryserver/oauth2/schemas.py:101
+#: yithlibraryserver/oauth2/schemas.py:95
 msgid "Client Id"
 msgstr "Id de cliente"
 
-#: yithlibraryserver/oauth2/schemas.py:106
+#: yithlibraryserver/oauth2/schemas.py:100
 msgid "Client secret"
 msgstr "Secreto de cliente"
 
-#: yithlibraryserver/oauth2/templates/developer_applications.pt:4
+#: yithlibraryserver/oauth2/templates/developer_applications.pt:9
 msgid "Developer applications"
 msgstr "Aplicaciones de desarrolladores"
 
-#: yithlibraryserver/oauth2/templates/developer_applications.pt:12
+#: yithlibraryserver/oauth2/templates/developer_applications.pt:14
 msgid "Developer Applications"
 msgstr "Aplicaciones de Desarrolladores"
 
-#: yithlibraryserver/oauth2/templates/developer_applications.pt:18
+#: yithlibraryserver/oauth2/templates/developer_applications.pt:17
 msgid "You have not registered any developer application yet."
 msgstr "No has registrado ninguna aplicación de desarrollador aún."
 
-#: yithlibraryserver/oauth2/templates/developer_applications.pt:57
+#: yithlibraryserver/oauth2/templates/developer_applications.pt:34
 msgid "Register new application"
 msgstr "Registrar nueva aplicación"
 
-#: yithlibraryserver/oauth2/templates/developer_application_edit.pt:4
+#: yithlibraryserver/oauth2/templates/developer_application_edit.pt:9
 msgid "Edit Application"
 msgstr "Editar Aplicación"
 
-#: yithlibraryserver/oauth2/templates/developer_application_edit.pt:12
+#: yithlibraryserver/oauth2/templates/developer_application_edit.pt:14
 msgid "Edit application ${app-name}"
 msgstr "Editar aplicación ${app-name}"
 
-#: yithlibraryserver/oauth2/templates/clients.pt:4
-#: yithlibraryserver/oauth2/templates/clients.pt:12
+#: yithlibraryserver/oauth2/templates/clients.pt:9
+#: yithlibraryserver/oauth2/templates/clients.pt:14
 msgid "Available Clients"
 msgstr "Clientes Disponibles"
 
@@ -1528,19 +1599,19 @@ msgstr ""
 "Hay varios clientes para acceder a tu colección de contraseñas. Puedes\n"
 "usar el que mejor se ajuste a tus necesidades"
 
-#: yithlibraryserver/oauth2/templates/clients.pt:37
+#: yithlibraryserver/oauth2/templates/clients.pt:26
 msgid "Access"
 msgstr "Acceder"
 
-#: yithlibraryserver/oauth2/templates/application_revoke_authorization.pt:4
+#: yithlibraryserver/oauth2/templates/application_revoke_authorization.pt:9
 msgid "Revoke Authorization"
 msgstr "Revocar Autorización"
 
-#: yithlibraryserver/oauth2/templates/application_revoke_authorization.pt:12
+#: yithlibraryserver/oauth2/templates/application_revoke_authorization.pt:14
 msgid "Revoke authorization to application ${app-name}"
 msgstr "Revocar autorización a la aplicación ${app-name}"
 
-#: yithlibraryserver/oauth2/templates/application_revoke_authorization.pt:19
+#: yithlibraryserver/oauth2/templates/application_revoke_authorization.pt:17
 msgid ""
 "Are you sure you want to revoke the authorization to the application ${app-"
 "name} with id ${app-id}?"
@@ -1549,20 +1620,20 @@ msgstr ""
 "name} con\n"
 "el id ${app-id}?"
 
-#: yithlibraryserver/oauth2/templates/application_revoke_authorization.pt:31
-#: yithlibraryserver/oauth2/templates/developer_application_delete.pt:31
+#: yithlibraryserver/oauth2/templates/application_revoke_authorization.pt:21
+#: yithlibraryserver/oauth2/templates/developer_application_delete.pt:21
 msgid "No, take me back to the application list"
 msgstr "No, llevame de vuelta a la lista de aplicaciones"
 
-#: yithlibraryserver/oauth2/templates/developer_application_delete.pt:4
+#: yithlibraryserver/oauth2/templates/developer_application_delete.pt:9
 msgid "Delete Application"
 msgstr "Borrar Aplicación"
 
-#: yithlibraryserver/oauth2/templates/developer_application_delete.pt:12
+#: yithlibraryserver/oauth2/templates/developer_application_delete.pt:14
 msgid "Delete Application ${app-name}"
 msgstr "Editar Aplicación ${app-name}"
 
-#: yithlibraryserver/oauth2/templates/developer_application_delete.pt:19
+#: yithlibraryserver/oauth2/templates/developer_application_delete.pt:17
 msgid ""
 "Are you sure you want to remove the application ${app-name} with id ${app-"
 "id}?"
@@ -1570,67 +1641,67 @@ msgstr ""
 "¿Estas seguro de que quieres eliminar la aplicación ${app-name} con\n"
 "el id ${app-id}?"
 
-#: yithlibraryserver/oauth2/templates/developer_application_new.pt:4
+#: yithlibraryserver/oauth2/templates/developer_application_new.pt:9
 msgid "New application"
 msgstr "Nueva aplicación"
 
-#: yithlibraryserver/oauth2/templates/developer_application_new.pt:12
+#: yithlibraryserver/oauth2/templates/developer_application_new.pt:14
 msgid "New Application"
 msgstr "Nueva Aplicación"
 
-#: yithlibraryserver/oauth2/templates/application_authorization.pt:4
+#: yithlibraryserver/oauth2/templates/application_authorization.pt:9
 msgid "Authorize Application"
 msgstr "Autorizar Aplicación"
 
-#: yithlibraryserver/oauth2/templates/application_authorization.pt:14
+#: yithlibraryserver/oauth2/templates/application_authorization.pt:15
 msgid "Authorize Application ${app-name}"
 msgstr "Autorizar Aplicación ${app-name}"
 
-#: yithlibraryserver/oauth2/templates/application_authorization.pt:32
+#: yithlibraryserver/oauth2/templates/application_authorization.pt:24
 msgid "App:"
 msgstr "App:"
 
-#: yithlibraryserver/oauth2/templates/application_authorization.pt:39
+#: yithlibraryserver/oauth2/templates/application_authorization.pt:27
 msgid "Permissions:"
 msgstr "Permisos:"
 
-#: yithlibraryserver/oauth2/templates/application_authorization.pt:54
+#: yithlibraryserver/oauth2/templates/application_authorization.pt:34
 msgid "Site:"
 msgstr "Sitio:"
 
-#: yithlibraryserver/oauth2/templates/application_authorization.pt:61
+#: yithlibraryserver/oauth2/templates/application_authorization.pt:37
 msgid "Description:"
 msgstr "Descripción:"
 
-#: yithlibraryserver/oauth2/templates/application_authorization.pt:68
+#: yithlibraryserver/oauth2/templates/application_authorization.pt:40
 msgid "Author:"
 msgstr "Autor:"
 
-#: yithlibraryserver/oauth2/templates/application_authorization.pt:106
+#: yithlibraryserver/oauth2/templates/application_authorization.pt:59
 msgid "Allow access"
 msgstr "Permitir acceso"
 
-#: yithlibraryserver/oauth2/templates/application_authorization.pt:108
+#: yithlibraryserver/oauth2/templates/application_authorization.pt:60
 msgid "No, thanks"
 msgstr "No, gracias"
 
-#: yithlibraryserver/oauth2/templates/application_authorization.pt:110
+#: yithlibraryserver/oauth2/templates/application_authorization.pt:61
 msgid "You can revoke this authorization in the future."
 msgstr "Puedes revocar esta autorización en el futuro."
 
-#: yithlibraryserver/oauth2/templates/authorized_applications.pt:4
-#: yithlibraryserver/oauth2/templates/authorized_applications.pt:12
+#: yithlibraryserver/oauth2/templates/authorized_applications.pt:9
+#: yithlibraryserver/oauth2/templates/authorized_applications.pt:14
 msgid "Authorized Applications"
 msgstr "Aplicaciones autorizadas"
 
-#: yithlibraryserver/oauth2/templates/authorized_applications.pt:20
+#: yithlibraryserver/oauth2/templates/authorized_applications.pt:18
 msgid "You have not authorized any application yet."
 msgstr "No has autorizado ninguna aplicación aún."
 
-#: yithlibraryserver/oauth2/templates/authorized_applications.pt:24
+#: yithlibraryserver/oauth2/templates/authorized_applications.pt:20
 msgid "Start using a client"
 msgstr "Empieza a usar un cliente"
 
-#: yithlibraryserver/oauth2/templates/authorized_applications.pt:47
+#: yithlibraryserver/oauth2/templates/authorized_applications.pt:31
 msgid "Revoke authorization"
 msgstr "Revocar autorización"
