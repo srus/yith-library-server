@@ -20,6 +20,10 @@
 
 import pymongo
 
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import scoped_session, sessionmaker
+from zope.sqlalchemy import ZopeTransactionExtension
+
 from yithlibraryserver.compat import urlparse
 
 DEFAULT_MONGODB_HOST = 'localhost'
@@ -59,3 +63,7 @@ class MongoDB(object):
 
 def get_db(request):
     return request.registry.settings['mongodb'].get_database()
+
+
+DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
+Base = declarative_base()

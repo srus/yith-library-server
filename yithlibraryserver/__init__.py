@@ -29,10 +29,11 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.exceptions import ConfigurationError
 from pyramid.path import AssetResolver
 from pyramid.settings import asbool
+from sqlalchemy import engine_from_config
 
 from yithlibraryserver.config import read_setting_from_env
 from yithlibraryserver.cors import CORSManager
-from yithlibraryserver.db import MongoDB
+from yithlibraryserver.db import Base, DBSession, MongoDB
 from yithlibraryserver.jsonrenderer import json_renderer
 from yithlibraryserver.i18n import deform_translator, locale_negotiator
 from yithlibraryserver.security import RootFactory
@@ -71,6 +72,12 @@ def main(global_config, **settings):
     if settings['mongo_uri'] is None:
         raise ConfigurationError('The mongo_uri configuration '
                                  'option is required')
+
+    settings['database_url'] = read_setting_from_env(settings, 'database_url', None)
+    if settings['database_url'] is None:
+        raise ConfigurationError('The database_url configuration '
+                                 'option is required')
+    settings['sqlalchemy.url'] = settings['database_url']
 
     # Available languages
     available_languages = read_setting_from_env(settings, 'available_languages', 'en es')
@@ -150,6 +157,11 @@ def main(global_config, **settings):
     mongodb = MongoDB(settings['mongo_uri'])
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['db_conn'] = mongodb.get_connection()
+
+    # SQLAlchemy setup
+    engine = engine_from_config(settings, prefix='sqlalchemy.')
+    DBSession.configure(bind=engine)
+    Base.metadata.bind = engine
 
     # CORS support setup
     config.registry.settings['cors_manager'] = CORSManager(
