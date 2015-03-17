@@ -16,27 +16,55 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
+
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from yithlibraryserver.compat import text_type
+from yithlibraryserver.db import Base
 
+class User(Base):
+    __tablename__ = 'users'
 
-class User(dict):
+    id = Column(Integer, primary_key=True)
+    first_name = Column(String, nullable=False, default='')
+    last_name = Column(String, nullable=False, default='')
+    screen_name = Column(String, nullable=False, default='')
+
+    email = Column(String, nullable=False, default='')
+    email_verified = Column(Boolean, nullable=False, default=False)
+
+    date_joined = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
+    last_login = Column(DateTime, nullable=False)
+
+    twitter_id = Column(String, nullable=False, default='')
+    google_id = Column(String, nullable=False, default='')
+    facebook_id = Column(String, nullable=False, default='')
+
+    allow_google_analytics = Column(Boolean, nullable=False, default=False)
+    send_passwords_periodically = Column(Boolean, nullable=False, default=False)
+
+    @hybrid_property
+    def full_name(self):
+        result = ' '.join([self.first_name, self.last_name])
+        result = result.strip()
+        return result
 
     def __unicode__(self):
-        result = self.get('screen_name', '')
+        result = self.screen_name
         if result:
             return result
 
-        result = ' '.join([self.get('first_name', ''),
-                           self.get('last_name', '')])
-        result = result.strip()
+        result = self.full_name
         if result:
             return result
 
-        result = self.get('email', '')
+        result = self.email
         if result:
             return result
 
-        return text_type(self['_id'])
+        return text_type(self.id)
 
     # py3 compatibility
     def __str__(self):
