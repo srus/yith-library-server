@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-import datetime
+from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -35,7 +35,7 @@ class User(Base):
     email = Column(String, nullable=False, default='')
     email_verified = Column(Boolean, nullable=False, default=False)
 
-    date_joined = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
+    creation = Column(DateTime, nullable=False, default=datetime.utcnow)
     last_login = Column(DateTime, nullable=False)
 
     twitter_id = Column(String, nullable=False, default='')

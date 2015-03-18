@@ -18,6 +18,34 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime
+
+from sqlalchemy import Column, DateTime, Integer, String, Text
+from sqlalchemy import ForeignKey
+from sqlalchemy.dialects.postgresql import ARRAY, JSON
+from sqlalchemy.orm import relationship, backref
+
+from yithlibraryserver.db import Base
+
+
+class Password(Base):
+    __tablename__ = 'passwords'
+
+    id = Column(Integer, primary_key=True)
+    creation = Column(DateTime, nullable=False, default=datetime.utcnow)
+    modification = Column(DateTime, nullable=False, onupdate=datetime.utcnow)
+
+    notes = Column(Text, nullable=False, default='')
+    tags = Column(ARRAY(String), nullable=True)
+
+    secret = Column(JSON(none_as_null=True), nullable=False)
+    account = Column(String, nullable=False, default='')
+    service = Column(String, nullable=False, default='')
+    expiration = Column(Integer, nullable=True)
+
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user = relationship('User', backref=backref('passwords', order_by='id'))
+
 
 class PasswordsManager(object):
 
