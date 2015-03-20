@@ -16,8 +16,38 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-import datetime
+from datetime import datetime
 from bson.tz_util import utc
+
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship, backref
+
+from yithlibraryserver.db import Base
+
+class Donation(Base):
+    __tablename__ = 'donations'
+
+    id = Column(Integer, primary_key=True)
+    creation = Column(DateTime, nullable=False, default=datetime.utcnow)
+    modification = Column(DateTime, nullable=False, onupdate=datetime.utcnow)
+
+    first_name = Column(String, nullable=False, default='')
+    last_name = Column(String, nullable=False, default='')
+
+    email = Column(String, nullable=False, default='')
+
+    street = Column(String, nullable=False, default='')
+    city = Column(String, nullable=False, default='')
+    zipcode = Column(String, nullable=False, default='')
+    state = Column(String, nullable=False, default='')
+    country = Column(String, nullable=False, default='')
+
+    amount = Column(Integer, nullable=False)
+    send_sticker = Column(Boolean, nullable=False, default=True)
+
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user = relationship('User', backref=backref('passwords', order_by='id'))
 
 
 def include_sticker(amount):
@@ -36,7 +66,7 @@ def create_donation(request, data):
         'street': data['street'],
         'zip': data['zip'],
         'email': data['email'],
-        'creation': datetime.datetime.now(tz=utc),
+        'creation': datetime.now(tz=utc),
     }
     if include_sticker(amount):
         donation['send_sticker'] = not ('no-sticker' in data)
