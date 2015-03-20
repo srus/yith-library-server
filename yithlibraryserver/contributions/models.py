@@ -47,7 +47,7 @@ class Donation(Base):
     send_sticker = Column(Boolean, nullable=False, default=True)
 
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    user = relationship('User', backref=backref('passwords', order_by='id'))
+    user = relationship('User', backref=backref('donations', order_by='id'))
 
 
 def include_sticker(amount):
