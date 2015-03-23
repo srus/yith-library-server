@@ -20,10 +20,10 @@
 
 import logging
 
-from yithlibraryserver.oauth2.models import AccessCode
-from yithlibraryserver.oauth2.models import Application
-from yithlibraryserver.oauth2.models import AuthorizationCode
-from yithlibraryserver.oauth2.models import AuthorizedApplication
+# from yithlibraryserver.oauth2.models import AccessCode
+# from yithlibraryserver.oauth2.models import Application
+# from yithlibraryserver.oauth2.models import AuthorizationCode
+# from yithlibraryserver.oauth2.models import AuthorizedApplication
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ def includeme(config):
 
     config.add_route('oauth2_clients', '/oauth2/clients')
 
-    logger.debug('Importing %s model so SQLAlchemy knows about it', AccessCode)
-    logger.debug('Importing %s model so SQLAlchemy knows about it', Application)
-    logger.debug('Importing %s model so SQLAlchemy knows about it', AuthorizationCode)
-    logger.debug('Importing %s model so SQLAlchemy knows about it', AuthorizedApplication)
+    # logger.debug('Importing %s model so SQLAlchemy knows about it', AccessCode)
+    # logger.debug('Importing %s model so SQLAlchemy knows about it', Application)
+    # logger.debug('Importing %s model so SQLAlchemy knows about it', AuthorizationCode)
+    # logger.debug('Importing %s model so SQLAlchemy knows about it', AuthorizedApplication)

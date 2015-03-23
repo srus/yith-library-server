@@ -19,12 +19,15 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-from bson.tz_util import utc
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember
 
-from yithlibraryserver.user.accounts import get_provider_key
+from sqlalchemy.orm.exc import NoResultFound
+
+from yithlibraryserver.db import DBSession
+from yithlibraryserver.user.models import User
+from yithlibraryserver.user.providers import get_provider_key
 
 
 def split_name(name):
@@ -39,36 +42,18 @@ def split_name(name):
     return first_name, last_name
 
 
-def delete_user(db, user):
-    result = db.users.remove(user['_id'])
-    return result['n'] == 1
-
-
-def update_user(db, user, user_info, other_changes):
-    changes = {}
-    for attribute in ('screen_name', 'first_name', 'last_name', 'email'):
-        if attribute in user_info and user_info[attribute]:
-            if attribute in user:
-                if user_info[attribute] != user[attribute]:
-
-                    changes[attribute] = user_info[attribute]
-            else:
-                changes[attribute] = user_info[attribute]
-
-    changes.update(other_changes)
-
-    if changes:
-        db.users.update({'_id': user['_id']}, {'$set': changes})
-
-
-def user_from_provider_id(db, provider, user_id):
+def user_from_provider_id(provider, user_id):
     provider_key = get_provider_key(provider)
-    return db.users.find_one({provider_key: user_id})
+    column = getattr(User, provider_key)
+    try:
+        return DBSession.query(User).filter(column==user_id).one()
+    except NoResultFound:
+        return None
 
 
 def register_or_update(request, provider, user_id, info, default_url='/'):
     provider_key = get_provider_key(provider)
-    user = user_from_provider_id(request.db, provider, user_id)
+    user = user_from_provider_id(provider, user_id)
     if user is None:
 
         new_info = {'provider': provider, provider_key: user_id}
@@ -83,15 +68,16 @@ def register_or_update(request, provider, user_id, info, default_url='/'):
             request.session['next_url'] = default_url
         return HTTPFound(location=request.route_path('register_new_user'))
     else:
-        changes = {'last_login': datetime.datetime.now(tz=utc)}
+        user.last_login = datetime.datetime.utcnow()
 
         ga = request.google_analytics
         if ga.is_in_session():
             if not ga.is_stored_in_user(user):
-                changes.update(ga.get_user_attr(ga.show_in_session()))
+                user.allow_google_analytics = ga.show_in_session()
             ga.clean_session()
 
-        update_user(request.db, user, info, changes)
+        user.update_user_info(info)
+        DBSession.add(user)
 
         if 'next_url' in request.session:
             next_url = request.session['next_url']
@@ -100,5 +86,5 @@ def register_or_update(request, provider, user_id, info, default_url='/'):
             next_url = default_url
 
         request.session['current_provider'] = provider
-        remember_headers = remember(request, str(user['_id']))
+        remember_headers = remember(request, str(user.id))
         return HTTPFound(location=next_url, headers=remember_headers)

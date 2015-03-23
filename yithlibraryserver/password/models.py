@@ -44,7 +44,10 @@ class Password(Base):
     expiration = Column(Integer, nullable=True)
 
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    user = relationship('User', backref=backref('passwords', order_by='id'))
+    users = relationship(
+        'User',
+        backref=backref('passwords', cascade='all, delete-orphan'),
+    )
 
 
 class PasswordsManager(object):
