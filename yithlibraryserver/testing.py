@@ -30,13 +30,14 @@ from pyramid.settings import asbool
 from pyramid.testing import DummyRequest
 
 from yithlibraryserver import main
+from yithlibraryserver.db import Base
+from yithlibraryserver.db import DBSession
 
 # On Travis-CI tests are executed in paralllel for every Python
 # version we support. We should not share the test database on
 # each of this test executions
 PY_VERSION = '%d%d' % (sys.version_info[0], sys.version_info[1])
-DB_NAME = 'test-yith-library-%s' % PY_VERSION
-MONGO_URI = 'mongodb://localhost:27017/%s' % DB_NAME
+DB_NAME = 'test_yithlibrary_%s' % PY_VERSION
 
 
 class FakeRequest(DummyRequest):
@@ -44,20 +45,13 @@ class FakeRequest(DummyRequest):
     def __init__(self, *args, **kwargs):
         super(FakeRequest, self).__init__(*args, **kwargs)
         self.authorization = self.headers.get('Authorization', '').split(' ')
-        if 'db' in kwargs:
-            self.db = kwargs['db']
-
-
-def clean_db(db):
-    for col in db.collection_names(include_system_collections=False):
-        db.drop_collection(col)
 
 
 class TestCase(unittest.TestCase):
 
     def setUp(self):
         settings = {
-            'mongo_uri': MONGO_URI,
+            'database_url': 'postgres://yithian:123456@localhost:5432/%s' % DB_NAME,
             'auth_tk_secret': '123456',
             'twitter_consumer_key': 'key',
             'twitter_consumer_secret': 'secret',
@@ -78,11 +72,11 @@ class TestCase(unittest.TestCase):
             'webassets.debug': 'True',
         }
         app = main({}, **settings)
+        Base.metadata.create_all()
         self.testapp = TestApp(app)
-        self.db = app.registry.settings['db_conn'][DB_NAME]
 
     def tearDown(self):
-        clean_db(self.db)
+        DBSession.remove()
         self.testapp.reset()
 
     def get_session(self, response):

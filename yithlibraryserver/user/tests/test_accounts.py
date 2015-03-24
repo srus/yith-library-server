@@ -25,13 +25,12 @@ from pyramid.testing import DummyRequest
 
 from pyramid_mailer import get_mailer
 
-from yithlibraryserver.db import MongoDB
 from yithlibraryserver.user.accounts import get_available_providers
-from yithlibraryserver.user.accounts import get_providers, get_n_passwords
-from yithlibraryserver.user.accounts import get_accounts, merge_accounts
+#from yithlibraryserver.user.accounts import get_providers, get_n_passwords
+#from yithlibraryserver.user.accounts import get_accounts, merge_accounts
 from yithlibraryserver.user.accounts import merge_users
 from yithlibraryserver.user.accounts import notify_admins_of_account_removal
-from yithlibraryserver.testing import MONGO_URI, TestCase, clean_db
+from yithlibraryserver.testing import TestCase
 
 
 class AccountTests(TestCase):
@@ -40,193 +39,190 @@ class AccountTests(TestCase):
         self.assertEqual(('facebook', 'google', 'twitter', 'persona', 'liveconnect'),
                          get_available_providers())
 
-    def test_get_providers(self):
-        self.assertEqual([], get_providers({}, ''))
-        self.assertEqual([
-            {'name': 'facebook', 'is_current': True}
-        ], get_providers({'facebook_id': 1234}, 'facebook'))
-        self.assertEqual([{
-            'name': 'facebook',
-            'is_current': True,
-        }, {
-            'name': 'google',
-            'is_current': False,
-        }, {
-            'name': 'twitter',
-            'is_current': False,
-        }], get_providers({
-            'facebook_id': 1234,
-            'google_id': 4321,
-            'twitter_id': 6789
-        }, 'facebook'))
-        self.assertEqual([], get_providers({'myspace_id': 1234}, ''))
+    # def test_get_providers(self):
+    #     self.assertEqual([], get_providers({}, ''))
+    #     self.assertEqual([
+    #         {'name': 'facebook', 'is_current': True}
+    #     ], get_providers({'facebook_id': 1234}, 'facebook'))
+    #     self.assertEqual([{
+    #         'name': 'facebook',
+    #         'is_current': True,
+    #     }, {
+    #         'name': 'google',
+    #         'is_current': False,
+    #     }, {
+    #         'name': 'twitter',
+    #         'is_current': False,
+    #     }], get_providers({
+    #         'facebook_id': 1234,
+    #         'google_id': 4321,
+    #         'twitter_id': 6789
+    #     }, 'facebook'))
+    #     self.assertEqual([], get_providers({'myspace_id': 1234}, ''))
 
-    def test_n_passwords(self):
-        self.assertEqual(0, get_n_passwords(self.db, {'_id': 1}))
+    # def test_n_passwords(self):
+    #     self.assertEqual(0, get_n_passwords(self.db, {'_id': 1}))
 
-        self.db.passwords.insert({'password': 'secret', 'owner': 1})
-        self.assertEqual(1, get_n_passwords(self.db, {'_id': 1}))
+    #     self.db.passwords.insert({'password': 'secret', 'owner': 1})
+    #     self.assertEqual(1, get_n_passwords(self.db, {'_id': 1}))
 
-        self.db.passwords.insert({'password2': 'secret2', 'owner': 1})
-        self.assertEqual(2, get_n_passwords(self.db, {'_id': 1}))
-        self.db.passwords.insert({'password2': 'secret2', 'owner': 2})
-        self.assertEqual(2, get_n_passwords(self.db, {'_id': 1}))
+    #     self.db.passwords.insert({'password2': 'secret2', 'owner': 1})
+    #     self.assertEqual(2, get_n_passwords(self.db, {'_id': 1}))
+    #     self.db.passwords.insert({'password2': 'secret2', 'owner': 2})
+    #     self.assertEqual(2, get_n_passwords(self.db, {'_id': 1}))
 
-    def test_get_accounts_empty_user(self):
-        self.assertEqual([], get_accounts(self.db, {}, ''))
+    # def test_get_accounts_empty_user(self):
+    #     self.assertEqual([], get_accounts(self.db, {}, ''))
 
-    def test_get_accounts_empty_provider(self):
-        self.assertEqual([{
-            'providers': [],
-            'is_current': False,
-            'passwords': 0,
-            'id': '',
-            'is_verified': False,
-        }], get_accounts(self.db, {
-            'email': 'john@example.com',
-            '_id': '',
-        }, ''))
+    # def test_get_accounts_empty_provider(self):
+    #     self.assertEqual([{
+    #         'providers': [],
+    #         'is_current': False,
+    #         'passwords': 0,
+    #         'id': '',
+    #         'is_verified': False,
+    #     }], get_accounts(self.db, {
+    #         'email': 'john@example.com',
+    #         '_id': '',
+    #     }, ''))
 
-    def test_get_accounts_one_user_no_provider(self):
-        user_id = self.db.users.insert({'email': 'john@example.com'})
-        self.assertEqual([{
-            'providers': [],
-            'is_current': False,
-            'passwords': 0,
-            'id': '',
-            'is_verified': False,
-        }, {
-            'providers': [],
-            'is_current': False,
-            'passwords': 0,
-            'id': str(user_id),
-            'is_verified': False,
-        }], get_accounts(self.db, {
-            'email': 'john@example.com',
-            '_id': '',
-        }, ''))
+    # def test_get_accounts_one_user_no_provider(self):
+    #     user_id = self.db.users.insert({'email': 'john@example.com'})
+    #     self.assertEqual([{
+    #         'providers': [],
+    #         'is_current': False,
+    #         'passwords': 0,
+    #         'id': '',
+    #         'is_verified': False,
+    #     }, {
+    #         'providers': [],
+    #         'is_current': False,
+    #         'passwords': 0,
+    #         'id': str(user_id),
+    #         'is_verified': False,
+    #     }], get_accounts(self.db, {
+    #         'email': 'john@example.com',
+    #         '_id': '',
+    #     }, ''))
 
-    def test_get_accounts_one_user_with_provider(self):
-        user_id = self.db.users.insert({
-            'email': 'john@example.com',
-            'twitter_id': 1234,
-        })
-        self.assertEqual([{
-            'providers': [],
-            'is_current': False,
-            'passwords': 0,
-            'id': '',
-            'is_verified': False,
-        }, {
-            'providers': [{
-                'name': 'twitter',
-                'is_current': False,
-            }],
-            'is_current': False,
-            'passwords': 0,
-            'id': str(user_id),
-            'is_verified': False,
-        }], get_accounts(self.db, {
-            'email': 'john@example.com',
-            '_id': '',
-        }, ''))
+    # def test_get_accounts_one_user_with_provider(self):
+    #     user_id = self.db.users.insert({
+    #         'email': 'john@example.com',
+    #         'twitter_id': 1234,
+    #     })
+    #     self.assertEqual([{
+    #         'providers': [],
+    #         'is_current': False,
+    #         'passwords': 0,
+    #         'id': '',
+    #         'is_verified': False,
+    #     }, {
+    #         'providers': [{
+    #             'name': 'twitter',
+    #             'is_current': False,
+    #         }],
+    #         'is_current': False,
+    #         'passwords': 0,
+    #         'id': str(user_id),
+    #         'is_verified': False,
+    #     }], get_accounts(self.db, {
+    #         'email': 'john@example.com',
+    #         '_id': '',
+    #     }, ''))
 
-    def test_get_accounts_one_user_with_provider_email_verified(self):
-        user_id = self.db.users.insert({
-            'email': 'john@example.com',
-            'twitter_id': 1234,
-            'email_verified': True,
-        })
-        self.assertEqual([{
-            'providers': [],
-            'is_current': False,
-            'passwords': 0,
-            'id': '',
-            'is_verified': False,
-        }, {
-            'providers': [{
-                'name': 'twitter',
-                'is_current': True,
-            }],
-            'passwords': 0,
-            'id': str(user_id),
-            'is_current': True,
-            'is_verified': True,
-        }], get_accounts(self.db, {
-            'email': 'john@example.com',
-            '_id': '',
-        }, 'twitter'))
+    # def test_get_accounts_one_user_with_provider_email_verified(self):
+    #     user_id = self.db.users.insert({
+    #         'email': 'john@example.com',
+    #         'twitter_id': 1234,
+    #         'email_verified': True,
+    #     })
+    #     self.assertEqual([{
+    #         'providers': [],
+    #         'is_current': False,
+    #         'passwords': 0,
+    #         'id': '',
+    #         'is_verified': False,
+    #     }, {
+    #         'providers': [{
+    #             'name': 'twitter',
+    #             'is_current': True,
+    #         }],
+    #         'passwords': 0,
+    #         'id': str(user_id),
+    #         'is_current': True,
+    #         'is_verified': True,
+    #     }], get_accounts(self.db, {
+    #         'email': 'john@example.com',
+    #         '_id': '',
+    #     }, 'twitter'))
 
-    def test_get_accounts_user_with_passwords(self):
-        user_id = self.db.users.insert({
-            'email': 'john@example.com',
-            'twitter_id': 1234,
-            'email_verified': True,
-        })
-        self.db.passwords.insert({'password': 'secret', 'owner': user_id})
-        self.assertEqual([{
-            'providers': [],
-            'is_current': False,
-            'passwords': 0,
-            'id': '',
-            'is_verified': False,
-        }, {
-            'providers': [{
-                'name': 'twitter',
-                'is_current': False,
-            }],
-            'passwords': 1,
-            'id': str(user_id),
-            'is_current': False,
-            'is_verified': True,
-        }], get_accounts(self.db, {
-            'email': 'john@example.com',
-            '_id': '',
-        }, 'google'))
+    # def test_get_accounts_user_with_passwords(self):
+    #     user_id = self.db.users.insert({
+    #         'email': 'john@example.com',
+    #         'twitter_id': 1234,
+    #         'email_verified': True,
+    #     })
+    #     self.db.passwords.insert({'password': 'secret', 'owner': user_id})
+    #     self.assertEqual([{
+    #         'providers': [],
+    #         'is_current': False,
+    #         'passwords': 0,
+    #         'id': '',
+    #         'is_verified': False,
+    #     }, {
+    #         'providers': [{
+    #             'name': 'twitter',
+    #             'is_current': False,
+    #         }],
+    #         'passwords': 1,
+    #         'id': str(user_id),
+    #         'is_current': False,
+    #         'is_verified': True,
+    #     }], get_accounts(self.db, {
+    #         'email': 'john@example.com',
+    #         '_id': '',
+    #     }, 'google'))
 
-    def test_get_accounts_user_multiple_providers(self):
-        user_id = self.db.users.insert({
-            'email': 'john@example.com',
-            'twitter_id': 1234,
-            'google_id': 4321,
-            'email_verified': True,
-        })
-        self.db.passwords.insert({'password': 'secret', 'owner': user_id})
+    # def test_get_accounts_user_multiple_providers(self):
+    #     user_id = self.db.users.insert({
+    #         'email': 'john@example.com',
+    #         'twitter_id': 1234,
+    #         'google_id': 4321,
+    #         'email_verified': True,
+    #     })
+    #     self.db.passwords.insert({'password': 'secret', 'owner': user_id})
 
-        self.assertEqual([{
-            'providers': [],
-            'is_current': False,
-            'passwords': 0,
-            'id': '',
-            'is_verified': False,
-        }, {
-            'providers': [{
-                'name': 'google',
-                'is_current': True,
-            }, {
-                'name': 'twitter',
-                'is_current': False,
-            }],
-            'passwords': 1,
-            'id': str(user_id),
-            'is_current': True,
-            'is_verified': True,
-        }], get_accounts(self.db, {
-            'email': 'john@example.com',
-            '_id': '',
-        }, 'google'))
+    #     self.assertEqual([{
+    #         'providers': [],
+    #         'is_current': False,
+    #         'passwords': 0,
+    #         'id': '',
+    #         'is_verified': False,
+    #     }, {
+    #         'providers': [{
+    #             'name': 'google',
+    #             'is_current': True,
+    #         }, {
+    #             'name': 'twitter',
+    #             'is_current': False,
+    #         }],
+    #         'passwords': 1,
+    #         'id': str(user_id),
+    #         'is_current': True,
+    #         'is_verified': True,
+    #     }], get_accounts(self.db, {
+    #         'email': 'john@example.com',
+    #         '_id': '',
+    #     }, 'google'))
 
 
 class BaseMergeTests(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
-        mdb = MongoDB(MONGO_URI)
-        self.db = mdb.get_database()
 
     def tearDown(self):
         testing.tearDown()
-        clean_db(self.db)
 
     def _add_authorized_app(self, user_id, client_id):
         self.db.authorized_apps.insert({
