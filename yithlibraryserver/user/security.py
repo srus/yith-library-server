@@ -41,10 +41,9 @@ def get_user(request):
 
 def assert_authenticated_user_is_registered(request):
     user_id = request.authenticated_userid
-    import pdb; pdb.set_trace()
 
     try:
-        user = DBSession.queyr(User).filter(User.id==user_id)
+        user = DBSession.query(User).filter(User.id==user_id).one()
     except NoResultFound:
         raise HTTPFound(location=request.route_path('register_new_user'))
     else:

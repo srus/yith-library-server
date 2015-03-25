@@ -72,7 +72,7 @@ def register_or_update(request, provider, user_id, info, default_url='/'):
 
         ga = request.google_analytics
         if ga.is_in_session():
-            if not ga.is_stored_in_user(user):
+            if user.allow_google_analytics is None:
                 user.allow_google_analytics = ga.show_in_session()
             ga.clean_session()
 

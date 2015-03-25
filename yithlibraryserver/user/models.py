@@ -40,7 +40,7 @@ class User(Base):
     email_verification_code = Column(String, nullable=False, default='')
 
     creation = Column(DateTime, nullable=False, default=datetime.utcnow)
-    last_login = Column(DateTime, nullable=False)
+    last_login = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     twitter_id = Column(String, nullable=False, default='')
     google_id = Column(String, nullable=False, default='')
@@ -48,7 +48,7 @@ class User(Base):
     persona_id = Column(String, nullable=False, default='')
     liveconnect_id = Column(String, nullable=False, default='')
 
-    allow_google_analytics = Column(Boolean, nullable=False, default=False)
+    allow_google_analytics = Column(Boolean, nullable=True, default=None)
     send_passwords_periodically = Column(Boolean, nullable=False, default=False)
 
     @hybrid_property

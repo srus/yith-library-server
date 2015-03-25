@@ -23,11 +23,14 @@ import unittest
 
 from webtest import TestApp
 
+from pyramid import testing as pyramid_testing
 from pyramid.httpexceptions import HTTPFound
 from pyramid.interfaces import ISessionFactory
 from pyramid.security import remember
 from pyramid.settings import asbool
 from pyramid.testing import DummyRequest
+
+from sqlalchemy import create_engine
 
 from yithlibraryserver import main
 from yithlibraryserver.db import Base
@@ -38,6 +41,21 @@ from yithlibraryserver.db import DBSession
 # each of this test executions
 PY_VERSION = '%d%d' % (sys.version_info[0], sys.version_info[1])
 DB_NAME = 'test_yithlibrary_%s' % PY_VERSION
+DB_URL = 'postgres://yithian:123456@localhost:5432/%s' % DB_NAME
+
+
+def setUp():
+    engine = create_engine(DB_URL)
+    DBSession.configure(bind=engine)
+    Base.metadata.bind = engine
+    Base.metadata.create_all()
+
+    return pyramid_testing.setUp()
+
+
+def tearDown():
+    DBSession.remove()
+    pyramid_testing.tearDown()
 
 
 class FakeRequest(DummyRequest):
@@ -51,7 +69,7 @@ class TestCase(unittest.TestCase):
 
     def setUp(self):
         settings = {
-            'database_url': 'postgres://yithian:123456@localhost:5432/%s' % DB_NAME,
+            'database_url': DB_URL,
             'auth_tk_secret': '123456',
             'twitter_consumer_key': 'key',
             'twitter_consumer_secret': 'secret',

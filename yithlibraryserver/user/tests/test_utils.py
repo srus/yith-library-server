@@ -22,99 +22,86 @@ import unittest
 
 from freezegun import freeze_time
 
-from pyramid import testing
 
-from yithlibraryserver.db import MongoDB
-from yithlibraryserver.testing import MONGO_URI, clean_db
-
+from yithlibraryserver import testing
+from yithlibraryserver.db import DBSession
 from yithlibraryserver.user.analytics import GoogleAnalytics
 from yithlibraryserver.user.analytics import USER_ATTR
-from yithlibraryserver.user.utils import split_name, delete_user, update_user
+from yithlibraryserver.user.models import User
+from yithlibraryserver.user.utils import split_name
 from yithlibraryserver.user.utils import register_or_update
 
 
-class UtilsTests(unittest.TestCase):
+class SplitNameTests(unittest.TestCase):
+
+    def test_split_name_two_words(self):
+        self.assertEqual(split_name('John Doe'), ('John', 'Doe'))
+
+    def test_split_name_one_word(self):
+        self.assertEqual(split_name('John'), ('John', ''))
+
+    def test_split_name_three_words(self):
+        self.assertEqual(split_name('John M Doe'), ('John', 'M Doe'))
+
+    def test_split_name_empty_string(self):
+        self.assertEqual(split_name(''), ('', ''))
+
+
+class RegisterOrUpdateTests(unittest.TestCase):
 
     def setUp(self):
         self.config = testing.setUp()
         self.config.include('yithlibraryserver.user')
-        mdb = MongoDB(MONGO_URI)
-        self.db = mdb.get_database()
 
     def tearDown(self):
         testing.tearDown()
-        clean_db(self.db)
 
-    def test_split_name(self):
-        self.assertEqual(split_name('John Doe'),
-                         ('John', 'Doe'))
-        self.assertEqual(split_name('John'),
-                         ('John', ''))
-        self.assertEqual(split_name('John M Doe'),
-                         ('John', 'M Doe'))
-        self.assertEqual(split_name(''),
-                         ('', ''))
+    # def test_update_user(self):
+    #     user_id = self.db.users.insert({
+    #         'screen_name': 'John Doe',
+    #         'first_name': 'John',
+    #         'last_name': '',
+    #     })
+    #     user = self.db.users.find_one({'_id': user_id})
+    #     update_user(self.db, user, {}, {})
 
-    def test_delete_user(self):
-        user_id = self.db.users.insert({
-            'screen_name': 'John Doe',
-            'first_name': 'John',
-            'last_name': '',
-        })
-        user = self.db.users.find_one({'_id': user_id})
-        n_users = self.db.users.count()
-        self.assertTrue(delete_user(self.db, user))
-        refreshed_user = self.db.users.find_one({'_id': user_id})
-        self.assertEqual(None, refreshed_user)
-        self.assertEqual(n_users - 1, self.db.users.count())
+    #     updated_user = self.db.users.find_one({'_id': user_id})
+    #     # the user has not changed
+    #     self.assertEqual(updated_user['screen_name'], user['screen_name'])
+    #     self.assertEqual(updated_user['first_name'], user['first_name'])
+    #     self.assertEqual(updated_user['last_name'], user['last_name'])
 
-    def test_update_user(self):
-        user_id = self.db.users.insert({
-            'screen_name': 'John Doe',
-            'first_name': 'John',
-            'last_name': '',
-        })
-        user = self.db.users.find_one({'_id': user_id})
-        update_user(self.db, user, {}, {})
+    #     # update the last_name
+    #     update_user(self.db, user, {'last_name': 'Doe'}, {})
+    #     updated_user = self.db.users.find_one({'_id': user_id})
+    #     self.assertEqual(updated_user['last_name'], 'Doe')
 
-        updated_user = self.db.users.find_one({'_id': user_id})
-        # the user has not changed
-        self.assertEqual(updated_user['screen_name'], user['screen_name'])
-        self.assertEqual(updated_user['first_name'], user['first_name'])
-        self.assertEqual(updated_user['last_name'], user['last_name'])
+    #     # add an email attribute
+    #     update_user(self.db, user, {'email': 'john@example.com'}, {})
+    #     updated_user = self.db.users.find_one({'_id': user_id})
+    #     self.assertEqual(updated_user['email'], 'john@example.com')
 
-        # update the last_name
-        update_user(self.db, user, {'last_name': 'Doe'}, {})
-        updated_user = self.db.users.find_one({'_id': user_id})
-        self.assertEqual(updated_user['last_name'], 'Doe')
+    #     # if an attribute has no value, no update happens
+    #     update_user(self.db, user, {'first_name': ''}, {})
+    #     updated_user = self.db.users.find_one({'_id': user_id})
+    #     self.assertEqual(updated_user['first_name'], 'John')
 
-        # add an email attribute
-        update_user(self.db, user, {'email': 'john@example.com'}, {})
-        updated_user = self.db.users.find_one({'_id': user_id})
-        self.assertEqual(updated_user['email'], 'john@example.com')
+    #     # update a non existing attribute
+    #     update_user(self.db, user, {'foo': 'bar'}, {})
+    #     updated_user = self.db.users.find_one({'_id': user_id})
+    #     self.assertFalse('foo' in updated_user)
 
-        # if an attribute has no value, no update happens
-        update_user(self.db, user, {'first_name': ''}, {})
-        updated_user = self.db.users.find_one({'_id': user_id})
-        self.assertEqual(updated_user['first_name'], 'John')
-
-        # update a non existing attribute
-        update_user(self.db, user, {'foo': 'bar'}, {})
-        updated_user = self.db.users.find_one({'_id': user_id})
-        self.assertFalse('foo' in updated_user)
-
-        # update the same attribute within the last parameter
-        update_user(self.db, user, {}, {'foo': 'bar'})
-        updated_user = self.db.users.find_one({'_id': user_id})
-        self.assertEqual(updated_user['foo'], 'bar')
+    #     # update the same attribute within the last parameter
+    #     update_user(self.db, user, {}, {'foo': 'bar'})
+    #     updated_user = self.db.users.find_one({'_id': user_id})
+    #     self.assertEqual(updated_user['foo'], 'bar')
 
     @freeze_time('2013-01-02 10:11:12')
-    def test_register_or_update(self):
+    def test_register_or_update_new_user(self):
         request = testing.DummyRequest()
-        request.db = self.db
         request.session = {}
         request.google_analytics = GoogleAnalytics(request)
-        response = register_or_update(request, 'skynet', 1, {
+        response = register_or_update(request, 'twitter', '1', {
             'screen_name': 'JohnDoe',
             'first_name': 'John',
             'last_name': 'Doe',
@@ -128,23 +115,24 @@ class UtilsTests(unittest.TestCase):
             'first_name': 'John',
             'last_name': 'Doe',
             'email': '',
-            'provider': 'skynet',
-            'skynet_id': 1,
+            'provider': 'twitter',
+            'twitter_id': '1',
         })
 
-        # try with an existing user
-        user_id = self.db.users.insert({
-            'skynet_id': 1,
-            'screen_name': 'JohnDoe',
-            'first_name': 'John',
-            'last_name': '',
-        })
+    @freeze_time('2013-01-02 10:11:12')
+    def test_register_or_update_existing_user(self):
+        user = User(twitter_id='1',
+                    screen_name='JohnDoe',
+                    first_name='John',
+                    last_name='')
+        DBSession.add(user)
+        DBSession.flush()
+        user_id = user.id
 
         request = testing.DummyRequest()
-        request.db = self.db
         request.session = {USER_ATTR: True}
         request.google_analytics = GoogleAnalytics(request)
-        response = register_or_update(request, 'skynet', 1, {
+        response = register_or_update(request, 'twitter', '1', {
             'screen_name': 'JohnDoe',
             'first_name': 'John',
             'last_name': 'Doe',
@@ -152,17 +140,24 @@ class UtilsTests(unittest.TestCase):
         }, '/next')
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location, '/next')
-        user = self.db.users.find_one({'_id': user_id})
-        self.assertEqual(user['email'], 'john@example.com')
-        self.assertEqual(user['last_name'], 'Doe')
-        self.assertEqual(user[USER_ATTR], True)
+        user = DBSession.query(User).filter(User.id==user_id).one()
+        self.assertEqual(user.email, 'john@example.com')
+        self.assertEqual(user.last_name, 'Doe')
+        self.assertEqual(user.allow_google_analytics, True)
 
-        # maybe there is a next_url in the session
+    @freeze_time('2013-01-02 10:11:12')
+    def test_register_or_update_next_url_in_session(self):
+        user = User(twitter_id='1',
+                    screen_name='JohnDoe',
+                    first_name='John',
+                    last_name='')
+        DBSession.add(user)
+        DBSession.flush()
+
         request = testing.DummyRequest()
-        request.db = self.db
         request.session = {'next_url': '/foo'}
         request.google_analytics = GoogleAnalytics(request)
-        response = register_or_update(request, 'skynet', 1, {
+        response = register_or_update(request, 'twitter', '1', {
             'screen_name': 'JohnDoe',
             'first_name': 'John',
             'last_name': 'Doe',
