@@ -20,14 +20,14 @@
 
 import unittest
 
-from pyramid import testing
 from pyramid.testing import DummyRequest
 
 from pyramid_mailer import get_mailer
 
-from yithlibraryserver.db import MongoDB
-from yithlibraryserver.testing import MONGO_URI, clean_db
+from yithlibraryserver import testing
+from yithlibraryserver.db import DBSession
 from yithlibraryserver.user.email_verification import EmailVerificationCode
+from yithlibraryserver.user.models import User
 
 
 class EmailVerificationCodeTests(unittest.TestCase):
@@ -36,40 +36,56 @@ class EmailVerificationCodeTests(unittest.TestCase):
         self.config = testing.setUp()
         self.config.include('pyramid_mailer.testing')
         self.config.include('pyramid_chameleon')
-        self.db = MongoDB(MONGO_URI).get_database()
 
     def tearDown(self):
         testing.tearDown()
-        clean_db(self.db)
 
-    def test_email_verification_code(self):
+    def test_email_verification_code_verify_negative(self):
         evc = EmailVerificationCode()
 
-        self.assertNotEqual(evc.code, None)
+        self.assertIsNotNone(evc.code)
 
-        user_id = self.db.users.insert({
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john@example.com',
-        })
-        user = self.db.users.find_one({'_id': user_id})
-        evc.store(self.db, user)
-
-        user = self.db.users.find_one({'_id': user_id})
-        self.assertEqual(user['email_verification_code'], evc.code)
+        user = User(first_name='John',
+                    last_name='Doe',
+                    email='john@example.com')
+        DBSession.add(user)
+        DBSession.flush()
 
         evc2 = EmailVerificationCode(evc.code)
-        result = evc2.verify(self.db, 'john@example.com')
-        self.assertTrue(result)
+        result = evc2.verify('john@example.com')
+        self.assertIsNone(result)
 
-        evc2.remove(self.db, 'john@example.com', True)
-        user = self.db.users.find_one({'_id': user_id})
-        self.assertFalse('email_verification_code' in user)
-        self.assertTrue(user['email_verified'])
+    def test_email_verification_code_verify_positive(self):
+        evc = EmailVerificationCode()
+
+        self.assertIsNotNone(evc.code)
+
+        user = User(first_name='John',
+                    last_name='Doe',
+                    email='john@example.com',
+                    email_verification_code=evc.code)
+        DBSession.add(user)
+        DBSession.flush()
+
+        evc2 = EmailVerificationCode(evc.code)
+        result = evc2.verify('john@example.com')
+        self.assertIsNotNone(result)
+        self.assertEqual(user.id, result.id)
+
+    def test_email_verification_code_send(self):
+        evc = EmailVerificationCode()
+        user = User(first_name='John',
+                    last_name='Doe',
+                    email='john@example.com',
+                    email_verification_code=evc.code)
+        DBSession.add(user)
+        DBSession.flush()
 
         request = DummyRequest()
         mailer = get_mailer(request)
         self.assertEqual(len(mailer.outbox), 0)
+
+        evc2 = EmailVerificationCode(evc.code)
         evc2.send(request, user, 'http://example.com/verify')
 
         self.assertEqual(len(mailer.outbox), 1)
