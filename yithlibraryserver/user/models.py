@@ -78,7 +78,8 @@ class User(Base):
 
     def update_preferences(self, preferences):
         for preference in ('allow_google_analytics', 'send_passwords_periodically'):
-            setattr(self, preference, preferences[preference])
+            if preference in preferences:
+                setattr(self, preference, preferences[preference])
 
     def update_user_info(self, user_info):
         for attribute in ('screen_name', 'first_name', 'last_name'):

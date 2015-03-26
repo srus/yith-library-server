@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -18,27 +18,97 @@
 
 import unittest
 
+from yithlibraryserver import testing
 from yithlibraryserver.compat import text_type
+from yithlibraryserver.db import DBSession
 from yithlibraryserver.user.models import User
 
 
-class UserTests(unittest.TestCase):
+class FullNameTests(unittest.TestCase):
 
-    def test_unicode(self):
-        data = {'_id': '1234'}
-        self.assertEqual(text_type(User(data)), '1234')
+    def test_empty(self):
+        user = User(first_name='', last_name='')
+        self.assertEqual(user.full_name, '')
 
-        data['email'] = 'john@example.com'
-        self.assertEqual(text_type(User(data)), 'john@example.com')
+    def test_only_first_name(self):
+        user = User(first_name='John', last_name='')
+        self.assertEqual(user.full_name, 'John')
 
-        data['last_name'] = 'Doe'
-        self.assertEqual(text_type(User(data)), 'Doe')
+    def test_only_last_name(self):
+        user = User(first_name='', last_name='Doe')
+        self.assertEqual(user.full_name, 'Doe')
 
-        data['first_name'] = 'John'
-        self.assertEqual(text_type(User(data)), 'John Doe')
+    def test_first_and_last_name(self):
+        user = User(first_name='John', last_name='Doe')
+        self.assertEqual(user.full_name, 'John Doe')
 
-        data['screen_name'] = 'Johnny'
-        self.assertEqual(text_type(User(data)), 'Johnny')
 
-        u = User(data)
+class UnicodeTests(unittest.TestCase):
+
+    def setUp(self):
+        self.config = testing.setUp()
+        self.config.include('yithlibraryserver.user')
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def test_unicode_only_id(self):
+        user = User()
+        DBSession.add(user)
+        DBSession.flush()
+        self.assertEqual(text_type(user), text_type(user.id))
+
+    def test_unicode_only_email(self):
+        user = User(email='john@example.com')
+        DBSession.add(user)
+        DBSession.flush()
+        self.assertEqual(text_type(user), 'john@example.com')
+
+    def test_unicode_only_last_name(self):
+        user = User(last_name='Doe')
+        DBSession.add(user)
+        DBSession.flush()
+        self.assertEqual(text_type(user), 'Doe')
+
+    def test_unicode_first_name_and_last_name(self):
+        user = User(first_name='John', last_name='Doe')
+        DBSession.add(user)
+        DBSession.flush()
+        self.assertEqual(text_type(user), 'John Doe')
+
+    def test_unicode_only_screen_name(self):
+        user = User(screen_name='Johnny')
+        DBSession.add(user)
+        DBSession.flush()
+        self.assertEqual(text_type(user), 'Johnny')
+
+    def test_unicode_is_str(self):
+        u = User()
+        DBSession.add(u)
+        DBSession.flush()
         self.assertEqual(u.__unicode__(), u.__str__())
+
+
+class UpdatePreferencesTests(unittest.TestCase):
+
+    def setUp(self):
+        self.user = User(allow_google_analytics=False,
+                         send_passwords_periodically=True)
+
+    def test_empty_preferences(self):
+        self.user.update_preferences({})
+        self.assertEqual(self.user.allow_google_analytics, False)
+        self.assertEqual(self.user.send_passwords_periodically, True)
+
+    def test_fake_preferences(self):
+        self.user.update_preferences({'foo': 'bar'})
+        self.assertEqual(self.user.allow_google_analytics, False)
+        self.assertEqual(self.user.send_passwords_periodically, True)
+
+    def test_real_preferences(self):
+        self.user.update_preferences({
+            'allow_google_analytics': True,
+            'send_passwords_periodically': False,
+        })
+        self.assertEqual(self.user.allow_google_analytics, True)
+        self.assertEqual(self.user.send_passwords_periodically, False)
