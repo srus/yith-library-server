@@ -18,15 +18,15 @@
 
 from datetime import datetime
 
+from pyramid_sqlalchemy import BaseObject
+
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
 from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship, backref
 
-from yithlibraryserver.db import Base
 
-
-class Application(Base):
+class Application(BaseObject):
     __tablename__ = 'applications'
 
     id = Column(Integer, primary_key=True)
@@ -49,7 +49,7 @@ class Application(Base):
     user = relationship('User', backref=backref('applications'))#, order_by='id'))
 
 
-class AuthorizedApplication(Base):
+class AuthorizedApplication(BaseObject):
     __tablename__ = 'authorized_applications'
 
     id = Column(Integer, primary_key=True)
@@ -78,7 +78,7 @@ class AuthorizedApplication(Base):
     )
 
 
-class AuthorizationCode(Base):
+class AuthorizationCode(BaseObject):
     __tablename__ = 'authorization_codes'
 
     code = Column(String, primary_key=True)
@@ -109,7 +109,7 @@ class AuthorizationCode(Base):
     )
 
 
-class AccessCode(Base):
+class AccessCode(BaseObject):
     __tablename__ = 'access_codes'
 
     code = Column(String, primary_key=True)

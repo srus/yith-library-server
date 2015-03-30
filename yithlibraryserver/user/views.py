@@ -27,8 +27,9 @@ from pyramid.i18n import get_localizer
 from pyramid.security import remember, forget
 from pyramid.view import view_config, view_defaults, forbidden_view_config
 
+from pyramid_sqlalchemy import Session
+
 from yithlibraryserver.compat import url_quote
-from yithlibraryserver.db import DBSession
 from yithlibraryserver.i18n import translation_domain
 from yithlibraryserver.i18n import TranslationString as _
 from yithlibraryserver.oauth2.decorators import protected_method
@@ -120,7 +121,7 @@ def register_new_user(request):
             request.google_analytics.clean_session()
 
         user = User(**user_attrs)
-        DBSession.add(user)
+        Session.add(user)
 
         if not email_verified and email != '':
             evc = EmailVerificationCode()
@@ -132,7 +133,7 @@ def register_new_user(request):
         if 'next_url' in request.session:
             del request.session['next_url']
 
-        DBSession.flush()
+        Session.flush()
 
         request.session['current_provider'] = provider
         return HTTPFound(location=next_url,
@@ -203,7 +204,7 @@ def destroy(request):
         notify_admins_of_account_removal(request, user, reason)
 
         # TODO: remove user's applications
-        DBSession.delete(user)
+        Session.delete(user)
 
         request.session.flash(
             _('Your account has been removed. Have a nice day!'),
@@ -250,7 +251,7 @@ def user_information(request):
         }
         user.update_user_info(changes)
 
-        DBSession.add(user)
+        Session.add(user)
 
         request.session.flash(
             _('The changes were saved successfully'),
@@ -291,7 +292,7 @@ def preferences(request):
             return {'form': e.render()}
 
         user.update_preferences(appstruct)
-        DBSession.add(user)
+        Session.add(user)
 
         request.session.flash(
             _('The changes were saved successfully'),
@@ -401,7 +402,7 @@ def verify_email(request):
             'success',
         )
         user.verify_email()
-        DBSession.add(user)
+        Session.add(user)
         return {
             'verified': True,
         }
@@ -428,7 +429,7 @@ def google_analytics_preference(request):
         request.session[analytics.USER_ATTR] = allow
     else:
         request.user.allow_google_analytics = allow
-        DBSession.add(request.user)
+        Session.add(request.user)
 
     return {'allow': allow}
 

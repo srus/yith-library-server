@@ -22,9 +22,9 @@ import unittest
 
 from freezegun import freeze_time
 
+from pyramid_sqlalchemy import Session
 
 from yithlibraryserver import testing
-from yithlibraryserver.db import DBSession
 from yithlibraryserver.user.analytics import GoogleAnalytics
 from yithlibraryserver.user.analytics import USER_ATTR
 from yithlibraryserver.user.models import User
@@ -125,8 +125,8 @@ class RegisterOrUpdateTests(unittest.TestCase):
                     screen_name='JohnDoe',
                     first_name='John',
                     last_name='')
-        DBSession.add(user)
-        DBSession.flush()
+        Session.add(user)
+        Session.flush()
         user_id = user.id
 
         request = testing.DummyRequest()
@@ -140,7 +140,7 @@ class RegisterOrUpdateTests(unittest.TestCase):
         }, '/next')
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location, '/next')
-        user = DBSession.query(User).filter(User.id==user_id).one()
+        user = Session.query(User).filter(User.id==user_id).one()
         self.assertEqual(user.email, 'john@example.com')
         self.assertEqual(user.last_name, 'Doe')
         self.assertEqual(user.allow_google_analytics, True)
@@ -151,8 +151,8 @@ class RegisterOrUpdateTests(unittest.TestCase):
                     screen_name='JohnDoe',
                     first_name='John',
                     last_name='')
-        DBSession.add(user)
-        DBSession.flush()
+        Session.add(user)
+        Session.flush()
 
         request = testing.DummyRequest()
         request.session = {'next_url': '/foo'}

@@ -20,9 +20,10 @@
 
 from pyramid.httpexceptions import HTTPFound
 
+from pyramid_sqlalchemy import Session
+
 from sqlalchemy.orm.exc import NoResultFound
 
-from yithlibraryserver.db import DBSession
 from yithlibraryserver.user.models import User
 
 
@@ -32,7 +33,7 @@ def get_user(request):
         return user_id
 
     try:
-        user = DBSession.query(User).filter(User.id==user_id).one()
+        user = Session.query(User).filter(User.id==user_id).one()
     except NoResultFound:
         user = None
 
@@ -43,7 +44,7 @@ def assert_authenticated_user_is_registered(request):
     user_id = request.authenticated_userid
 
     try:
-        user = DBSession.query(User).filter(User.id==user_id).one()
+        user = Session.query(User).filter(User.id==user_id).one()
     except NoResultFound:
         raise HTTPFound(location=request.route_path('register_new_user'))
     else:

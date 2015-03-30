@@ -24,8 +24,9 @@ from pyramid.testing import DummyRequest
 
 from pyramid_mailer import get_mailer
 
+from pyramid_sqlalchemy import Session
+
 from yithlibraryserver import testing
-from yithlibraryserver.db import DBSession
 from yithlibraryserver.user.email_verification import EmailVerificationCode
 from yithlibraryserver.user.models import User
 
@@ -48,8 +49,8 @@ class EmailVerificationCodeTests(unittest.TestCase):
         user = User(first_name='John',
                     last_name='Doe',
                     email='john@example.com')
-        DBSession.add(user)
-        DBSession.flush()
+        Session.add(user)
+        Session.flush()
 
         evc2 = EmailVerificationCode(evc.code)
         result = evc2.verify('john@example.com')
@@ -64,8 +65,8 @@ class EmailVerificationCodeTests(unittest.TestCase):
                     last_name='Doe',
                     email='john@example.com',
                     email_verification_code=evc.code)
-        DBSession.add(user)
-        DBSession.flush()
+        Session.add(user)
+        Session.flush()
 
         evc2 = EmailVerificationCode(evc.code)
         result = evc2.verify('john@example.com')
@@ -78,8 +79,8 @@ class EmailVerificationCodeTests(unittest.TestCase):
                     last_name='Doe',
                     email='john@example.com',
                     email_verification_code=evc.code)
-        DBSession.add(user)
-        DBSession.flush()
+        Session.add(user)
+        Session.flush()
 
         request = DummyRequest()
         mailer = get_mailer(request)

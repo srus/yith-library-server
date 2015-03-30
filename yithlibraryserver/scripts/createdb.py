@@ -16,7 +16,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-from yithlibraryserver.db import Base
+from pyramid_sqlalchemy import BaseObject
+
 from yithlibraryserver.scripts.utils import setup_simple_command
 
 
@@ -31,7 +32,7 @@ def createdb():
         settings, closer, env, args = result
 
     try:
-        Base.metadata.create_all()
+        BaseObject.metadata.create_all()
 
     finally:
         closer()

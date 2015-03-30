@@ -20,15 +20,15 @@
 
 from datetime import datetime
 
+from pyramid_sqlalchemy import BaseObject
+
 from sqlalchemy import Column, DateTime, Integer, String, Text
 from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.postgresql import ARRAY, JSON
 from sqlalchemy.orm import relationship, backref
 
-from yithlibraryserver.db import Base
 
-
-class Password(Base):
+class Password(BaseObject):
     __tablename__ = 'passwords'
 
     id = Column(Integer, primary_key=True)

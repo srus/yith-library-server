@@ -30,11 +30,11 @@ from pyramid.security import remember
 from pyramid.settings import asbool
 from pyramid.testing import DummyRequest
 
+from pyramid_sqlalchemy import BaseObject, Session
+
 from sqlalchemy import create_engine
 
 from yithlibraryserver import main
-from yithlibraryserver.db import Base
-from yithlibraryserver.db import DBSession
 
 # On Travis-CI tests are executed in paralllel for every Python
 # version we support. We should not share the test database on
@@ -46,15 +46,15 @@ DB_URL = 'postgres://yithian:123456@localhost:5432/%s' % DB_NAME
 
 def setUp():
     engine = create_engine(DB_URL)
-    DBSession.configure(bind=engine)
-    Base.metadata.bind = engine
-    Base.metadata.create_all()
+    Session.configure(bind=engine)
+    BaseObject.metadata.bind = engine
+    BaseObject.metadata.create_all()
 
     return pyramid_testing.setUp()
 
 
 def tearDown():
-    DBSession.remove()
+    Session.remove()
     pyramid_testing.tearDown()
 
 
@@ -90,11 +90,11 @@ class TestCase(unittest.TestCase):
             'webassets.debug': 'True',
         }
         app = main({}, **settings)
-        Base.metadata.create_all()
+        BaseObject.metadata.create_all()
         self.testapp = TestApp(app)
 
     def tearDown(self):
-        DBSession.remove()
+        Session.remove()
         self.testapp.reset()
 
     def get_session(self, response):

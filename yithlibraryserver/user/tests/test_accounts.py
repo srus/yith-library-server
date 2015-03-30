@@ -39,26 +39,6 @@ class AccountTests(TestCase):
         self.assertEqual(('facebook', 'google', 'twitter', 'persona', 'liveconnect'),
                          get_available_providers())
 
-    # def test_get_providers(self):
-    #     self.assertEqual([], get_providers({}, ''))
-    #     self.assertEqual([
-    #         {'name': 'facebook', 'is_current': True}
-    #     ], get_providers({'facebook_id': 1234}, 'facebook'))
-    #     self.assertEqual([{
-    #         'name': 'facebook',
-    #         'is_current': True,
-    #     }, {
-    #         'name': 'google',
-    #         'is_current': False,
-    #     }, {
-    #         'name': 'twitter',
-    #         'is_current': False,
-    #     }], get_providers({
-    #         'facebook_id': 1234,
-    #         'google_id': 4321,
-    #         'twitter_id': 6789
-    #     }, 'facebook'))
-    #     self.assertEqual([], get_providers({'myspace_id': 1234}, ''))
 
     # def test_n_passwords(self):
     #     self.assertEqual(0, get_n_passwords(self.db, {'_id': 1}))

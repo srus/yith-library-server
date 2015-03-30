@@ -23,9 +23,10 @@ import datetime
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember
 
+from pyramid_sqlalchemy import Session
+
 from sqlalchemy.orm.exc import NoResultFound
 
-from yithlibraryserver.db import DBSession
 from yithlibraryserver.user.models import User
 from yithlibraryserver.user.providers import get_provider_key
 
@@ -46,7 +47,7 @@ def user_from_provider_id(provider, user_id):
     provider_key = get_provider_key(provider)
     column = getattr(User, provider_key)
     try:
-        return DBSession.query(User).filter(column==user_id).one()
+        return Session.query(User).filter(column==user_id).one()
     except NoResultFound:
         return None
 
@@ -77,7 +78,7 @@ def register_or_update(request, provider, user_id, info, default_url='/'):
             ga.clean_session()
 
         user.update_user_info(info)
-        DBSession.add(user)
+        Session.add(user)
 
         if 'next_url' in request.session:
             next_url = request.session['next_url']

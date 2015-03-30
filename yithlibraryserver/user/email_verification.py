@@ -22,7 +22,8 @@ import uuid
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from yithlibraryserver.db import DBSession
+from pyramid_sqlalchemy import Session
+
 from yithlibraryserver.email import send_email
 from yithlibraryserver.user.models import User
 
@@ -40,7 +41,7 @@ class EmailVerificationCode(object):
 
     def verify(self, email):
         try:
-            return DBSession.query(
+            return Session.query(
                 User
             ).filter(
                 User.email==email,

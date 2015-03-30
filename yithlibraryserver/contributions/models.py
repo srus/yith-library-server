@@ -19,13 +19,14 @@
 from datetime import datetime
 from bson.tz_util import utc
 
+from pyramid_sqlalchemy import BaseObject
+
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, backref
 
-from yithlibraryserver.db import Base
 
-class Donation(Base):
+class Donation(BaseObject):
     __tablename__ = 'donations'
 
     id = Column(Integer, primary_key=True)

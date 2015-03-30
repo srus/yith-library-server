@@ -18,9 +18,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+from pyramid_sqlalchemy import Session
 from sqlalchemy.orm.exc import NoResultFound
 
-from yithlibraryserver.db import DBSession
 from yithlibraryserver.email import send_email_to_admins
 from yithlibraryserver.oauth2.authorization import Authorizator
 from yithlibraryserver.user.models import User
@@ -37,7 +37,7 @@ def merge_accounts(master_user, accounts):
             continue
 
         try:
-            current_user = DBSession.query(User).filter(User.id==user_id).one()
+            current_user = Session.query(User).filter(User.id==user_id).one()
         except NoResultFound:
             continue
 

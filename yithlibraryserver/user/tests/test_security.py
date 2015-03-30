@@ -22,8 +22,9 @@ import unittest
 
 from pyramid.httpexceptions import HTTPFound
 
+from pyramid_sqlalchemy import Session
+
 from yithlibraryserver import testing
-from yithlibraryserver.db import DBSession
 from yithlibraryserver.user.security import (
     get_user,
     assert_authenticated_user_is_registered,
@@ -51,8 +52,8 @@ class GetUserTests(unittest.TestCase):
 
     def test_get_user_existing_user(self):
         user = User(screen_name='John Doe')
-        DBSession.add(user)
-        DBSession.flush()
+        Session.add(user)
+        Session.flush()
         user_id = user.id
 
         self.config.testing_securitypolicy(userid=user_id)
@@ -84,8 +85,8 @@ class AssertAuthenticatedUserIsRegisteredTests(unittest.TestCase):
 
     def test_assert_authenticated_user_is_registered_existing_user(self):
         user = User(screen_name='John Doe')
-        DBSession.add(user)
-        DBSession.flush()
+        Session.add(user)
+        Session.flush()
         user_id = user.id
 
         self.config.testing_securitypolicy(userid=user_id)

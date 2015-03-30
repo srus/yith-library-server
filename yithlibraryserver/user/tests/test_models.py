@@ -18,9 +18,10 @@
 
 import unittest
 
+from pyramid_sqlalchemy import Session
+
 from yithlibraryserver import testing
 from yithlibraryserver.compat import text_type
-from yithlibraryserver.db import DBSession
 from yithlibraryserver.user.models import User
 
 
@@ -54,38 +55,38 @@ class UnicodeTests(unittest.TestCase):
 
     def test_unicode_only_id(self):
         user = User()
-        DBSession.add(user)
-        DBSession.flush()
+        Session.add(user)
+        Session.flush()
         self.assertEqual(text_type(user), text_type(user.id))
 
     def test_unicode_only_email(self):
         user = User(email='john@example.com')
-        DBSession.add(user)
-        DBSession.flush()
+        Session.add(user)
+        Session.flush()
         self.assertEqual(text_type(user), 'john@example.com')
 
     def test_unicode_only_last_name(self):
         user = User(last_name='Doe')
-        DBSession.add(user)
-        DBSession.flush()
+        Session.add(user)
+        Session.flush()
         self.assertEqual(text_type(user), 'Doe')
 
     def test_unicode_first_name_and_last_name(self):
         user = User(first_name='John', last_name='Doe')
-        DBSession.add(user)
-        DBSession.flush()
+        Session.add(user)
+        Session.flush()
         self.assertEqual(text_type(user), 'John Doe')
 
     def test_unicode_only_screen_name(self):
         user = User(screen_name='Johnny')
-        DBSession.add(user)
-        DBSession.flush()
+        Session.add(user)
+        Session.flush()
         self.assertEqual(text_type(user), 'Johnny')
 
     def test_unicode_is_str(self):
         u = User()
-        DBSession.add(u)
-        DBSession.flush()
+        Session.add(u)
+        Session.flush()
         self.assertEqual(u.__unicode__(), u.__str__())
 
 
@@ -112,3 +113,100 @@ class UpdatePreferencesTests(unittest.TestCase):
         })
         self.assertEqual(self.user.allow_google_analytics, True)
         self.assertEqual(self.user.send_passwords_periodically, False)
+
+
+class UpdateUserInfo(unittest.TestCase):
+
+    def setUp(self):
+        self.user = User(screen_name='', first_name='', last_name='',
+                         email='', email_verified=False)
+
+    def test_update_user_info_empty(self):
+        self.user.update_user_info({})
+        self.assertEqual(self.user.screen_name, '')
+        self.assertEqual(self.user.first_name, '')
+        self.assertEqual(self.user.last_name, '')
+        self.assertEqual(self.user.email, '')
+        self.assertEqual(self.user.email_verified, False)
+
+    def test_update_user_info_names(self):
+        self.user.update_user_info({
+            'screen_name': 'John Doe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+        })
+        self.assertEqual(self.user.screen_name, 'John Doe')
+        self.assertEqual(self.user.first_name, 'John')
+        self.assertEqual(self.user.last_name, 'Doe')
+        self.assertEqual(self.user.email, '')
+        self.assertEqual(self.user.email_verified, False)
+
+    def test_update_user_info_names_dont_update_empty_ones(self):
+        self.user.screen_name = 'John Doe'
+        self.user.first_name = 'John'
+        self.user.last_name = 'Doe'
+        self.user.update_user_info({
+            'screen_name': '',
+            'first_name': '',
+            'last_name': '',
+        })
+        self.assertEqual(self.user.screen_name, 'John Doe')
+        self.assertEqual(self.user.first_name, 'John')
+        self.assertEqual(self.user.last_name, 'Doe')
+        self.assertEqual(self.user.email, '')
+        self.assertEqual(self.user.email_verified, False)
+
+    def test_update_user_info_email(self):
+        self.user.update_user_info({'email': 'john@example.com'})
+        self.assertEqual(self.user.email, 'john@example.com')
+        self.assertEqual(self.user.email_verified, False)
+
+    def test_update_user_info_email_force_verified(self):
+        self.user.update_user_info({
+            'email': 'john@example.com',
+            'email_verified': True,
+        })
+        self.assertEqual(self.user.email, 'john@example.com')
+        self.assertEqual(self.user.email_verified, False)
+
+    def test_update_user_info_email_previously_verified(self):
+        self.user.email = 'johndoe@example.com'
+        self.user.email_verified = True
+        self.user.update_user_info({'email': 'john@example.com'})
+        self.assertEqual(self.user.email, 'john@example.com')
+        self.assertEqual(self.user.email_verified, False)
+
+
+class GetAccountsTests(unittest.TestCase):
+
+    def test_foo(self):
+        pass
+
+
+class GetProvidersTests(unittest.TestCase):
+
+    def test_get_providers_none(self):
+        user = User(facebook_id='', google_id='', twitter_id='',
+                    persona_id='', liveconnect_id='')
+        self.assertEqual([], user.get_providers(''))
+
+    def test_get_providers_one_provider_current(self):
+        user = User(facebook_id='1234', google_id='', twitter_id='',
+                    persona_id='', liveconnect_id='')
+        self.assertEqual([
+            {'name': 'facebook', 'is_current': True},
+        ], user.get_providers('facebook'))
+
+    def test_get_providers_multiple_providers(self):
+        user = User(facebook_id='1234', google_id='4321', twitter_id='6789',
+                    persona_id='', liveconnect_id='')
+        self.assertEqual([
+            {'name': 'facebook', 'is_current': True},
+            {'name': 'google', 'is_current': False},
+            {'name': 'twitter', 'is_current': False},
+        ], user.get_providers('facebook'))
+
+    def test_get_providers_invalid_provider(self):
+        user = User(facebook_id='', google_id='', twitter_id='',
+                    persona_id='', liveconnect_id='')
+        self.assertEqual([], user.get_providers('myspace'))

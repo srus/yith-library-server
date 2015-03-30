@@ -18,16 +18,15 @@
 
 from datetime import datetime
 
+from pyramid_sqlalchemy import BaseObject, Session
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from yithlibraryserver.compat import text_type
-from yithlibraryserver.db import Base
-from yithlibraryserver.db import DBSession
 from yithlibraryserver.user import providers
 
 
-class User(Base):
+class User(BaseObject):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
@@ -92,7 +91,7 @@ class User(Base):
             self.email_verified = False
 
     def get_accounts(self, current_provider):
-        other_users = DBSession.query(
+        other_users = Session.query(
             User
         ).filter(User.email==self.email).filter(User.id!=self.id)
 
