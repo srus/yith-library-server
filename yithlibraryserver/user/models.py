@@ -124,4 +124,4 @@ class User(BaseObject):
 
     def verify_email(self):
         self.email_verified = True
-        self.email_verificatioN_code = ''
+        self.email_verification_code = ''

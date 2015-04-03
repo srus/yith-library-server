@@ -19,20 +19,17 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-import unittest
 
 from webtest import TestApp
 
-from pyramid import testing as pyramid_testing
 from pyramid.httpexceptions import HTTPFound
 from pyramid.interfaces import ISessionFactory
 from pyramid.security import remember
 from pyramid.settings import asbool
 from pyramid.testing import DummyRequest
 
-from pyramid_sqlalchemy import BaseObject, Session
-
-from sqlalchemy import create_engine
+from pyramid_sqlalchemy import metadata
+from pyramid_sqlalchemy import testing
 
 from yithlibraryserver import main
 
@@ -44,20 +41,6 @@ DB_NAME = 'test_yithlibrary_%s' % PY_VERSION
 DB_URL = 'postgres://yithian:123456@localhost:5432/%s' % DB_NAME
 
 
-def setUp():
-    engine = create_engine(DB_URL)
-    Session.configure(bind=engine)
-    BaseObject.metadata.bind = engine
-    BaseObject.metadata.create_all()
-
-    return pyramid_testing.setUp()
-
-
-def tearDown():
-    Session.remove()
-    pyramid_testing.tearDown()
-
-
 class FakeRequest(DummyRequest):
 
     def __init__(self, *args, **kwargs):
@@ -65,9 +48,15 @@ class FakeRequest(DummyRequest):
         self.authorization = self.headers.get('Authorization', '').split(' ')
 
 
-class TestCase(unittest.TestCase):
+class DatabaseTestCase(testing.DatabaseTestCase):
+
+    db_uri = 'postgres://yithian:123456@localhost:5432/%s' % DB_NAME
+
+
+class TestCase(DatabaseTestCase):
 
     def setUp(self):
+        super(TestCase, self).setUp()
         settings = {
             'database_url': DB_URL,
             'auth_tk_secret': '123456',
@@ -90,12 +79,13 @@ class TestCase(unittest.TestCase):
             'webassets.debug': 'True',
         }
         app = main({}, **settings)
-        BaseObject.metadata.create_all()
         self.testapp = TestApp(app)
+        if self.create_tables:
+            metadata.create_all()
 
     def tearDown(self):
-        Session.remove()
         self.testapp.reset()
+        super(TestCase, self).tearDown()
 
     def get_session(self, response):
         queryUtility = self.testapp.app.registry.queryUtility

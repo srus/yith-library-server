@@ -18,13 +18,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-
+from pyramid import testing
 from pyramid.httpexceptions import HTTPFound
 
 from pyramid_sqlalchemy import Session
 
-from yithlibraryserver import testing
+from yithlibraryserver.testing import DatabaseTestCase
 from yithlibraryserver.user.security import (
     get_user,
     assert_authenticated_user_is_registered,
@@ -32,14 +31,16 @@ from yithlibraryserver.user.security import (
 from yithlibraryserver.user.models import User
 
 
-class GetUserTests(unittest.TestCase):
+class GetUserTests(DatabaseTestCase):
 
     def setUp(self):
+        super(GetUserTests, self).setUp()
         self.config = testing.setUp()
         self.config.include('yithlibraryserver.user')
 
     def tearDown(self):
         testing.tearDown()
+        super(GetUserTests, self).tearDown()
 
     def test_get_user_no_userid(self):
         request = testing.DummyRequest()
@@ -63,14 +64,16 @@ class GetUserTests(unittest.TestCase):
         self.assertEqual(new_user.screen_name, 'John Doe')
 
 
-class AssertAuthenticatedUserIsRegisteredTests(unittest.TestCase):
+class AssertAuthenticatedUserIsRegisteredTests(DatabaseTestCase):
 
     def setUp(self):
+        super(AssertAuthenticatedUserIsRegisteredTests, self).setUp()
         self.config = testing.setUp()
         self.config.include('yithlibraryserver.user')
 
     def tearDown(self):
         testing.tearDown()
+        super(AssertAuthenticatedUserIsRegisteredTests, self).tearDown()
 
     def test_assert_authenticated_user_is_registered_no_user(self):
         self.config.testing_securitypolicy(userid=1)

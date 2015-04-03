@@ -18,10 +18,12 @@
 
 import unittest
 
+from pyramid import testing
+
 from pyramid_sqlalchemy import Session
 
-from yithlibraryserver import testing
 from yithlibraryserver.compat import text_type
+from yithlibraryserver.testing import DatabaseTestCase
 from yithlibraryserver.user.models import User
 
 
@@ -44,14 +46,16 @@ class FullNameTests(unittest.TestCase):
         self.assertEqual(user.full_name, 'John Doe')
 
 
-class UnicodeTests(unittest.TestCase):
+class UnicodeTests(DatabaseTestCase):
 
     def setUp(self):
+        super(UnicodeTests, self).setUp()
         self.config = testing.setUp()
         self.config.include('yithlibraryserver.user')
 
     def tearDown(self):
         testing.tearDown()
+        super(UnicodeTests, self).tearDown()
 
     def test_unicode_only_id(self):
         user = User()

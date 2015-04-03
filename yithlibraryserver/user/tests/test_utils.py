@@ -22,9 +22,11 @@ import unittest
 
 from freezegun import freeze_time
 
+from pyramid import testing
+
 from pyramid_sqlalchemy import Session
 
-from yithlibraryserver import testing
+from yithlibraryserver.testing import DatabaseTestCase
 from yithlibraryserver.user.analytics import GoogleAnalytics
 from yithlibraryserver.user.analytics import USER_ATTR
 from yithlibraryserver.user.models import User
@@ -47,14 +49,16 @@ class SplitNameTests(unittest.TestCase):
         self.assertEqual(split_name(''), ('', ''))
 
 
-class RegisterOrUpdateTests(unittest.TestCase):
+class RegisterOrUpdateTests(DatabaseTestCase):
 
     def setUp(self):
+        super(RegisterOrUpdateTests, self).setUp()
         self.config = testing.setUp()
         self.config.include('yithlibraryserver.user')
 
     def tearDown(self):
         testing.tearDown()
+        super(RegisterOrUpdateTests, self).tearDown()
 
     # def test_update_user(self):
     #     user_id = self.db.users.insert({
