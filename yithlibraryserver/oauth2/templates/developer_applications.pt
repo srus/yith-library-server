@@ -14,9 +14,9 @@
     <h1 i18n:translate="">Developer Applications</h1>
   </div>
 
-  <p class="well well-lg" tal:condition="applications.count() == 0" i18n:translate="">You have not registered any developer application yet.</p>
+  <p class="well well-lg" tal:condition="len(applications) == 0" i18n:translate="">You have not registered any developer application yet.</p>
 
-  <table class="table table-striped" tal:condition="applications.count() > 0">
+  <table class="table table-striped" tal:condition="len(applications) > 0">
     <thead>
       <th i18n:translate="">Name</th>
       <th i18n:translate="">Main URL</th>

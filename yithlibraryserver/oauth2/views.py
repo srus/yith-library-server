@@ -29,6 +29,9 @@ from pyramid.httpexceptions import (
 from pyramid.httpexceptions import HTTPUnauthorized
 from pyramid.view import view_config
 
+from pyramid_sqlalchemy import Session
+from sqlalchemy.orm.exc import NoResultFound
+
 from oauthlib.oauth2 import (
     AccessDeniedError,
     FatalClientError,
@@ -37,8 +40,8 @@ from oauthlib.oauth2 import (
 )
 
 from yithlibraryserver.i18n import TranslationString as _
-from yithlibraryserver.oauth2.application import create_client_id_and_secret
 from yithlibraryserver.oauth2.authorization import Authorizator
+from yithlibraryserver.oauth2.models import Application
 from yithlibraryserver.oauth2.schemas import ApplicationSchema
 from yithlibraryserver.oauth2.schemas import FullApplicationSchema
 from yithlibraryserver.oauth2.utils import (
@@ -55,9 +58,8 @@ from yithlibraryserver.user.security import assert_authenticated_user_is_registe
              permission='view-applications')
 def developer_applications(request):
     assert_authenticated_user_is_registered(request)
-    owned_apps_filter = {'owner': request.user['_id']}
     return {
-        'applications': request.db.applications.find(owned_apps_filter)
+        'applications': request.user.applications,
     }
 
 
@@ -81,24 +83,25 @@ def developer_application_new(request):
             return {'form': e.render()}
 
         # the data is fine, save into the db
-        application = {
-            'owner': request.user['_id'],
-            'name': appstruct['name'],
-            'main_url': appstruct['main_url'],
-            'callback_url': appstruct['callback_url'],
-            'authorized_origins': appstruct['authorized_origins'],
-            'production_ready': appstruct['production_ready'],
-            'image_url': appstruct['image_url'],
-            'description': appstruct['description'],
-        }
-        create_client_id_and_secret(application)
+        application = Application(
+            name=appstruct['name'],
+            main_url=appstruct['main_url'],
+            callback_url=appstruct['callback_url'],
+            authorized_origins=appstruct['authorized_origins'],
+            production_ready=appstruct['production_ready'],
+            image_url=appstruct['image_url'],
+            description=appstruct['description'],
+        )
+        application.create_client_id_and_secret()
+        request.user.applications.append(application)
 
         request.session.flash(
             _('The application ${app} was created successfully',
               mapping={'app': appstruct['name']}),
             'success')
 
-        request.db.applications.insert(application)
+        Session.add(request.user)
+
         return HTTPFound(
             location=request.route_path('oauth2_developer_applications'))
     elif 'cancel' in request.POST:
@@ -181,24 +184,21 @@ def developer_application_edit(request):
              renderer='templates/developer_application_delete.pt',
              permission='delete-application')
 def developer_application_delete(request):
+    app_id = request.matchdict['app']
     try:
-        app_id = bson.ObjectId(request.matchdict['app'])
-    except bson.errors.InvalidId:
-        return HTTPBadRequest(body='Invalid application id')
-
-    app = request.db.applications.find_one(app_id)
-    if app is None:
+        app = Session.query(Application).filter(Application.id==app_id).one()
+    except NoResultFound:
         return HTTPNotFound()
 
     assert_authenticated_user_is_registered(request)
-    if app['owner'] != request.user['_id']:
+    if app.user != request.user:
         return HTTPUnauthorized()
 
     if 'submit' in request.POST:
-        request.db.applications.remove(app_id)
+        Session.delete(app)
         request.session.flash(
             _('The application ${app} was deleted successfully',
-              mapping={'app': app['name']}),
+              mapping={'app': app.name}),
             'success',
         )
         return HTTPFound(

@@ -17,6 +17,7 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
+import uuid
 
 from pyramid_sqlalchemy import BaseObject
 
@@ -30,12 +31,15 @@ class Application(BaseObject):
     __tablename__ = 'applications'
 
     id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False, default='')
+
     creation = Column(DateTime, nullable=False, default=datetime.utcnow)
-    modification = Column(DateTime, nullable=False, onupdate=datetime.utcnow)
+    modification = Column(DateTime, nullable=False,
+                          default=datetime.utcnow, onupdate=datetime.utcnow)
 
     main_url = Column(String, nullable=False, default='')
     callback_url = Column(String, nullable=False, default='')
-    authorized_origins = Column(ARRAY(String), nullable=True)
+    authorized_origins = Column(ARRAY(Text, dimensions=1), nullable=True)
 
     client_id = Column(String, nullable=False, default='')
     client_secret = Column(String, nullable=False, default='')
@@ -48,12 +52,16 @@ class Application(BaseObject):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     user = relationship('User', backref=backref('applications'))#, order_by='id'))
 
+    def create_client_id_and_secret(self):
+        self.client_id = str(uuid.uuid4())
+        self.client_secret = str(uuid.uuid4())
+
 
 class AuthorizedApplication(BaseObject):
     __tablename__ = 'authorized_applications'
 
     id = Column(Integer, primary_key=True)
-    scope = Column(ARRAY(String), nullable=True)
+    scope = Column(ARRAY(Text, dimensions=1), nullable=True)
     response_type = Column(String, nullable=False, default='')
     redirect_uri = Column(String, nullable=False, default='')
 
@@ -85,7 +93,7 @@ class AuthorizationCode(BaseObject):
     creation = Column(DateTime, nullable=False, default=datetime.utcnow)
     expiration = Column(DateTime, nullable=False)
 
-    scope = Column(ARRAY(String), nullable=True)
+    scope = Column(ARRAY(Text, dimensions=1), nullable=True)
     redirect_uri = Column(String, nullable=False, default='')
 
     application_id = Column(
@@ -115,7 +123,7 @@ class AccessCode(BaseObject):
     code = Column(String, primary_key=True)
     creation = Column(DateTime, nullable=False, default=datetime.utcnow)
 
-    scope = Column(ARRAY(String), nullable=True)
+    scope = Column(ARRAY(Text, dimensions=1), nullable=True)
 
     application_id = Column(
         Integer,
