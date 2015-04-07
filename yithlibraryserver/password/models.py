@@ -36,7 +36,7 @@ class Password(BaseObject):
     modification = Column(DateTime, nullable=False, onupdate=datetime.utcnow)
 
     notes = Column(Text, nullable=False, default='')
-    tags = Column(ARRAY(String), nullable=True)
+    tags = Column(ARRAY(Text, dimensions=1), nullable=True)
 
     secret = Column(JSON(none_as_null=True), nullable=False)
     account = Column(String, nullable=False, default='')

@@ -116,18 +116,16 @@ def developer_application_new(request):
              renderer='templates/developer_application_edit.pt',
              permission='edit-application')
 def developer_application_edit(request):
+    app_id = request.matchdict['app']
+
     try:
-        app_id = bson.ObjectId(request.matchdict['app'])
-    except bson.errors.InvalidId:
-        return HTTPBadRequest(body='Invalid application id')
+        app = Session.query(Application).filter(Application.id==app_id).one()
+    except NoResultFound:
+        return HTTPNotFound()
 
     assert_authenticated_user_is_registered(request)
 
-    app = request.db.applications.find_one(app_id)
-    if app is None:
-        return HTTPNotFound()
-
-    if app['owner'] != request.user['_id']:
+    if app.user != request.user:
         return HTTPUnauthorized()
 
     schema = FullApplicationSchema()
@@ -147,21 +145,15 @@ def developer_application_edit(request):
             return {'form': e.render(), 'app': app}
 
         # the data is fine, save into the db
-        application = {
-            'owner': request.user['_id'],
-            'name': appstruct['name'],
-            'main_url': appstruct['main_url'],
-            'callback_url': appstruct['callback_url'],
-            'authorized_origins': appstruct['authorized_origins'],
-            'production_ready': appstruct['production_ready'],
-            'image_url': appstruct['image_url'],
-            'description': appstruct['description'],
-            'client_id': app['client_id'],
-            'client_secret': app['client_secret'],
-        }
+        app.name =  appstruct['name']
+        app.main_url = appstruct['main_url']
+        app.callback_url = appstruct['callback_url']
+        app.authorized_origins = appstruct['authorized_origins']
+        app.production_ready = appstruct['production_ready']
+        app.image_url = appstruct['image_url']
+        app.description = appstruct['description']
 
-        request.db.applications.update({'_id': app['_id']},
-                                       application)
+        Session.add(app)
 
         request.session.flash(_('The changes were saved successfully'),
                               'success')
@@ -171,13 +163,26 @@ def developer_application_edit(request):
     elif 'delete' in request.POST:
         return HTTPFound(
             location=request.route_path('oauth2_developer_application_delete',
-                                        app=app['_id']))
+                                        app=app.id))
     elif 'cancel' in request.POST:
         return HTTPFound(
             location=request.route_path('oauth2_developer_applications'))
 
     # this is a GET
-    return {'form': form.render(app), 'app': app}
+    return {
+        'form': form.render({
+            'name': app.name,
+            'main_url': app.main_url,
+            'callback_url': app.callback_url,
+            'authorized_origins': app.authorized_origins,
+            'production_ready': app.production_ready,
+            'image_url': app.image_url,
+            'description': app.description,
+            'client_id': app.client_id,
+            'client_secret': app.client_secret,
+        }),
+        'app': app,
+    }
 
 
 @view_config(route_name='oauth2_developer_application_delete',
@@ -310,31 +315,20 @@ def token_endpoint(request):
              permission='view-applications')
 def authorized_applications(request):
     assert_authenticated_user_is_registered(request)
-    authorizator = Authorizator(request.db)
-    authorized_apps = []
-    for authorization in authorizator.get_user_authorizations(request.user):
-        app = request.db.applications.find_one({
-            'client_id': authorization['client_id'],
-        })
-        if app is not None:
-            authorized_apps.append(app)
-    return {'authorized_apps': authorized_apps}
+    return {'authorized_apps': request.user.authorized_applications}
 
 
 @view_config(route_name='oauth2_revoke_application',
              renderer='templates/application_revoke_authorization.pt',
              permission='revoke-authorized-app')
 def revoke_application(request):
-    assert_authenticated_user_is_registered(request)
-
+    app_id = request.matchdict['app']
     try:
-        app_id = bson.ObjectId(request.matchdict['app'])
-    except bson.errors.InvalidId:
-        return HTTPBadRequest(body='Invalid application id')
-
-    app = request.db.applications.find_one(app_id)
-    if app is None:
+        app = Session.query(Application).filter(Application.id==app_id).one()
+    except NoResultFound:
         return HTTPNotFound()
+
+    assert_authenticated_user_is_registered(request)
 
     authorizator = Authorizator(request.db)
 
@@ -355,4 +349,5 @@ def revoke_application(request):
 @view_config(route_name='oauth2_clients',
              renderer='templates/clients.pt')
 def clients(request):
-    return {'apps': request.db.applications.find({'production_ready': True})}
+    apps = Session.query(Application).filter(Application.production_ready==True)
+    return {'apps': apps}

@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -32,6 +32,7 @@ import transaction
 from yithlibraryserver.compat import encodebytes, encode_header, urlparse
 from yithlibraryserver.oauth2.authorization import Authorizator
 from yithlibraryserver.oauth2.models import Application
+from yithlibraryserver.oauth2.models import AuthorizedApplication
 from yithlibraryserver.testing import TestCase
 from yithlibraryserver.user.models import User
 
@@ -556,10 +557,10 @@ https://example.com''',
                           production_ready=False)
 
         other_user = User(twitter_id='twitter2',
-                    screen_name='Alice doe',
-                    first_name='Alice',
-                    last_name='Doe',
-                    email='alice@example.com')
+                          screen_name='Alice doe',
+                          first_name='Alice',
+                          last_name='Doe',
+                          email='alice@example.com')
 
         other_user.applications.append(app)
 
@@ -613,27 +614,13 @@ https://example.com''',
 
         self.assertIsNone(app)
 
-    @unittest.skip
-    def test_application_edit(self):
-        # this view required authentication
+    def test_application_edit_requires_authentication(self):
         res = self.testapp.get('/oauth2/applications/xxx/edit')
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Log in')
 
-        # Log in
-        user_id = self.db.users.insert({
-            'twitter_id': 'twitter1',
-            'screen_name': 'John Doe',
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john@example.com',
-        })
-        self.testapp.get('/__login/' + str(user_id))
-
-        res = self.testapp.get('/oauth2/applications/xxx/edit',
-                               status=400)
-        self.assertEqual(res.status, '400 Bad Request')
-        res.mustcontain('Invalid application id')
+    def test_application_edit_app_id_doesnt_exist(self):
+        create_and_login_user(self.testapp)
 
         res = self.testapp.get(
             '/oauth2/applications/000000000000000000000000/edit',
@@ -641,28 +628,65 @@ https://example.com''',
         )
         self.assertEqual(res.status, '404 Not Found')
 
-        # create a valid app
-        app_id = self.db.applications.insert({
-            'owner': bson.ObjectId(),
-            'name': 'Test Application',
-            'main_url': 'http://example.com',
-            'callback_url': 'http://example.com/callback',
-            'authorized_origins': ['http://example.com',
-                                   'https://example.com'],
-            'production_ready': False,
-            'image_url': 'http://example.com/image.png',
-            'description': 'example description',
-            'client_id': '123456',
-            'client_secret': 'secret',
-        })
+    def test_application_edit_unauthorized(self):
+        create_and_login_user(self.testapp)
+
+        app = Application(name='Test Application',
+                          client_id='123456',
+                          client_secret='secret',
+                          main_url='http://example.com',
+                          callback_url='http://example.com/callback',
+                          authorized_origins=['http://example.com',
+                                              'https://example.com'],
+                          production_ready=False,
+                          image_url='http://example.com/image.png',
+                          description='example description')
+
+        other_user = User(twitter_id='twitter2',
+                          screen_name='Alice doe',
+                          first_name='Alice',
+                          last_name='Doe',
+                          email='alice@example.com')
+
+        other_user.applications.append(app)
+
+        with transaction.manager:
+            Session.add(other_user)
+            Session.flush()
+            app_id = app.id
+
 
         res = self.testapp.get('/oauth2/applications/%s/edit' % str(app_id),
                                status=401)
         self.assertEqual(res.status, '401 Unauthorized')
 
-        self.db.applications.update({'_id': app_id}, {
-            '$set': {'owner': user_id},
-        })
+    def test_application_edit(self):
+        user = User(twitter_id='twitter1',
+                    screen_name='John Doe',
+                    first_name='John',
+                    last_name='Doe',
+                    email='john@example.com')
+
+        app = Application(name='Test Application',
+                          client_id='123456',
+                          client_secret='secret',
+                          main_url='http://example.com',
+                          callback_url='http://example.com/callback',
+                          authorized_origins=['http://example.com',
+                                              'https://example.com'],
+                          production_ready=False,
+                          image_url='http://example.com/image.png',
+                          description='example description')
+        user.applications.append(app)
+
+        with transaction.manager:
+            Session.add(user)
+            Session.flush()
+            app_id = app.id
+            user_id = user.id
+
+        self.testapp.get('/__login/' + str(user_id))
+
         res = self.testapp.get('/oauth2/applications/%s/edit' % str(app_id))
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Edit application <span>Test Application</span>')
@@ -689,7 +713,7 @@ https://example.com""")
         res.mustcontain('Cancel')
 
         # Let's make some changes
-        old_count = self.db.applications.count()
+        old_count = Session.query(Application).count()
         res = self.testapp.post('/oauth2/applications/%s/edit' % str(app_id), {
             'name': 'Test Application 2',
             'main_url': 'http://example.com/new',
@@ -704,23 +728,47 @@ https://example.com""")
         })
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/oauth2/applications')
-        new_app = self.db.applications.find_one(app_id)
-        self.assertEqual(new_app['name'], 'Test Application 2')
-        self.assertEqual(new_app['main_url'],
-                         'http://example.com/new')
-        self.assertEqual(new_app['callback_url'],
-                         'http://example.com/new/callback')
-        self.assertEqual(new_app['authorized_origins'],
-                         ['http://client.example.com'])
-        self.assertEqual(new_app['production_ready'], True)
-        self.assertEqual(new_app['image_url'], 'http://example.com/image2.png')
-        self.assertEqual(new_app['description'], 'example description 2')
+        new_app = Session.query(Application).filter(Application.id==app_id).one()
+        self.assertEqual(new_app.name, 'Test Application 2')
+        self.assertEqual(new_app.main_url, 'http://example.com/new')
+        self.assertEqual(new_app.callback_url, 'http://example.com/new/callback')
+        self.assertEqual(new_app.authorized_origins, ['http://client.example.com'])
+        self.assertEqual(new_app.production_ready, True)
+        self.assertEqual(new_app.image_url, 'http://example.com/image2.png')
+        self.assertEqual(new_app.description, 'example description 2')
         # the Id and Secret shouldn't change
-        self.assertEqual(new_app['client_id'], '123456')
-        self.assertEqual(new_app['client_secret'], 'secret')
-        self.assertEqual(old_count, self.db.applications.count())
+        self.assertEqual(new_app.client_id, '123456')
+        self.assertEqual(new_app.client_secret, 'secret')
+        new_count = Session.query(Application).count()
+        self.assertEqual(old_count, new_count)
 
-        # Try and invalid change
+    def test_application_edit_invalid_change(self):
+        user = User(twitter_id='twitter1',
+                    screen_name='John Doe',
+                    first_name='John',
+                    last_name='Doe',
+                    email='john@example.com')
+
+        app = Application(name='Test Application',
+                          client_id='123456',
+                          client_secret='secret',
+                          main_url='http://example.com',
+                          callback_url='http://example.com/callback',
+                          authorized_origins=['http://example.com',
+                                              'https://example.com'],
+                          production_ready=False,
+                          image_url='http://example.com/image.png',
+                          description='example description')
+        user.applications.append(app)
+
+        with transaction.manager:
+            Session.add(user)
+            Session.flush()
+            app_id = app.id
+            user_id = user.id
+
+        self.testapp.get('/__login/' + str(user_id))
+
         res = self.testapp.post('/oauth2/applications/%s/edit' % str(app_id), {
             'submit': 'Save changes',
         })
@@ -728,7 +776,33 @@ https://example.com""")
         res.mustcontain('There was a problem with your submission')
         res.mustcontain('Required')
 
-        # The user hit the delete button
+    def test_application_edit_delete(self):
+        user = User(twitter_id='twitter1',
+                    screen_name='John Doe',
+                    first_name='John',
+                    last_name='Doe',
+                    email='john@example.com')
+
+        app = Application(name='Test Application',
+                          client_id='123456',
+                          client_secret='secret',
+                          main_url='http://example.com',
+                          callback_url='http://example.com/callback',
+                          authorized_origins=['http://example.com',
+                                              'https://example.com'],
+                          production_ready=False,
+                          image_url='http://example.com/image.png',
+                          description='example description')
+        user.applications.append(app)
+
+        with transaction.manager:
+            Session.add(user)
+            Session.flush()
+            app_id = app.id
+            user_id = user.id
+
+        self.testapp.get('/__login/' + str(user_id))
+
         res = self.testapp.post('/oauth2/applications/%s/edit' % str(app_id), {
             'delete': 'Delete',
         })
@@ -737,65 +811,100 @@ https://example.com""")
                          'http://localhost/oauth2/applications/%s/delete'
                          % str(app_id))
 
-        # The user hit the cancel button
+    def test_application_edit_cancel(self):
+        user = User(twitter_id='twitter1',
+                    screen_name='John Doe',
+                    first_name='John',
+                    last_name='Doe',
+                    email='john@example.com')
+
+        app = Application(name='Test Application',
+                          client_id='123456',
+                          client_secret='secret',
+                          main_url='http://example.com',
+                          callback_url='http://example.com/callback',
+                          authorized_origins=['http://example.com',
+                                              'https://example.com'],
+                          production_ready=False,
+                          image_url='http://example.com/image.png',
+                          description='example description')
+        user.applications.append(app)
+
+        with transaction.manager:
+            Session.add(user)
+            Session.flush()
+            app_id = app.id
+            user_id = user.id
+
+        self.testapp.get('/__login/' + str(user_id))
+
         res = self.testapp.post('/oauth2/applications/%s/edit' % str(app_id), {
             'cancel': 'Cancel',
         })
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/oauth2/applications')
 
-    @unittest.skip
-    def test_authorized_applications(self):
-        # this view required authentication
+    def test_authorized_applications_requires_authentication(self):
         res = self.testapp.get('/oauth2/authorized-applications')
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Log in')
 
-        # Log in
-        user_id = self.db.users.insert({
-            'twitter_id': 'twitter1',
-            'screen_name': 'John Doe',
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john@example.com',
-        })
-        self.testapp.get('/__login/' + str(user_id))
+    def test_authorized_applications(self):
+        administrator = User(twitter_id='twitter2',
+                          screen_name='Alice doe',
+                          first_name='Alice',
+                          last_name='Doe',
+                          email='alice@example.com')
+        user = User(twitter_id='twitter1',
+                    screen_name='John Doe',
+                    first_name='John',
+                    last_name='Doe',
+                    email='john@example.com')
 
-        # let's create a couple of authorized apps
-        self.db.applications.insert({
-            'owner': bson.ObjectId(),
-            'name': 'Test Application 1',
-            'main_url': 'http://example.com/1',
-            'image_url': 'http://example.com/1/logo.png',
-            'callback_url': 'http://example.com/1/callback',
-            'description': 'Test description 1',
-            'client_id': '123456',
-            'client_secret': 'secret',
-        })
-        self.db.authorized_apps.insert({
-            'user': user_id,
-            'client_id': '123456',
-            'redirect_uri': 'http://example.com/1/callback',
-            'response_type': 'code',
-            'scope': 'scope1',
-        })
-        self.db.applications.insert({
-            'owner': bson.ObjectId(),
-            'name': 'Test Application 2',
-            'main_url': 'http://example.com/2',
-            'image_url': 'http://example.com/2/logo.png',
-            'callback_url': 'http://example.com/2/callback',
-            'description': 'Test description 2',
-            'client_id': '789012',
-            'client_secret': 'secret',
-        })
-        self.db.authorized_apps.insert({
-            'user': user_id,
-            'client_id': '789012',
-            'redirect_uri': 'http://example.com/2/callback',
-            'response_type': 'code',
-            'scope': 'scope1',
-        })
+        app1 = Application(name='Test Application 1',
+                           client_id='123456',
+                           client_secret='secret',
+                           main_url='http://example.com/1',
+                           callback_url='http://example.com/1/callback',
+                           image_url='http://example.com/1/image.png',
+                           description='Test description 1',
+                           user=administrator)
+
+        auth_app1 = AuthorizedApplication(
+            scope=['scope1'],
+            response_type='code',
+            redirect_uri='http://example.com/1/callback',
+            application=app1,
+            user=user,
+        )
+
+        app2 = Application(name='Test Application 2',
+                           client_id='789012',
+                           client_secret='secret',
+                           main_url='http://example.com/2',
+                           callback_url='http://example.com/2/callback',
+                           image_url='http://example.com/2/image.png',
+                           description='Test description 2',
+                           user=administrator)
+
+        auth_app2 = AuthorizedApplication(
+            scope=['scope1'],
+            response_type='code',
+            redirect_uri='http://example.com/2/callback',
+            application=app2,
+            user=user,
+        )
+
+        with transaction.manager:
+            Session.add(user)
+            Session.add(app1)
+            Session.add(auth_app1)
+            Session.add(app2)
+            Session.add(auth_app2)
+            Session.flush()
+            user_id = user.id
+
+        self.testapp.get('/__login/' + str(user_id))
 
         res = self.testapp.get('/oauth2/authorized-applications')
         self.assertEqual(res.status, '200 OK')
@@ -803,33 +912,21 @@ https://example.com""")
         res.mustcontain('Test Application 1')
         res.mustcontain('Test Application 2')
 
-    @unittest.skip
-    def test_revoke_application(self):
-        # this view required authentication
+    def test_revoke_application_requires_authentication(self):
         res = self.testapp.get('/oauth2/applications/xxx/revoke')
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Log in')
 
-        # Log in
-        user_id = self.db.users.insert({
-            'twitter_id': 'twitter1',
-            'screen_name': 'John Doe',
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john@example.com',
-        })
-        self.testapp.get('/__login/' + str(user_id))
-
-        res = self.testapp.get('/oauth2/applications/xxx/revoke',
-                               status=400)
-        self.assertEqual(res.status, '400 Bad Request')
-        res.mustcontain('Invalid application id')
+    def test_revoke_application_app_id_doesnt_exist(self):
+        create_and_login_user(self.testapp)
 
         res = self.testapp.get(
             '/oauth2/applications/000000000000000000000000/revoke',
             status=404)
         self.assertEqual(res.status, '404 Not Found')
 
+    @unittest.skip
+    def test_revoke_application_app(self):
         # create a valid app
         app_id = self.db.applications.insert({
             'owner': bson.ObjectId(),
@@ -861,29 +958,40 @@ https://example.com""")
         self.assertFalse(authorizator.is_app_authorized(['read-passwords'],
                                                         credentials))
 
-    @unittest.skip
-    def test_clients(self):
+    def test_clients_empty(self):
         res = self.testapp.get('/oauth2/clients')
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Available Clients')
 
-        # create a couple of apps
-        self.db.applications.insert({
-            'client_id': '123456',
-            'name': 'Example app 1',
-            'main_url': 'https://example.com',
-            'callback_url': 'https://example.com/callback',
-            'production_ready': True,
-            'image_url': 'https://example.com/image.png',
-            'description': 'example description',
-        })
-        self.db.applications.insert({
-            'client_id': '654321',
-            'name': 'Example app 2',
-            'main_url': 'https://2.example.com',
-            'callback_url': 'https://2.example.com/callback',
-            'production_ready': False,
-        })
+    def test_clients_two_apps(self):
+        administrator = User(twitter_id='twitter2',
+                          screen_name='Alice doe',
+                          first_name='Alice',
+                          last_name='Doe',
+                          email='alice@example.com')
+
+        app1 = Application(name='Example app 1',
+                           client_id='123456',
+                           client_secret='secret',
+                           main_url='https://example.com',
+                           callback_url='https://example.com/callback',
+                           image_url='https://example.com/image.png',
+                           description='example description',
+                           production_ready=True,
+                           user=administrator)
+
+        app2 = Application(name='Example app 2',
+                           client_id='654321',
+                           client_secret='secret',
+                           main_url='https://2.example.com',
+                           callback_url='https://2.example.com/callback',
+                           production_ready=False,
+                           user=administrator)
+
+        with transaction.manager:
+            Session.add(app1)
+            Session.add(app2)
+            Session.flush()
 
         res = self.testapp.get('/oauth2/clients')
         self.assertEqual(res.status, '200 OK')
