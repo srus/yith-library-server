@@ -18,11 +18,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-import bson
 from deform import Button, Form, ValidationFailure
 
 from pyramid.httpexceptions import (
-    HTTPBadRequest,
     HTTPFound,
     HTTPNotFound,
 )
@@ -40,8 +38,10 @@ from oauthlib.oauth2 import (
 )
 
 from yithlibraryserver.i18n import TranslationString as _
-from yithlibraryserver.oauth2.authorization import Authorizator
-from yithlibraryserver.oauth2.models import Application
+from yithlibraryserver.oauth2.models import (
+    Application,
+    AuthorizedApplication,
+)
 from yithlibraryserver.oauth2.schemas import ApplicationSchema
 from yithlibraryserver.oauth2.schemas import FullApplicationSchema
 from yithlibraryserver.oauth2.utils import (
@@ -216,9 +216,8 @@ class AuthorizationEndpoint(object):
 
     def __init__(self, request):
         self.request = request
-        self.validator = RequestValidator(request.db)
+        self.validator = RequestValidator()
         self.server = Server(self.validator)
-        self.authorizator = Authorizator(request.db)
 
     @view_config(route_name='oauth2_authorization_endpoint',
                  renderer='templates/application_authorization.pt',
@@ -330,14 +329,20 @@ def revoke_application(request):
 
     assert_authenticated_user_is_registered(request)
 
-    authorizator = Authorizator(request.db)
-
     if 'submit' in request.POST:
-        authorizator.remove_user_authorization(request.user, app['client_id'])
+
+        try:
+            authorized_app = Session.query(AuthorizedApplication).filter(
+                AuthorizedApplication.application==app,
+                AuthorizedApplication.user==request.user
+            ).one()
+            Session.delete(authorized_app)
+        except NoResultFound:
+            pass
 
         request.session.flash(
             _('The access to application ${app} has been revoked',
-              mapping={'app': app['name']}),
+              mapping={'app': app.name}),
             'success',
         )
         return HTTPFound(

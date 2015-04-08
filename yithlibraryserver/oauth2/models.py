@@ -22,7 +22,7 @@ import uuid
 from pyramid_sqlalchemy import BaseObject
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import relationship, backref
 
@@ -50,7 +50,7 @@ class Application(BaseObject):
     production_ready = Column(Boolean, nullable=False, default=False)
 
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    user = relationship('User', backref=backref('applications'))#, order_by='id'))
+    user = relationship('User', backref=backref('applications'))
 
     def create_client_id_and_secret(self):
         self.client_id = str(uuid.uuid4())
@@ -72,7 +72,8 @@ class AuthorizedApplication(BaseObject):
     )
     application = relationship(
         'Application',
-        backref=backref('authorized_applications'), #, order_by='id'),
+        backref=backref('authorized_applications',
+                        cascade='all, delete-orphan'),
     )
 
     user_id = Column(
@@ -82,7 +83,12 @@ class AuthorizedApplication(BaseObject):
     )
     user = relationship(
         'User',
-        backref=backref('authorized_applications'), #, order_by='id'),
+        backref=backref('authorized_applications',
+                        cascade='all, delete-orphan'),
+    )
+
+    __table_args__ = (
+        UniqueConstraint(application_id, user_id),
     )
 
 
@@ -103,7 +109,7 @@ class AuthorizationCode(BaseObject):
     )
     application = relationship(
         'Application',
-        backref=backref('authorization_codes'), #, order_by='creation'),
+        backref=backref('authorization_codes'),
     )
 
     user_id = Column(
@@ -113,7 +119,7 @@ class AuthorizationCode(BaseObject):
     )
     user = relationship(
         'User',
-        backref=backref('authorization_codes'), #, order_by='creation'),
+        backref=backref('authorization_codes'),
     )
 
 
@@ -132,7 +138,7 @@ class AccessCode(BaseObject):
     )
     application = relationship(
         'Application',
-        backref=backref('access_codes'), #, order_by='creation'),
+        backref=backref('access_codes'),
     )
 
     user_id = Column(
@@ -142,5 +148,5 @@ class AccessCode(BaseObject):
     )
     user = relationship(
         'User',
-        backref=backref('access_codes'), #, order_by='creation'),
+        backref=backref('access_codes'),
     )

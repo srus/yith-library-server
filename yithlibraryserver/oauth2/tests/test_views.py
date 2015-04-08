@@ -20,7 +20,6 @@
 
 import unittest
 
-import bson
 from freezegun import freeze_time
 
 from pyramid_sqlalchemy import Session
@@ -60,52 +59,48 @@ def create_and_login_user(testapp):
     return user, user_id
 
 
-class BaseEndpointTests(TestCase):
+def create_client():
+    user = User(twitter_id='twitter2',
+                screen_name='Administrator',
+                first_name='Alice',
+                last_name='Doe',
+                email='alice@example.com')
 
-    def _create_client(self):
-        user = User(twitter_id='twitter2',
-                    screen_name='Administrator',
-                    first_name='Alice',
-                    last_name='Doe',
-                    email='alice@example.com')
+    app = Application(user=user,
+                      client_id='123456',
+                      client_secret='s3cr3t',
+                      name='Example',
+                      main_url='https://example.com',
+                      callback_url='https://example.com/callback',
+                      image_url='https://example.com/logo.png',
+                      description='Example description')
 
-        app = Application(user=user,
-                          client_id='123456',
-                          client_secret='s3cr3t',
-                          name='Example',
-                          main_url='https://example.com',
-                          callback_url='https://example.com/callback',
-                          image_url='https://example.com/logo.png',
-                          description='Example description')
+    with transaction.manager:
+        Session.add(user)
+        Session.add(app)
+        Session.flush()
+        owner_id = user.id
+        app_id = app.id
 
-        with transaction.manager:
-            Session.add(user)
-            Session.add(app)
-            Session.flush()
-            owner_id = user.id
-            app_id = app.id
-
-        return owner_id, app_id
+    return owner_id, app_id
 
 
-@unittest.skip
-class AuthorizationEndpointTests(BaseEndpointTests):
+class AuthorizationEndpointTests(TestCase):
 
     def test_anonymous_user(self):
-        # this view requires authentication
         res = self.testapp.get('/oauth2/endpoints/authorization')
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Log in')
 
     def test_no_client_id(self):
-        self._login()
+        create_and_login_user(self.testapp)
         res = self.testapp.get('/oauth2/endpoints/authorization',
                                status=400)
         self.assertEqual(res.status, '400 Bad Request')
         res.mustcontain('Error is: invalid_client_id')
 
     def test_invalid_client_id(self):
-        self._login()
+        create_and_login_user(self.testapp)
         res = self.testapp.get('/oauth2/endpoints/authorization', {
             'client_id': '1234',
         }, status=400)
@@ -121,8 +116,8 @@ class AuthorizationEndpointTests(BaseEndpointTests):
         self.assertEqual(query, expected)
 
     def test_no_response_type(self):
-        self._login()
-        self._create_client()
+        create_and_login_user(self.testapp)
+        create_client()
         res = self.testapp.get('/oauth2/endpoints/authorization', {
             'client_id': '123456',
         }, status=302)
@@ -131,8 +126,8 @@ class AuthorizationEndpointTests(BaseEndpointTests):
                            'Missing response_type parameter.')
 
     def test_invalid_redirect_callback(self):
-        self._login()
-        self._create_client()
+        create_and_login_user(self.testapp)
+        create_client()
         res = self.testapp.get('/oauth2/endpoints/authorization', {
             'client_id': '123456',
             'response_type': 'code',
@@ -141,6 +136,7 @@ class AuthorizationEndpointTests(BaseEndpointTests):
         self.assertEqual(res.status, '400 Bad Request')
         res.mustcontain('Error is: mismatching_redirect_uri')
 
+    @unittest.skip
     def test_user_cancel(self):
         self._login()
         self._create_client()
@@ -162,6 +158,7 @@ class AuthorizationEndpointTests(BaseEndpointTests):
         self.assertEqual(res.location,
                          'https://example.com/callback?error=access_denied')
 
+    @unittest.skip
     @freeze_time('2012-01-10 15:31:11')
     def test_non_authorized_app_yet(self):
         user_id = self._login()
@@ -213,6 +210,7 @@ class AuthorizationEndpointTests(BaseEndpointTests):
         location = 'https://example.com/callback?code=%s' % code
         self.assertEqual(res.location, location)
 
+    @unittest.skip
     @freeze_time('2012-01-10 15:31:11')
     def test_already_authorized_app(self):
         user_id = self._login()
@@ -264,6 +262,7 @@ class AuthorizationEndpointTests(BaseEndpointTests):
         location = 'https://example.com/callback?code=%s' % code
         self.assertEqual(res.location, location)
 
+    @unittest.skip
     @freeze_time('2012-01-10 15:31:11')
     def test_invalid_redirect_callback_in_post(self):
         self._login()
@@ -286,6 +285,7 @@ class AuthorizationEndpointTests(BaseEndpointTests):
         self.assertEqual(res.status, '400 Bad Request')
         res.mustcontain('Error is: mismatching_redirect_uri')
 
+    @unittest.skip
     @freeze_time('2012-01-10 15:31:11')
     def test_no_response_type_in_post(self):
         self._login()
@@ -311,7 +311,7 @@ class AuthorizationEndpointTests(BaseEndpointTests):
 
 
 @unittest.skip
-class TokenEndpointTests(BaseEndpointTests):
+class TokenEndpointTests(TestCase):
 
     def test_no_grant_type(self):
         res = self.testapp.post('/oauth2/endpoints/token', {}, status=400)
@@ -585,14 +585,25 @@ https://example.com''',
                           callback_url='https://example.com/callback',
                           production_ready=False)
         user.applications.append(app)
+        auth_app = AuthorizedApplication(
+            scope=['scope1'],
+            response_type='code',
+            redirect_uri='http://example.com/callback',
+            application=app,
+            user=user,
+        )
 
         with transaction.manager:
             Session.add(user)
+            Session.add(auth_app)
             Session.flush()
             app_id = app.id
             user_id = user.id
 
         self.testapp.get('/__login/' + str(user_id))
+
+        self.assertEqual(Session.query(Application).count(), 1)
+        self.assertEqual(Session.query(AuthorizedApplication).count(), 1)
 
         res = self.testapp.get('/oauth2/applications/%s/delete' % str(app_id))
         self.assertEqual(res.status, '200 OK')
@@ -613,6 +624,12 @@ https://example.com''',
             app = None
 
         self.assertIsNone(app)
+
+        self.assertEqual(Session.query(User).count(), 1)
+        self.assertEqual(Session.query(Application).count(), 0)
+        # Related authorizations should be deleted on cascade
+        self.assertEqual(Session.query(AuthorizedApplication).count(), 0)
+
 
     def test_application_edit_requires_authentication(self):
         res = self.testapp.get('/oauth2/applications/xxx/edit')
@@ -925,26 +942,45 @@ https://example.com""")
             status=404)
         self.assertEqual(res.status, '404 Not Found')
 
-    @unittest.skip
     def test_revoke_application_app(self):
-        # create a valid app
-        app_id = self.db.applications.insert({
-            'owner': bson.ObjectId(),
-            'name': 'Test Application',
-            'main_url': 'http://example.com',
-            'callback_url': 'http://example.com/callback',
-            'client_id': '123456',
-            'client_secret': 'secret',
-        })
+        administrator = User(twitter_id='twitter2',
+                          screen_name='Alice doe',
+                          first_name='Alice',
+                          last_name='Doe',
+                          email='alice@example.com')
+        user = User(twitter_id='twitter1',
+                    screen_name='John Doe',
+                    first_name='John',
+                    last_name='Doe',
+                    email='john@example.com')
 
-        authorizator = Authorizator(self.db)
-        credentials = {
-            'client_id': '123456',
-            'user': {'_id': user_id},
-            'redirect_uri': 'http://example.com/callback',
-            'response_type': 'code',
-        }
-        authorizator.store_user_authorization(['read-passwords'], credentials)
+        app = Application(name='Test Application',
+                           client_id='123456',
+                           client_secret='secret',
+                           main_url='http://example.com',
+                           callback_url='http://example.com/callback',
+                           user=administrator)
+
+        auth_app = AuthorizedApplication(
+            scope=['read-passwords'],
+            response_type='code',
+            redirect_uri='http://example.com/callback',
+            application=app,
+            user=user,
+        )
+
+        with transaction.manager:
+            Session.add(user)
+            Session.add(app)
+            Session.add(auth_app)
+            Session.flush()
+            user_id = user.id
+            app_id = app.id
+
+        self.testapp.get('/__login/' + str(user_id))
+
+        self.assertEqual(Session.query(Application).count(), 1)
+        self.assertEqual(Session.query(AuthorizedApplication).count(), 1)
 
         res = self.testapp.get('/oauth2/applications/%s/revoke' % str(app_id))
         self.assertEqual(res.status, '200 OK')
@@ -955,8 +991,18 @@ https://example.com""")
         })
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/oauth2/authorized-applications')
-        self.assertFalse(authorizator.is_app_authorized(['read-passwords'],
-                                                        credentials))
+        try:
+            auth_app = Session.query(AuthorizedApplication).filter(
+                AuthorizedApplication.application_id==app_id,
+                AuthorizedApplication.user_id==user_id,
+            ).one()
+        except NoResultFound:
+            auth_app = None
+
+        self.assertIsNone(auth_app)
+
+        # the application should not be removed on cascade
+        self.assertEqual(Session.query(Application).count(), 1)
 
     def test_clients_empty(self):
         res = self.testapp.get('/oauth2/clients')

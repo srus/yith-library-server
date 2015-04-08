@@ -24,19 +24,16 @@ from bson.tz_util import utc
 import oauthlib.oauth2
 from oauthlib.common import to_unicode
 
+from pyramid_sqlalchemy import Session
+
+from sqlalchemy.orm.exc import NoResultFound
+
 from yithlibraryserver.i18n import TranslationString as _
+from yithlibraryserver.oauth2.models import Application
 from yithlibraryserver.oauth2.utils import decode_base64
 
 
 logger = logging.getLogger(__name__)
-
-
-class WrappedClient(object):
-
-    def __init__(self, client):
-        self._client = client
-        for key, value in client.items():
-            setattr(self, key, value)
 
 
 class RequestValidator(oauthlib.oauth2.RequestValidator):
@@ -47,19 +44,21 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         'read-userinfo': _('Access your user information'),
     }
 
-    def __init__(self, db, default_scopes=None):
-        self.db = db
+    def __init__(self, default_scopes=None):
         if default_scopes is None:
             self.default_scopes = ['read-passwords']
         else:
             self.default_scopes = default_scopes
 
     def get_client(self, client_id):
-        client = self.db.applications.find_one(
-            {'client_id': client_id}
-        )
-        if client is not None:
-            return WrappedClient(client)
+        try:
+            client = Session.query(Application).filter(
+                Application.client_id==client_id
+            ).one()
+        except NoResultFound:
+            client = None
+
+        return client
 
     def get_pretty_scopes(self, scopes):
         return [self.scopes.get(scope) for scope in scopes]
