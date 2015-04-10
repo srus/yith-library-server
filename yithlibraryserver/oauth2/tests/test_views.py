@@ -29,9 +29,11 @@ from sqlalchemy.orm.exc import NoResultFound
 import transaction
 
 from yithlibraryserver.compat import encodebytes, encode_header, urlparse
-from yithlibraryserver.oauth2.authorization import Authorizator
-from yithlibraryserver.oauth2.models import Application
-from yithlibraryserver.oauth2.models import AuthorizedApplication
+from yithlibraryserver.oauth2.models import (
+    Application,
+    AuthorizationCode,
+    AuthorizedApplication,
+)
 from yithlibraryserver.testing import TestCase
 from yithlibraryserver.user.models import User
 
@@ -136,10 +138,9 @@ class AuthorizationEndpointTests(TestCase):
         self.assertEqual(res.status, '400 Bad Request')
         res.mustcontain('Error is: mismatching_redirect_uri')
 
-    @unittest.skip
     def test_user_cancel(self):
-        self._login()
-        self._create_client()
+        create_and_login_user(self.testapp)
+        create_client()
         res = self.testapp.get('/oauth2/endpoints/authorization', {
             'client_id': '123456',
             'response_type': 'code',
@@ -158,15 +159,15 @@ class AuthorizationEndpointTests(TestCase):
         self.assertEqual(res.location,
                          'https://example.com/callback?error=access_denied')
 
-    @unittest.skip
     @freeze_time('2012-01-10 15:31:11')
     def test_non_authorized_app_yet(self):
-        user_id = self._login()
-        self._create_client()
+        _, user_id = create_and_login_user(self.testapp)
+        _, application_id = create_client()
 
-        authorizator = Authorizator(self.db)
-        auths = authorizator.get_user_authorizations({'_id': user_id})
-        self.assertEqual(auths.count(), 0)
+        count = Session.query(AuthorizedApplication).filter(
+            AuthorizedApplication.user_id==user_id,
+        ).count()
+        self.assertEqual(count, 0)
 
         res = self.testapp.get('/oauth2/endpoints/authorization', {
             'response_type': 'code',
@@ -191,34 +192,42 @@ class AuthorizationEndpointTests(TestCase):
         self.assertEqual(res.status, '302 Found')
 
         # Check that the app is authorized now
-        auths = authorizator.get_user_authorizations({'_id': user_id})
-        self.assertEqual(auths.count(), 1)
-        auth = auths[0]
-        self.assertEqual(auth['redirect_uri'], 'https://example.com/callback')
-        self.assertEqual(auth['response_type'], 'code')
-        self.assertEqual(auth['client_id'], '123456')
-        self.assertEqual(auth['scope'], 'read-passwords')
-        self.assertEqual(auth['user'], user_id)
+        query = Session.query(AuthorizedApplication).filter(
+            AuthorizedApplication.user_id==user_id,
+        )
+
+        self.assertEqual(query.count(), 1)
+        auth = query[0]
+        self.assertEqual(auth.redirect_uri, 'https://example.com/callback')
+        self.assertEqual(auth.response_type, 'code')
+        self.assertEqual(auth.application.client_id, '123456')
+        self.assertEqual(auth.scope, ['read-passwords'])
+        self.assertEqual(auth.user_id, user_id)
+        self.assertEqual(auth.application_id, application_id)
 
         # Check the right redirect url
-        grant = self.db.authorization_codes.find_one({
-            'client_id': '123456',
-            'user': user_id,
-        })
-        self.assertNotEqual(grant, None)
-        code = grant['code']
-        location = 'https://example.com/callback?code=%s' % code
+        try:
+            grant = Session.query(AuthorizationCode).filter(
+                AuthorizationCode.application_id==application_id,
+                AuthorizationCode.user_id==user_id,
+            ).one()
+        except NoResultFound:
+            grant = None
+
+        self.assertIsNotNone(grant)
+        self.assertEqual(grant.application.client_id, '123456')
+        location = 'https://example.com/callback?code=%s' % grant.code
         self.assertEqual(res.location, location)
 
-    @unittest.skip
     @freeze_time('2012-01-10 15:31:11')
     def test_already_authorized_app(self):
-        user_id = self._login()
-        self._create_client()
+        _, user_id = create_and_login_user(self.testapp)
+        _, application_id = create_client()
 
-        authorizator = Authorizator(self.db)
-        auths = authorizator.get_user_authorizations({'_id': user_id})
-        self.assertEqual(auths.count(), 0)
+        count = Session.query(AuthorizedApplication).filter(
+            AuthorizedApplication.user_id==user_id,
+        ).count()
+        self.assertEqual(count, 0)
 
         # do an initial authorization
         res = self.testapp.get('/oauth2/endpoints/authorization', {
@@ -237,8 +246,10 @@ class AuthorizationEndpointTests(TestCase):
         })
         self.assertEqual(res.status, '302 Found')
 
-        auths = authorizator.get_user_authorizations({'_id': user_id})
-        self.assertEqual(auths.count(), 1)
+        count = Session.query(AuthorizedApplication).filter(
+            AuthorizedApplication.user_id==user_id,
+        ).count()
+        self.assertEqual(count, 1)
 
         # Now do a second authorization
         res = self.testapp.get('/oauth2/endpoints/authorization', {
@@ -248,25 +259,26 @@ class AuthorizationEndpointTests(TestCase):
         })
         self.assertEqual(res.status, '302 Found')
 
-        auths = authorizator.get_user_authorizations({'_id': user_id})
-        self.assertEqual(auths.count(), 1)
+        count = Session.query(AuthorizedApplication).filter(
+            AuthorizedApplication.user_id==user_id,
+        ).count()
+        self.assertEqual(count, 1)
 
-        grants = self.db.authorization_codes.find({
-            'client_id': '123456',
-            'user': user_id,
-        })
+        grants = Session.query(AuthorizationCode).filter(
+            AuthorizationCode.application_id==application_id,
+            AuthorizationCode.user_id==user_id,
+        )
 
         # There are two grants now
         self.assertEqual(grants.count(), 2)
-        code = grants[1]['code']
+        code = grants.all()[1].code
         location = 'https://example.com/callback?code=%s' % code
         self.assertEqual(res.location, location)
 
-    @unittest.skip
     @freeze_time('2012-01-10 15:31:11')
     def test_invalid_redirect_callback_in_post(self):
-        self._login()
-        self._create_client()
+        create_and_login_user(self.testapp)
+        create_client()
 
         res = self.testapp.get('/oauth2/endpoints/authorization', {
             'response_type': 'code',
@@ -285,11 +297,10 @@ class AuthorizationEndpointTests(TestCase):
         self.assertEqual(res.status, '400 Bad Request')
         res.mustcontain('Error is: mismatching_redirect_uri')
 
-    @unittest.skip
     @freeze_time('2012-01-10 15:31:11')
     def test_no_response_type_in_post(self):
-        self._login()
-        self._create_client()
+        create_and_login_user(self.testapp)
+        create_client()
 
         res = self.testapp.get('/oauth2/endpoints/authorization', {
             'response_type': 'code',

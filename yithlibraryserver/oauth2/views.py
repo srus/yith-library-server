@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2013 Yaco Sistemas
 # Copyright (C) 2012-2013 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2013 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -230,23 +230,28 @@ class AuthorizationEndpoint(object):
             scopes, credentials = self.server.validate_authorization_request(
                 uri, http_method, body, headers,
             )
-            credentials['user'] = self.request.user
 
-            if self.authorizator.is_app_authorized(scopes, credentials):
+            app = self.validator.get_client(credentials['client_id'])
+
+            try:
+                auth_app = Session.query(AuthorizedApplication).filter(
+                    AuthorizedApplication.user==self.request.user,
+                    AuthorizedApplication.scope==scopes,
+                    AuthorizedApplication.redirect_uri==credentials['redirect_uri'],
+                    AuthorizedApplication.response_type==credentials['response_type'],
+                    AuthorizedApplication.application==app,
+                ).one()
+            except NoResultFound:
+                auth_app = None
+
+            if auth_app is not None:
+                credentials['user'] = self.request.user
                 server_response = self.server.create_authorization_response(
                     uri, http_method, body, headers, scopes, credentials,
                 )
                 return create_response(*server_response)
             else:
-                app = self.validator.get_client(credentials['client_id'])
-                authorship_information = ''
-                owner_id = app._client.get('owner', None)
-                if owner_id is not None:
-                    owner = self.request.db.users.find_one({'_id': owner_id})
-                    if owner:
-                        email = owner.get('email', None)
-                        if email:
-                            authorship_information = email
+                authorship_information = app.user.email
 
                 pretty_scopes = self.validator.get_pretty_scopes(scopes)
                 return {
@@ -255,7 +260,7 @@ class AuthorizationEndpoint(object):
                     'redirect_uri': credentials['redirect_uri'],
                     'state': credentials['state'],
                     'scope': ' '.join(scopes),
-                    'app': app._client,
+                    'app': app,
                     'scopes': pretty_scopes,
                     'authorship_information': authorship_information,
                 }
@@ -286,7 +291,28 @@ class AuthorizationEndpoint(object):
                 server_response = self.server.create_authorization_response(
                     uri, http_method, body, headers, scopes, credentials,
                 )
-                self.authorizator.store_user_authorization(scopes, credentials)
+
+                app = Session.query(Application).filter(
+                    Application.client_id==credentials['client_id'],
+                ).one()
+
+                try:
+                    auth_app = Session.query(AuthorizedApplication).filter(
+                        AuthorizedApplication.user==self.request.user,
+                        AuthorizedApplication.application==app,
+                    ).one()
+                except NoResultFound:
+                    auth_app = AuthorizedApplication(
+                        user=self.request.user,
+                        application=app,
+                    )
+
+                auth_app.redirect_uri = credentials['redirect_uri']
+                auth_app.response_type = credentials['response_type']
+                auth_app.scope = scopes
+
+                Session.add(auth_app)
+
                 return create_response(*server_response)
             except FatalClientError as e:
                 return response_from_error(e)

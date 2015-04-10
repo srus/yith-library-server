@@ -30,6 +30,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from yithlibraryserver.i18n import TranslationString as _
 from yithlibraryserver.oauth2.models import Application
+from yithlibraryserver.oauth2.models import AuthorizationCode
 from yithlibraryserver.oauth2.utils import decode_base64
 
 
@@ -117,17 +118,23 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         (the last is passed in post_authorization credentials,
         i.e. { 'user': request.user}.
         """
-        now = datetime.datetime.now(tz=utc)
+        app = Session.query(Application).filter(
+            Application.client_id==client_id,
+        ).one()
+
+        now = datetime.datetime.utcnow()
         expiration = now + datetime.timedelta(minutes=10)
-        new_record = {
-            'code': code['code'],
-            'scope': ' '.join(request.scopes),
-            'client_id': client_id,
-            'user': request.user['_id'],
-            'expiration': expiration,
-            'redirect_uri': request.redirect_uri,
-        }
-        self.db.authorization_codes.insert(new_record)
+
+        authorization_code = AuthorizationCode(
+            code=code['code'],
+            creation=now,
+            expiration=expiration,
+            scope=request.scopes,
+            redirect_uri=request.redirect_uri,
+            application=app,
+            user=request.user,
+        )
+        Session.add(authorization_code)
 
     # Token request
 
