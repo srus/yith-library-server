@@ -18,8 +18,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-
 from freezegun import freeze_time
 
 from pyramid_sqlalchemy import Session
@@ -30,6 +28,7 @@ import transaction
 
 from yithlibraryserver.compat import encodebytes, encode_header, urlparse
 from yithlibraryserver.oauth2.models import (
+    AccessCode,
     Application,
     AuthorizationCode,
     AuthorizedApplication,
@@ -321,7 +320,6 @@ class AuthorizationEndpointTests(TestCase):
                            'Missing response_type parameter.')
 
 
-@unittest.skip
 class TokenEndpointTests(TestCase):
 
     def test_no_grant_type(self):
@@ -353,7 +351,7 @@ class TokenEndpointTests(TestCase):
         })
 
     def test_bad_client_secret(self):
-        self._create_client()
+        create_client()
         headers = {
             'Authorization': auth_basic_encode('123456', 'secret'),
         }
@@ -365,7 +363,7 @@ class TokenEndpointTests(TestCase):
         })
 
     def test_usupported_grant_type(self):
-        self._create_client()
+        create_client()
         headers = {
             'Authorization': auth_basic_encode('123456', 's3cr3t'),
         }
@@ -377,7 +375,7 @@ class TokenEndpointTests(TestCase):
         })
 
     def test_missing_code(self):
-        self._create_client()
+        create_client()
         headers = {
             'Authorization': auth_basic_encode('123456', 's3cr3t'),
         }
@@ -391,7 +389,7 @@ class TokenEndpointTests(TestCase):
         })
 
     def test_invalid_code(self):
-        self._create_client()
+        create_client()
         headers = {
             'Authorization': auth_basic_encode('123456', 's3cr3t'),
         }
@@ -406,8 +404,8 @@ class TokenEndpointTests(TestCase):
 
     @freeze_time('2012-01-10 15:31:11')
     def test_valid_request(self):
-        user_id = self._login()
-        self._create_client()
+        _, user_id = create_and_login_user(self.testapp)
+        _, application_id = create_client()
 
         # First authorize the app
         res = self.testapp.get('/oauth2/endpoints/authorization', {
@@ -425,11 +423,11 @@ class TokenEndpointTests(TestCase):
             'scope': 'read-passwords',
         })
         self.assertEqual(res.status, '302 Found')
-        grant = self.db.authorization_codes.find_one({
-            'client_id': '123456',
-            'user': user_id,
-        })
-        code = grant['code']
+        grant = Session.query(AuthorizationCode).filter(
+            AuthorizationCode.application_id==application_id,
+            AuthorizationCode.user_id==user_id,
+        ).one()
+        code = grant.code
 
         # now send the token request
         headers = {
@@ -444,19 +442,26 @@ class TokenEndpointTests(TestCase):
         self.assertEqual(res.headers['Pragma'], 'no-cache')
 
         # the grant code should be removed
-        grant = self.db.authorization_codes.find_one({
-            'client_id': '123456',
-            'user': user_id,
-        })
-        self.assertEqual(grant, None)
+        try:
+            grant = Session.query(AuthorizationCode).filter(
+                AuthorizationCode.application_id==application_id,
+                AuthorizationCode.user_id==user_id,
+            ).one()
+        except NoResultFound:
+            grant = None
+        self.assertIsNone(grant)
 
         # and an access token should be created
         self.assertEqual(res.json['token_type'], 'Bearer')
         self.assertEqual(res.json['expires_in'], 3600)
-        access_code = self.db.access_codes.find_one({
-            'access_token': res.json['access_token'],
-        })
-        self.assertNotEqual(access_code, None)
+
+        try:
+            access_code = Session.query(AccessCode).filter(
+                AccessCode.code==res.json['access_token'],
+            ).one()
+        except NoResultFound:
+            access_code = None
+        self.assertIsNotNone(access_code)
 
 
 class ApplicationViewTests(TestCase):

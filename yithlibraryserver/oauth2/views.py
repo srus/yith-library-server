@@ -325,7 +325,7 @@ class AuthorizationEndpoint(object):
 @view_config(route_name='oauth2_token_endpoint',
              renderer='json')
 def token_endpoint(request):
-    validator = RequestValidator(request.db)
+    validator = RequestValidator()
     server = Server(validator)
 
     uri, http_method, body, headers = extract_params(request)

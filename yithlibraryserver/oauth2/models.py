@@ -127,7 +127,12 @@ class AccessCode(BaseObject):
     __tablename__ = 'access_codes'
 
     code = Column(String, primary_key=True)
+    code_type = Column(String, nullable=False, default='')
+
     creation = Column(DateTime, nullable=False, default=datetime.utcnow)
+    expiration = Column(DateTime, nullable=False)
+
+    refresh_code = Column(String, nullable=False, default='')
 
     scope = Column(ARRAY(Text, dimensions=1), nullable=True)
 

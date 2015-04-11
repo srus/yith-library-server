@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2014-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -29,8 +29,11 @@ from pyramid_sqlalchemy import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from yithlibraryserver.i18n import TranslationString as _
-from yithlibraryserver.oauth2.models import Application
-from yithlibraryserver.oauth2.models import AuthorizationCode
+from yithlibraryserver.oauth2.models import (
+    AccessCode,
+    Application,
+    AuthorizationCode,
+)
 from yithlibraryserver.oauth2.utils import decode_base64
 
 
@@ -118,10 +121,6 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         (the last is passed in post_authorization credentials,
         i.e. { 'user': request.user}.
         """
-        app = Session.query(Application).filter(
-            Application.client_id==client_id,
-        ).one()
-
         now = datetime.datetime.utcnow()
         expiration = now + datetime.timedelta(minutes=10)
 
@@ -131,7 +130,7 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
             expiration=expiration,
             scope=request.scopes,
             redirect_uri=request.redirect_uri,
-            application=app,
+            application=request.client,
             user=request.user,
         )
         Session.add(authorization_code)
@@ -180,18 +179,22 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         Add associated scopes, state and user to request.scopes, request.state
         and request.user.
         """
-        record = self.db.authorization_codes.find_one({
-            'code': code,
-            'client_id': client.client_id,
-        })
+        try:
+            record = Session.query(AuthorizationCode).filter(
+                AuthorizationCode.code==code,
+                AuthorizationCode.application==request.client,
+            ).one()
+        except NoResultFound:
+            record = None
+
         if record is None:
             return False
 
-        if datetime.datetime.now(tz=utc) > record['expiration']:
+        if datetime.datetime.utcnow() > record.expiration:
             return False
 
-        request.user = record['user']
-        request.scopes = record['scope'].split(' ')
+        request.user = record.user
+        request.scopes = record.scope
         return True
 
     def confirm_redirect_uri(self, client_id, code, redirect_uri, client, *args, **kwargs):
@@ -223,28 +226,28 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         Don't forget to save both the access_token and the refresh_token and
         set expiration for the access_token to now + expires_in seconds.
         """
-        now = datetime.datetime.now(tz=utc)
+        now = datetime.datetime.utcnow()
         expiration = now + datetime.timedelta(seconds=token['expires_in'])
-        record = {
-            'access_token': token['access_token'],
-            'type': token['token_type'],
-            'expiration': expiration,
-            'refresh_token': token.get('refresh_token'),
-            'user_id': request.user,
-            'scope': ' '.join(request.scopes),
-            'client_id': request.client.client_id,
-        }
-        self.db.access_codes.insert(record)
+        access_code = AccessCode(
+            code=token['access_token'],
+            code_type=token['token_type'],
+            expiration=expiration,
+            refresh_code=token['refresh_token'],
+            user=request.user,
+            scope=request.scopes,
+            application=request.client,
+        )
+        Session.add(access_code)
 
     def invalidate_authorization_code(self, client_id, code, request, *args, **kwargs):
         """Authorization codes are use once, invalidate it when a Bearer token
         has been acquired.
         """
-        record = {
-            'code': code,
-            'client_id': request.client.client_id,
-        }
-        self.db.authorization_codes.remove(record)
+        authorization_code = Session.query(AuthorizationCode).filter(
+            AuthorizationCode.code==code,
+            AuthorizationCode.application==request.client,
+        ).one()
+        Session.delete(authorization_code)
 
     # Protected resource request
 
