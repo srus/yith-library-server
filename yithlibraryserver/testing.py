@@ -19,6 +19,9 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+import unittest
+
+import mock
 
 from webtest import TestApp
 
@@ -28,8 +31,13 @@ from pyramid.security import remember
 from pyramid.settings import asbool
 from pyramid.testing import DummyRequest
 
+from pyramid_sqlalchemy import init_sqlalchemy
 from pyramid_sqlalchemy import metadata
-from pyramid_sqlalchemy import testing
+from pyramid_sqlalchemy import Session
+
+from sqlalchemy import create_engine
+
+import transaction
 
 from yithlibraryserver import main
 
@@ -48,17 +56,30 @@ class FakeRequest(DummyRequest):
         self.authorization = self.headers.get('Authorization', '').split(' ')
 
 
-class DatabaseTestCase(testing.DatabaseTestCase):
+def enable_sql_two_phase_commit_test(config, enable=True):
+    """Fake enable_sql_two_phase_commit function used in the tests."""
+
+
+def includeme_test(config):
+    """Fake includeme function that replaces the real one in the tests."""
+    config.add_directive('enable_sql_two_phase_commit', enable_sql_two_phase_commit_test)
+
+
+class TestCase(unittest.TestCase):
 
     db_uri = 'postgres://yithian:123456@localhost:5432/%s' % DB_NAME
 
-
-class TestCase(DatabaseTestCase):
-
     def setUp(self):
         super(TestCase, self).setUp()
+
+        self.engine = create_engine(self.db_uri)
+        init_sqlalchemy(self.engine)
+
+        self._sqlalchemy_patcher = mock.patch('pyramid_sqlalchemy.includeme', includeme_test)
+        self._sqlalchemy_patcher.start()
+
         settings = {
-            'database_url': DB_URL,
+            'database_url': self.db_uri,
             'auth_tk_secret': '123456',
             'twitter_consumer_key': 'key',
             'twitter_consumer_secret': 'secret',
@@ -80,10 +101,18 @@ class TestCase(DatabaseTestCase):
         }
         app = main({}, **settings)
         self.testapp = TestApp(app)
-        if self.create_tables:
-            metadata.create_all()
+
+        metadata.create_all()
 
     def tearDown(self):
+        transaction.abort()
+        Session.remove()
+        metadata.drop_all()
+        Session.configure(bind=None)
+        metadata.bind = None
+        self.engine.dispose()
+        self._sqlalchemy_patcher.stop()
+
         self.testapp.reset()
         super(TestCase, self).tearDown()
 

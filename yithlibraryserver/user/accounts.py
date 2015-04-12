@@ -22,7 +22,6 @@ from pyramid_sqlalchemy import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from yithlibraryserver.email import send_email_to_admins
-from yithlibraryserver.oauth2.authorization import Authorizator
 from yithlibraryserver.user.models import User
 from yithlibraryserver.user.providers import get_available_providers
 

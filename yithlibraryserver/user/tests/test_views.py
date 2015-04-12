@@ -37,7 +37,6 @@ from sqlalchemy.orm.exc import NoResultFound
 import transaction
 
 from yithlibraryserver.compat import url_quote
-from yithlibraryserver.oauth2.authorization import Authorizator
 from yithlibraryserver.testing import TestCase
 from yithlibraryserver.user.analytics import USER_ATTR
 from yithlibraryserver.user.models import User

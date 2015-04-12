@@ -357,14 +357,12 @@ def revoke_application(request):
 
     if 'submit' in request.POST:
 
-        try:
-            authorized_app = Session.query(AuthorizedApplication).filter(
-                AuthorizedApplication.application==app,
-                AuthorizedApplication.user==request.user
-            ).one()
+        authorized_apps = Session.query(AuthorizedApplication).filter(
+            AuthorizedApplication.application==app,
+            AuthorizedApplication.user==request.user
+        ).all()
+        for authorized_app in authorized_apps:
             Session.delete(authorized_app)
-        except NoResultFound:
-            pass
 
         request.session.flash(
             _('The access to application ${app} has been revoked',

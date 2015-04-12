@@ -256,25 +256,27 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         if token is None:
             return False
 
-        record = {
-            'access_token': token,
-        }
-        access_code = self.db.access_codes.find_one(record)
+        try:
+            access_code = Session.query(AccessCode).filter(
+                AccessCode.code==token,
+            ).one()
+        except NoResultFound:
+            access_code = None
+
         if access_code is None:
             return False
 
-        if datetime.datetime.now(tz=utc) > access_code['expiration']:
+        if datetime.datetime.utcnow() > access_code.expiration:
             return False
 
-        ac_scopes = access_code['scope'].split(' ')
-        if not set(ac_scopes).issuperset(set(scopes)):
+        if not set(access_code.scope).issuperset(set(scopes)):
             return False
 
         request.access_token = access_code
-        request.user = access_code['user_id']
+        request.user = access_code.user
         request.scopes = scopes
-        request.client_id = access_code['client_id']
-        request.client = self.get_client(request.client_id)
+        request.client_id = access_code.application_id
+        request.client = access_code.application
 
         return True
 

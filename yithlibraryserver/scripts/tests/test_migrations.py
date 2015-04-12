@@ -19,7 +19,6 @@
 import sys
 
 from yithlibraryserver.compat import StringIO
-from yithlibraryserver.oauth2.authorization import Authorizator
 from yithlibraryserver.scripts.migrations import migrate
 from yithlibraryserver.scripts.testing import ScriptTests
 

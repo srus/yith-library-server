@@ -22,7 +22,6 @@ import sys
 
 from pyramid.paster import bootstrap
 
-from yithlibraryserver.oauth2.authorization import Authorizator
 from yithlibraryserver.scripts.utils import safe_print
 from yithlibraryserver.scripts.utils import get_user_display_name
 
