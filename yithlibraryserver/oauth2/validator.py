@@ -19,8 +19,6 @@
 import datetime
 import logging
 
-from bson.tz_util import utc
-
 import oauthlib.oauth2
 from oauthlib.common import to_unicode
 
@@ -202,14 +200,18 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         if redirect_uri is None:
             return True
 
-        record = self.db.authorization_codes.find_one({
-            'code': code,
-            'client_id': client_id,
-        })
-        if record is None:
+        try:
+            authorization_code = Session.query(AuthorizationCode).filter(
+                AuthorizationCode.code==code,
+                AuthorizationCode.application==client,
+            ).one()
+        except NoResultFound:
+            authorization_code = None
+
+        if authorization_code is None:
             return False
 
-        return record['redirect_uri'] == redirect_uri
+        return authorization_code.redirect_uri == redirect_uri
 
     def validate_grant_type(self, client_id, grant_type, client, request, *args, **kwargs):
         """Clients should only be allowed to use one type of grant.

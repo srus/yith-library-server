@@ -51,3 +51,18 @@ def create_client():
 
     return owner_id, app_id
 
+
+def create_user():
+
+    user = User(twitter_id='twitter1',
+                screen_name='John Doe',
+                first_name='John',
+                last_name='Doe',
+                email='john@example.com')
+
+    with transaction.manager:
+        Session.add(user)
+        Session.flush()
+        user_id = user.id
+
+    return user, user_id

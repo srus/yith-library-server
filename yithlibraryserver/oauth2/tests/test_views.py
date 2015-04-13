@@ -33,7 +33,7 @@ from yithlibraryserver.oauth2.models import (
     AuthorizationCode,
     AuthorizedApplication,
 )
-from yithlibraryserver.oauth2.tests import create_client
+from yithlibraryserver.oauth2.tests import create_client, create_user
 from yithlibraryserver.testing import TestCase
 from yithlibraryserver.user.models import User
 
@@ -45,18 +45,7 @@ def auth_basic_encode(user, password):
 
 
 def create_and_login_user(testapp):
-
-    user = User(twitter_id='twitter1',
-                screen_name='John Doe',
-                first_name='John',
-                last_name='Doe',
-                email='john@example.com')
-
-    with transaction.manager:
-        Session.add(user)
-        Session.flush()
-        user_id = user.id
-
+    user, user_id = create_user()
     testapp.get('/__login/' + str(user_id))
     return user, user_id
 

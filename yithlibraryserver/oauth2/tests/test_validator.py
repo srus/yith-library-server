@@ -1,5 +1,5 @@
 # Yith Library Server is a password storage server.
-# Copyright (C) 2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2014-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -19,47 +19,33 @@
 import base64
 import datetime
 
-from bson.tz_util import utc
 from freezegun import freeze_time
 
 from oauthlib.common import Request, to_unicode
 
-from yithlibraryserver import testing
+from pyramid_sqlalchemy import Session
+
+from sqlalchemy.orm.exc import NoResultFound
+
+from yithlibraryserver.testing import TestCase
+from yithlibraryserver.oauth2.models import (
+    AccessCode,
+    AuthorizationCode,
+)
+from yithlibraryserver.oauth2.tests import create_client, create_user
 from yithlibraryserver.oauth2.validator import RequestValidator
+from yithlibraryserver.user.models import User
 
 
-class RequestValidatorTests(testing.TestCase):
+class RequestValidatorTests(TestCase):
 
     def setUp(self):
         super(RequestValidatorTests, self).setUp()
-        self.owner_id = self.db.users.insert({
-            'twitter_id': 'twitter2',
-            'screen_name': 'Administrator',
-            'first_name': 'Alice',
-            'last_name': 'Doe',
-            'email': 'alice@example.com',
-        })
-        self.app_id = self.db.applications.insert({
-            'owner': self.owner_id,
-            'client_id': '123456',
-            'client_secret': 's3cr3t',
-            'name': 'Example',
-            'main_url': 'https://example.com',
-            'callback_url': 'https://example.com/callback',
-            'image_url': 'https://example.com/logo.png',
-            'description': 'Example description',
-        })
-        self.user_id = self.db.users.insert({
-            'twitter_id': 'twitter1',
-            'screen_name': 'JohnDoe',
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john@example.com',
-        })
+        self.owner_id, self.app_id = create_client()
+        _, self.user_id = create_user()
 
     def _create_request_validator(self, scopes=None):
-        rv = RequestValidator(self.db,
-                              default_scopes=scopes)
+        rv = RequestValidator(default_scopes=scopes)
         request = Request('https://server.example.com/')
         return rv, request
 
@@ -74,7 +60,7 @@ class RequestValidatorTests(testing.TestCase):
     def test_get_client(self):
         rv, _ = self._create_request_validator()
         client = rv.get_client('123456')
-        self.assertEqual(client.owner, self.owner_id)
+        self.assertEqual(client.user_id, self.owner_id)
         self.assertEqual(client.client_id, '123456')
         self.assertEqual(client.client_secret, 's3cr3t')
         self.assertEqual(client.name, 'Example')
@@ -166,20 +152,21 @@ class RequestValidatorTests(testing.TestCase):
     @freeze_time('2012-01-10 15:31:11')
     def test_save_authorization_code(self):
         rv, request = self._create_request_validator()
-        request.user = {'_id': self.user_id}
+        request.user = Session.query(User).filter(User.id==self.user_id).one()
+        request.client = rv.get_client('123456')
         request.scopes = ['read-passwords', 'write-passwords']
         request.redirect_uri = 'https://example.com/callback'
         rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
-        auth_code = self.db.authorization_codes.find_one({'code': 'abcdef'})
-        self.assertEquals(auth_code['user'], self.user_id)
-        self.assertEquals(auth_code['client_id'], '123456')
-        self.assertEquals(auth_code['scope'], 'read-passwords write-passwords')
-        self.assertEquals(auth_code['redirect_uri'],
-                          'https://example.com/callback')
-        expected_expiration = datetime.datetime(2012, 1, 10, 15, 31, 11,
-                                                tzinfo=utc)
-        expected_expiration += datetime.timedelta(minutes=10)
-        self.assertEquals(auth_code['expiration'], expected_expiration)
+
+        auth_code = Session.query(AuthorizationCode).filter(
+            AuthorizationCode.code=='abcdef',
+        ).one()
+        self.assertEquals(auth_code.user_id, self.user_id)
+        self.assertEquals(auth_code.application_id, self.app_id)
+        self.assertEquals(auth_code.scope, ['read-passwords', 'write-passwords'])
+        self.assertEquals(auth_code.redirect_uri, 'https://example.com/callback')
+        expected_expiration = datetime.datetime(2012, 1, 10, 15, 41, 11)
+        self.assertEquals(auth_code.expiration, expected_expiration)
 
     def test_authenticate_client_no_headers_no_request_attrs(self):
         rv, request = self._create_request_validator()
@@ -243,7 +230,8 @@ class RequestValidatorTests(testing.TestCase):
             rv, request = self._create_request_validator()
             client = rv.get_client('123456')
 
-            request.user = {'_id': self.user_id}
+            request.user = Session.query(User).filter(User.id==self.user_id).one()
+            request.client = client
             request.scopes = ['read-passwords', 'write-passwords']
             request.redirect_uri = 'https://example.com/callback'
             rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
@@ -255,7 +243,8 @@ class RequestValidatorTests(testing.TestCase):
     def test_validate_code_good(self):
         with freeze_time('2012-01-10 15:31:11'):
             rv, request = self._create_request_validator()
-            request.user = {'_id': self.user_id}
+            request.user = Session.query(User).filter(User.id==self.user_id).one()
+            request.client = rv.get_client('123456')
             request.scopes = ['read-passwords', 'write-passwords']
             request.redirect_uri = 'https://example.com/callback'
             rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
@@ -264,8 +253,9 @@ class RequestValidatorTests(testing.TestCase):
         with freeze_time('2012-01-10 15:36:11'):
             rv2, request2 = self._create_request_validator()
             client2 = rv2.get_client('123456')
+            request2.client = client2
             self.assertTrue(rv2.validate_code('123456', 'abcdef', client2, request2))
-            self.assertEquals(request2.user, self.user_id)
+            self.assertEquals(request2.user.id, self.user_id)
             self.assertEquals(request2.scopes, ['read-passwords', 'write-passwords'])
 
     def test_confirm_redirect_uri_no_redirect_uri(self):
@@ -282,9 +272,10 @@ class RequestValidatorTests(testing.TestCase):
                                                  client))
 
     @freeze_time('2012-01-10 15:31:11')
-    def test_confirm_redirect_uri_bad_redirect_uri(self):
+    def _test_confirm_redirect_uri_bad_redirect_uri(self):
         rv, request = self._create_request_validator()
-        request.user = {'_id': self.user_id}
+        request.user = Session.query(User).filter(User.id==self.user_id).one()
+        request.client = rv.get_client('123456')
         request.scopes = ['read-passwords', 'write-passwords']
         request.redirect_uri = 'https://example.com/callback'
         rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
@@ -298,7 +289,8 @@ class RequestValidatorTests(testing.TestCase):
     @freeze_time('2012-01-10 15:31:11')
     def test_confirm_redirect_uri_good_redirect_uri(self):
         rv, request = self._create_request_validator()
-        request.user = {'_id': self.user_id}
+        request.user = Session.query(User).filter(User.id==self.user_id).one()
+        request.client = rv.get_client('123456')
         request.scopes = ['read-passwords', 'write-passwords']
         request.redirect_uri = 'https://example.com/callback'
         rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
@@ -330,27 +322,28 @@ class RequestValidatorTests(testing.TestCase):
             'token_type': 'Bearer',
             'refresh_token': 'lmnopq',
         }
-        request.user = self.user_id
+        request.user = Session.query(User).filter(User.id==self.user_id).one()
         request.scopes = ['read-passwords', 'write-passwords']
         request.client = rv.get_client('123456')
         rv.save_bearer_token(token, request)
 
-        access_code = self.db.access_codes.find_one({'access_token': 'fghijk'})
-        self.assertEquals(access_code['access_token'], 'fghijk')
-        self.assertEquals(access_code['type'], 'Bearer')
-        self.assertEquals(access_code['scope'], 'read-passwords write-passwords')
-        self.assertEquals(access_code['refresh_token'], 'lmnopq')
-        expected_expiration = datetime.datetime(2012, 1, 10, 15, 31, 11,
-                                                tzinfo=utc)
-        expected_expiration += datetime.timedelta(seconds=3600)
-        self.assertEquals(access_code['expiration'], expected_expiration)
-        self.assertEquals(access_code['user_id'], self.user_id)
-        self.assertEquals(access_code['client_id'], '123456')
+        access_code = Session.query(AccessCode).filter(
+            AccessCode.code=='fghijk'
+        ).one()
+        self.assertEquals(access_code.code, 'fghijk')
+        self.assertEquals(access_code.code_type, 'Bearer')
+        self.assertEquals(access_code.scope, ['read-passwords', 'write-passwords'])
+        self.assertEquals(access_code.refresh_code, 'lmnopq')
+        expected_expiration = datetime.datetime(2012, 1, 10, 16, 31, 11)
+        self.assertEquals(access_code.expiration, expected_expiration)
+        self.assertEquals(access_code.user_id, self.user_id)
+        self.assertEquals(access_code.application_id, self.app_id)
 
     @freeze_time('2012-01-10 15:31:11')
     def test_invalidate_authorization_code(self):
         rv, request = self._create_request_validator()
-        request.user = {'_id': self.user_id}
+        request.user = Session.query(User).filter(User.id==self.user_id).one()
+        request.client = rv.get_client('123456')
         request.scopes = ['read-passwords', 'write-passwords']
         request.redirect_uri = 'https://example.com/callback'
         rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
@@ -358,8 +351,13 @@ class RequestValidatorTests(testing.TestCase):
         rv, request = self._create_request_validator()
         request.client = rv.get_client('123456')
         rv.invalidate_authorization_code('123456', 'abcdef', request)
-        auth_code = self.db.authorization_codes.find_one({'code': 'abcdef'})
-        self.assertEquals(auth_code, None)
+        try:
+            auth_code = Session.query(AuthorizationCode).filter(
+                AuthorizationCode.code=='abcdef',
+            ).one()
+        except NoResultFound:
+            auth_code = None
+        self.assertIsNone(auth_code)
 
     def test_validate_bearer_token_no_token(self):
         rv, request = self._create_request_validator()
@@ -378,7 +376,7 @@ class RequestValidatorTests(testing.TestCase):
                 'token_type': 'Bearer',
                 'refresh_token': 'lmnopq',
             }
-            request.user = self.user_id
+            request.user = Session.query(User).filter(User.id==self.user_id).one()
             request.scopes = ['read-passwords', 'write-passwords']
             request.client = rv.get_client('123456')
             rv.save_bearer_token(token, request)
@@ -401,7 +399,7 @@ class RequestValidatorTests(testing.TestCase):
                 'token_type': 'Bearer',
                 'refresh_token': 'lmnopq',
             }
-            request.user = self.user_id
+            request.user = Session.query(User).filter(User.id==self.user_id).one()
             request.scopes = ['read-passwords', 'write-passwords']
             request.client = rv.get_client('123456')
             rv.save_bearer_token(token, request)
@@ -424,7 +422,7 @@ class RequestValidatorTests(testing.TestCase):
                 'token_type': 'Bearer',
                 'refresh_token': 'lmnopq',
             }
-            request.user = self.user_id
+            request.user = Session.query(User).filter(User.id==self.user_id).one()
             request.scopes = ['read-passwords', 'write-passwords']
             request.client = rv.get_client('123456')
             rv.save_bearer_token(token, request)
