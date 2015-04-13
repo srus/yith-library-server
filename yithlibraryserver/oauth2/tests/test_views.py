@@ -169,15 +169,10 @@ class AuthorizationEndpointTests(TestCase):
         self.assertEqual(auth.application_id, application_id)
 
         # Check the right redirect url
-        try:
-            grant = Session.query(AuthorizationCode).filter(
-                AuthorizationCode.application_id==application_id,
-                AuthorizationCode.user_id==user_id,
-            ).one()
-        except NoResultFound:
-            grant = None
-
-        self.assertIsNotNone(grant)
+        grant = Session.query(AuthorizationCode).filter(
+            AuthorizationCode.application_id==application_id,
+            AuthorizationCode.user_id==user_id,
+        ).one()
         self.assertEqual(grant.application.client_id, '123456')
         location = 'https://example.com/callback?code=%s' % grant.code
         self.assertEqual(res.location, location)
@@ -419,12 +414,9 @@ class TokenEndpointTests(TestCase):
         self.assertEqual(res.json['token_type'], 'Bearer')
         self.assertEqual(res.json['expires_in'], 3600)
 
-        try:
-            access_code = Session.query(AccessCode).filter(
-                AccessCode.code==res.json['access_token'],
-            ).one()
-        except NoResultFound:
-            access_code = None
+        access_code = Session.query(AccessCode).filter(
+            AccessCode.code==res.json['access_token'],
+        ).one()
         self.assertIsNotNone(access_code)
 
 

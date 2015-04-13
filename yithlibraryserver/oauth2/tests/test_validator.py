@@ -272,7 +272,7 @@ class RequestValidatorTests(TestCase):
                                                  client))
 
     @freeze_time('2012-01-10 15:31:11')
-    def _test_confirm_redirect_uri_bad_redirect_uri(self):
+    def test_confirm_redirect_uri_bad_redirect_uri(self):
         rv, request = self._create_request_validator()
         request.user = Session.query(User).filter(User.id==self.user_id).one()
         request.client = rv.get_client('123456')
