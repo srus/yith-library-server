@@ -41,24 +41,22 @@ class ValidatePasswordsTests(unittest.TestCase):
         self.assertEqual(errors, ['There must be only one toplevel element called "password"'])
 
     def test_secret_missing(self):
-        password, errors = validate_password(b'{"password": {}}', _id='1')
+        password, errors = validate_password(b'{"password": {}}')
         self.assertEqual(errors, ['Secret is required',
                                   'Service is required'])
 
     def test_service_missing(self):
-        password, errors = validate_password(b'{"password": {"secret": "s3cr3t"}}', _id='1')
+        password, errors = validate_password(b'{"password": {"secret": "s3cr3t"}}')
         self.assertEqual(errors, ['Service is required'])
 
     def test_everything_fine(self):
-        password, errors = validate_password(b'{"password": {"secret": "s3cr3t", "service": "myservice"}}', _id='1')
+        password, errors = validate_password(b'{"password": {"secret": "s3cr3t", "service": "myservice"}}')
         self.assertEqual(errors, [])
         self.assertEqual(password, {
             'secret': 's3cr3t',
             'service': 'myservice',
-            'account': None,
+            'account': '',
             'expiration': None,
-            'notes': None,
-            'tags': None,
-            'creation': None,
-            'last_modification': None,
+            'notes': '',
+            'tags': [],
         })
