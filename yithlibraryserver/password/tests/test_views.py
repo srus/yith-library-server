@@ -169,7 +169,25 @@ class ViewTests(TestCase):
     @freeze_time('2014-02-23 08:00:00')
     def test_password_put_not_found(self):
         res = self.testapp.put('/passwords/000000000000000000000000',
-                               headers=self.auth_header, status=400)
+                               headers=self.auth_header, status=404)
+        self.assertEqual(res.status, '404 Not Found')
+        self.assertEqual(res.body,
+                         b'{"message": "Password not found"}')
+
+    @freeze_time('2014-02-23 08:00:00')
+    def test_password_put_bad_request(self):
+        password = Password(service='testing',
+                            secret='s3cr3t',
+                            user_id=self.user_id)
+
+        with transaction.manager:
+            Session.add(password)
+            Session.flush()
+            password_id = password.id
+
+        res = self.testapp.put('/passwords/%s' % str(password_id),
+                               '', headers=self.auth_header,
+                               status=400)
         self.assertEqual(res.status, '400 Bad Request')
         self.assertEqual(res.body,
                          b'{"message": "No JSON object could be decoded"}')

@@ -109,18 +109,19 @@ class PasswordRESTView(object):
     @view_config(request_method='PUT')
     @protected_method(['write-passwords'])
     def put(self):
-        cleaned_data, errors = validate_password(self.request.body,
-                                             self.request.charset)
-
-        if errors:
-            result = {'message': ','.join(errors)}
-            return HTTPBadRequest(body=json.dumps(result),
-                                  content_type='application/json')
-
         password = self._get_password()
         if password is None:
             return password_not_found()
+
         else:
+            cleaned_data, errors = validate_password(self.request.body,
+                                                     self.request.charset)
+
+            if errors:
+                result = {'message': ','.join(errors)}
+                return HTTPBadRequest(body=json.dumps(result),
+                                      content_type='application/json')
+
             password.secret = cleaned_data['secret']
             password.service = cleaned_data['service']
             password.account = cleaned_data['account']
