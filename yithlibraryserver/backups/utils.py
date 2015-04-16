@@ -20,7 +20,6 @@ import gzip
 import json
 
 from yithlibraryserver.compat import BytesIO
-from yithlibraryserver.password.models import PasswordsManager
 from yithlibraryserver.utils import remove_attrs
 
 

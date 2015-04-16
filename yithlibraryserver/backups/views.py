@@ -28,7 +28,6 @@ from yithlibraryserver.backups.utils import get_user_passwords
 from yithlibraryserver.backups.utils import compress, uncompress
 from yithlibraryserver.i18n import translation_domain
 from yithlibraryserver.i18n import TranslationString as _
-from yithlibraryserver.password.models import PasswordsManager
 
 
 @view_config(route_name='backups_index',
