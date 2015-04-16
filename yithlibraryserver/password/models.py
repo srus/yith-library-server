@@ -28,15 +28,19 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSON
 from sqlalchemy.orm import relationship, backref
 
 
+def now():
+    return datetime.utcnow()
+
+
 class Password(BaseObject):
     __tablename__ = 'passwords'
 
     id = Column(Integer, primary_key=True)
-    creation = Column(DateTime, nullable=False, default=datetime.utcnow)
-    modification = Column(DateTime, nullable=False, onupdate=datetime.utcnow)
+    creation = Column(DateTime, nullable=False, default=now)
+    modification = Column(DateTime, nullable=False, default=now, onupdate=now)
 
     notes = Column(Text, nullable=False, default='')
-    tags = Column(ARRAY(Text, dimensions=1), nullable=True)
+    tags = Column(ARRAY(Text, dimensions=1), nullable=False, default=[])
 
     secret = Column(JSON(none_as_null=True), nullable=False)
     account = Column(String, nullable=False, default='')
@@ -44,10 +48,26 @@ class Password(BaseObject):
     expiration = Column(Integer, nullable=True)
 
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    users = relationship(
+    user = relationship(
         'User',
         backref=backref('passwords', cascade='all, delete-orphan'),
     )
+
+    def as_dict(self):
+        return dict(
+            id=self.id,
+            creation=self.creation,
+            modification=self.modification,
+            notes=self.notes,
+            tags=self.tags,
+            secret=self.secret,
+            account=self.account,
+            service=self.service,
+            expiration=self.expiration,
+            user=self.user_id,
+            owner=self.user_id,  # backwards compatibility
+        )
+
 
 
 class PasswordsManager(object):
