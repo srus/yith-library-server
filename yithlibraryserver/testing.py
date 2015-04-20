@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import collections
 import sys
 import unittest
 
@@ -65,18 +66,42 @@ def includeme_test(config):
     config.add_directive('enable_sql_two_phase_commit', enable_sql_two_phase_commit_test)
 
 
+SQLAlchemyTestContext = collections.namedtuple('SQLAlchemyTestContext',
+                                               ['engine', 'sqlalchemy_patcher'])
+
+
+def sqlalchemy_setup(db_uri):
+    engine = create_engine(db_uri)
+    init_sqlalchemy(engine)
+
+    sqlalchemy_patcher = mock.patch('pyramid_sqlalchemy.includeme', includeme_test)
+    sqlalchemy_patcher.start()
+
+    return SQLAlchemyTestContext(engine, sqlalchemy_patcher)
+
+
+def sqlalchemy_teardown(context):
+    transaction.abort()
+    Session.remove()
+    metadata.drop_all()
+    Session.configure(bind=None)
+    metadata.bind = None
+    context.engine.dispose()
+    context.sqlalchemy_patcher.stop()
+
+
+def get_test_db_uri():
+    return 'postgres://yithian:123456@localhost:5432/%s' % DB_NAME
+
+
 class TestCase(unittest.TestCase):
 
-    db_uri = 'postgres://yithian:123456@localhost:5432/%s' % DB_NAME
+    db_uri = get_test_db_uri()
 
     def setUp(self):
         super(TestCase, self).setUp()
 
-        self.engine = create_engine(self.db_uri)
-        init_sqlalchemy(self.engine)
-
-        self._sqlalchemy_patcher = mock.patch('pyramid_sqlalchemy.includeme', includeme_test)
-        self._sqlalchemy_patcher.start()
+        self.db_context = sqlalchemy_setup(self.db_uri)
 
         settings = {
             'database_url': self.db_uri,
@@ -105,14 +130,7 @@ class TestCase(unittest.TestCase):
         metadata.create_all()
 
     def tearDown(self):
-        transaction.abort()
-        Session.remove()
-        metadata.drop_all()
-        Session.configure(bind=None)
-        metadata.bind = None
-        self.engine.dispose()
-        self._sqlalchemy_patcher.stop()
-
+        sqlalchemy_teardown(self.db_context)
         self.testapp.reset()
         super(TestCase, self).tearDown()
 

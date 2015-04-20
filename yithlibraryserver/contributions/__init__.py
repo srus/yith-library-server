@@ -19,7 +19,7 @@
 import logging
 
 from yithlibraryserver import read_setting_from_env
-#from yithlibraryserver.contributions.models import Donation
+from yithlibraryserver.contributions.models import Donation
 
 logger = logging.getLogger(__name__)
 
@@ -43,4 +43,4 @@ def includeme(config):
     config.add_route('contributions_paypal_cancel_callback',
                      '/contribute/paypal-cancel-callback')
 
-#    logger.debug('Importing %s model so SQLAlchemy knows about it', Donation)
+    logger.debug('Importing %s model so SQLAlchemy knows about it', Donation)

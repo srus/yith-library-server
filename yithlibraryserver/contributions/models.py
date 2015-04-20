@@ -17,7 +17,6 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
-from bson.tz_util import utc
 
 from pyramid_sqlalchemy import BaseObject
 
@@ -26,12 +25,16 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, backref
 
 
+def now():
+    return datetime.utcnow()
+
+
 class Donation(BaseObject):
     __tablename__ = 'donations'
 
     id = Column(Integer, primary_key=True)
-    creation = Column(DateTime, nullable=False, default=datetime.utcnow)
-    modification = Column(DateTime, nullable=False, onupdate=datetime.utcnow)
+    creation = Column(DateTime, nullable=False, default=now)
+    modification = Column(DateTime, nullable=False, default=now, onupdate=now)
 
     first_name = Column(String, nullable=False, default='')
     last_name = Column(String, nullable=False, default='')
@@ -47,38 +50,12 @@ class Donation(BaseObject):
     amount = Column(Integer, nullable=False)
     send_sticker = Column(Boolean, nullable=False, default=True)
 
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    user = relationship('User', backref=backref('donations')) #, order_by='id'))
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    user = relationship('User', backref=backref('donations'))
+
+    def should_include_sticker(self):
+        return include_sticker(self.amount)
 
 
 def include_sticker(amount):
     return amount > 1
-
-
-def create_donation(request, data):
-    amount = int(data['amount'])
-    donation = {
-        'amount': amount,
-        'firstname': data['firstname'],
-        'lastname': data['lastname'],
-        'city': data['city'],
-        'country': data['country'],
-        'state': data['state'],
-        'street': data['street'],
-        'zip': data['zip'],
-        'email': data['email'],
-        'creation': datetime.now(tz=utc),
-    }
-    if include_sticker(amount):
-        donation['send_sticker'] = not ('no-sticker' in data)
-    else:
-        donation['send_sticker'] = False
-
-    if request.user is not None:
-        donation['user'] = request.user['_id']
-    else:
-        donation['user'] = None
-
-    _id = request.db.donations.insert(donation)
-    donation['_id'] = _id
-    return donation
