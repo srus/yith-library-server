@@ -18,28 +18,40 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import unittest
+
 from pyramid import testing
 
 from pyramid_mailer import get_mailer
 
+from pyramid_sqlalchemy import metadata
 from pyramid_sqlalchemy import Session
 
-from yithlibraryserver.testing import DatabaseTestCase
+from yithlibraryserver.testing import (
+    get_test_db_uri,
+    sqlalchemy_setup,
+    sqlalchemy_teardown,
+)
 from yithlibraryserver.user.email_verification import EmailVerificationCode
 from yithlibraryserver.user.models import User
 
 
-class EmailVerificationCodeTests(DatabaseTestCase):
+class EmailVerificationCodeTests(unittest.TestCase):
 
     def setUp(self):
-        super(EmailVerificationCodeTests, self).setUp()
+        self.db_uri = get_test_db_uri()
+        self.db_context = sqlalchemy_setup(self.db_uri)
+
         self.config = testing.setUp()
         self.config.include('pyramid_mailer.testing')
         self.config.include('pyramid_chameleon')
+        self.config.include('yithlibraryserver.user')
+
+        metadata.create_all()
 
     def tearDown(self):
         testing.tearDown()
-        super(EmailVerificationCodeTests, self).tearDown()
+        sqlalchemy_teardown(self.db_context)
 
     def test_email_verification_code_verify_negative(self):
         evc = EmailVerificationCode()

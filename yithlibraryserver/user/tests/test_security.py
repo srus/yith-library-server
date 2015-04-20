@@ -18,12 +18,19 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import unittest
+
 from pyramid import testing
 from pyramid.httpexceptions import HTTPFound
 
 from pyramid_sqlalchemy import Session
 
-from yithlibraryserver.testing import DatabaseTestCase
+from pyramid_sqlalchemy import metadata
+from yithlibraryserver.testing import (
+    get_test_db_uri,
+    sqlalchemy_setup,
+    sqlalchemy_teardown,
+)
 from yithlibraryserver.user.security import (
     get_user,
     assert_authenticated_user_is_registered,
@@ -31,16 +38,20 @@ from yithlibraryserver.user.security import (
 from yithlibraryserver.user.models import User
 
 
-class GetUserTests(DatabaseTestCase):
+class GetUserTests(unittest.TestCase):
 
     def setUp(self):
-        super(GetUserTests, self).setUp()
+        self.db_uri = get_test_db_uri()
+        self.db_context = sqlalchemy_setup(self.db_uri)
+
         self.config = testing.setUp()
         self.config.include('yithlibraryserver.user')
 
+        metadata.create_all()
+
     def tearDown(self):
         testing.tearDown()
-        super(GetUserTests, self).tearDown()
+        sqlalchemy_teardown(self.db_context)
 
     def test_get_user_no_userid(self):
         request = testing.DummyRequest()
@@ -64,16 +75,20 @@ class GetUserTests(DatabaseTestCase):
         self.assertEqual(new_user.screen_name, 'John Doe')
 
 
-class AssertAuthenticatedUserIsRegisteredTests(DatabaseTestCase):
+class AssertAuthenticatedUserIsRegisteredTests(unittest.TestCase):
 
     def setUp(self):
-        super(AssertAuthenticatedUserIsRegisteredTests, self).setUp()
+        self.db_uri = get_test_db_uri()
+        self.db_context = sqlalchemy_setup(self.db_uri)
+
         self.config = testing.setUp()
         self.config.include('yithlibraryserver.user')
 
+        metadata.create_all()
+
     def tearDown(self):
         testing.tearDown()
-        super(AssertAuthenticatedUserIsRegisteredTests, self).tearDown()
+        sqlalchemy_teardown(self.db_context)
 
     def test_assert_authenticated_user_is_registered_no_user(self):
         self.config.testing_securitypolicy(userid=1)

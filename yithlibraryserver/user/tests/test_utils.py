@@ -24,9 +24,14 @@ from freezegun import freeze_time
 
 from pyramid import testing
 
+from pyramid_sqlalchemy import metadata
 from pyramid_sqlalchemy import Session
 
-from yithlibraryserver.testing import DatabaseTestCase
+from yithlibraryserver.testing import (
+    get_test_db_uri,
+    sqlalchemy_setup,
+    sqlalchemy_teardown,
+)
 from yithlibraryserver.user.analytics import GoogleAnalytics
 from yithlibraryserver.user.analytics import USER_ATTR
 from yithlibraryserver.user.models import User
@@ -49,16 +54,20 @@ class SplitNameTests(unittest.TestCase):
         self.assertEqual(split_name(''), ('', ''))
 
 
-class RegisterOrUpdateTests(DatabaseTestCase):
+class RegisterOrUpdateTests(unittest.TestCase):
 
     def setUp(self):
-        super(RegisterOrUpdateTests, self).setUp()
+        self.db_uri = get_test_db_uri()
+        self.db_context = sqlalchemy_setup(self.db_uri)
+
         self.config = testing.setUp()
         self.config.include('yithlibraryserver.user')
 
+        metadata.create_all()
+
     def tearDown(self):
         testing.tearDown()
-        super(RegisterOrUpdateTests, self).tearDown()
+        sqlalchemy_teardown(self.db_context)
 
     # def test_update_user(self):
     #     user_id = self.db.users.insert({
