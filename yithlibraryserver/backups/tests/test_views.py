@@ -16,14 +16,19 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-import datetime
 import gzip
-import json
 
 from freezegun import freeze_time
 
+from pyramid_sqlalchemy import Session
+
+import transaction
+
 from yithlibraryserver.compat import text_type, BytesIO
+from yithlibraryserver.password.models import Password
 from yithlibraryserver.testing import TestCase
+from yithlibraryserver.user.models import User
+from yithlibraryserver.user.tests.test_views import create_and_login_user
 
 
 def get_gzip_data(text):
@@ -41,47 +46,24 @@ class ViewTests(TestCase):
         gzip_file = gzip.GzipFile(fileobj=buf, mode='rb')
         self.assertEqual(gzip_file.read().decode('utf-8'), data)
 
-    def test_backups_index(self):
+    def test_backups_index_requires_authentication(self):
         res = self.testapp.get('/backup')
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Log in')
 
-        # Log in
-        date = datetime.datetime(2012, 12, 12, 12, 12)
-        user_id = self.db.users.insert({
-            'twitter_id': 'twitter1',
-            'screen_name': 'John Doe',
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': '',
-            'email_verified': False,
-            'date_joined': date,
-            'last_login': date,
-        })
-        self.testapp.get('/__login/' + str(user_id))
-
+    def test_backups_index(self):
+        create_and_login_user(self.testapp)
         res = self.testapp.get('/backup')
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Backup', 'Export passwords', 'Import passwords')
 
-    def test_backups_export(self):
+    def test_backups_export_requires_authentication(self):
         res = self.testapp.get('/backup/export')
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Log in')
 
-        # Log in
-        date = datetime.datetime(2012, 12, 12, 12, 12)
-        user_id = self.db.users.insert({
-            'twitter_id': 'twitter1',
-            'screen_name': 'John Doe',
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': '',
-            'email_verified': False,
-            'date_joined': date,
-            'last_login': date,
-        })
-        self.testapp.get('/__login/' + str(user_id))
+    def test_backups_export_empty_passwords(self):
+        create_and_login_user(self.testapp)
 
         with freeze_time('2012-01-10'):
             res = self.testapp.get('/backup/export')
@@ -93,64 +75,60 @@ class ViewTests(TestCase):
                 'attachment; filename=yith-library-backup-2012-01-10.yith',
             )
 
-            self.db.passwords.insert({
-                'owner': user_id,
-                'password': 'secret1',
-            })
-            self.db.passwords.insert({
-                'owner': user_id,
-                'password': 'secret2',
-            })
+    def test_backups_export_some_passwords(self):
+        user_id = create_and_login_user(self.testapp)
 
+        with freeze_time('2012-12-12 12:12:12'):
+            password1 = Password(secret='secret1', user_id=user_id)
+            password2 = Password(secret='secret2', user_id=user_id)
+
+            with transaction.manager:
+                Session.add(password1)
+                Session.add(password2)
+                Session.flush()
+
+        with freeze_time('2012-01-10'):
             res = self.testapp.get('/backup/export')
             self.assertEqual(res.status, '200 OK')
             self.assertEqual(res.content_type, 'application/yith-library')
-            self.assertUncompressData(res.body, json.dumps([{
-                'password': 'secret1',
-            }, {
-                'password': 'secret2',
-            }]))
+            self.assertUncompressData(
+                res.body,
+                '[{"account": "", "service": "", "tags": [], "notes": "", "creation": "2012-12-12T12:12:12", "secret": "secret1", "expiration": null, "modification": "2012-12-12T12:12:12"}, '
+                '{"account": "", "service": "", "tags": [], "notes": "", "creation": "2012-12-12T12:12:12", "secret": "secret2", "expiration": null, "modification": "2012-12-12T12:12:12"}]',
+            )
             self.assertEqual(
                 res.content_disposition,
                 'attachment; filename=yith-library-backup-2012-01-10.yith',
             )
 
-    def test_backups_import(self):
+    def test_backups_import_requires_authentication(self):
         res = self.testapp.post('/backup/import')
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Log in')
 
-        # Log in
-        date = datetime.datetime(2012, 12, 12, 12, 12)
-        user_id = self.db.users.insert({
-            'twitter_id': 'twitter1',
-            'screen_name': 'John Doe',
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': '',
-            'email_verified': False,
-            'date_joined': date,
-            'last_login': date,
-        })
-        self.testapp.get('/__login/' + str(user_id))
+    def test_backups_import_no_file_to_upload(self):
+        create_and_login_user(self.testapp)
 
-        # no file to upload
         res = self.testapp.post('/backup/import', status=302)
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/backup')
 
-        self.assertEqual(0, self.db.passwords.count())
+        self.assertEqual(0, Session.query(Password).count())
 
-        # not really a file
+    def test_backups_import_not_a_file(self):
+        create_and_login_user(self.testapp)
+
         res = self.testapp.post('/backup/import', {
             'passwords-file': '',
         }, status=302)
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/backup')
 
-        self.assertEqual(0, self.db.passwords.count())
+        self.assertEqual(0, Session.query(Password).count())
 
-        # bad file
+    def test_backups_import_bad_file(self):
+        create_and_login_user(self.testapp)
+
         content = get_gzip_data(text_type('[{}'))
         res = self.testapp.post(
             '/backup/import', {},
@@ -159,9 +137,11 @@ class ViewTests(TestCase):
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/backup')
 
-        self.assertEqual(0, self.db.passwords.count())
+        self.assertEqual(0, Session.query(Password).count())
 
-        # file with good syntax but empty
+    def test_backups_import_empty_file(self):
+        create_and_login_user(self.testapp)
+
         content = get_gzip_data(text_type('[]'))
         res = self.testapp.post(
             '/backup/import', {},
@@ -170,9 +150,11 @@ class ViewTests(TestCase):
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/backup')
 
-        self.assertEqual(0, self.db.passwords.count())
+        self.assertEqual(0, Session.query(Password).count())
 
-        # file with good syntax but empty
+    def test_backups_import_empty_file2(self):
+        create_and_login_user(self.testapp)
+
         content = get_gzip_data(text_type('[{}]'))
         res = self.testapp.post(
             '/backup/import', {},
@@ -181,9 +163,10 @@ class ViewTests(TestCase):
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/backup')
 
-        self.assertEqual(0, self.db.passwords.count())
+        self.assertEqual(0, Session.query(Password).count())
 
-        # file with good passwords
+    def test_backups_import_good_file(self):
+        user_id = create_and_login_user(self.testapp)
         content = get_gzip_data(text_type('[{"secret": "password1"}, {"secret": "password2"}]'))
         res = self.testapp.post(
             '/backup/import', {},
@@ -191,5 +174,6 @@ class ViewTests(TestCase):
             status=302)
         self.assertEqual(res.status, '302 Found')
         self.assertEqual(res.location, 'http://localhost/backup')
-
-        self.assertEqual(2, self.db.passwords.count())
+        self.assertEqual(2, Session.query(Password).count())
+        user = Session.query(User).filter(User.id==user_id).one()
+        self.assertEqual(len(user.passwords), 2)

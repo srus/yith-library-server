@@ -20,13 +20,13 @@ import gzip
 import json
 
 from yithlibraryserver.compat import BytesIO
+from yithlibraryserver.jsonrenderer import datetime_parser, json_renderer
 from yithlibraryserver.utils import remove_attrs
 
 
-def get_user_passwords(db, user):
-    passwords_manager = PasswordsManager(db)
-    return [remove_attrs(password, 'owner', '_id')
-            for password in passwords_manager.retrieve(user)]
+def get_user_passwords(user):
+    return [remove_attrs(password.as_dict(), 'user', 'owner', 'id')
+            for password in user.passwords]
 
 
 def get_backup_filename(date):
@@ -37,7 +37,8 @@ def get_backup_filename(date):
 def compress(passwords):
     buf = BytesIO()
     gzip_data = gzip.GzipFile(fileobj=buf, mode='wb')
-    data = json.dumps(passwords)
+    renderer = json_renderer(None)
+    data = renderer(passwords, {})
     gzip_data.write(data.encode('utf-8'))
     gzip_data.close()
     return buf.getvalue()
@@ -47,4 +48,15 @@ def uncompress(compressed_data):
     buf = BytesIO(compressed_data)
     gzip_data = gzip.GzipFile(fileobj=buf, mode='rb')
     raw_data = gzip_data.read()
-    return json.loads(raw_data.decode('utf-8'))
+    json_data = json.loads(raw_data.decode('utf-8'))
+
+    def parse_date(item, dt_attr):
+        if dt_attr in item:
+            item[dt_attr] = datetime_parser(item[dt_attr])
+
+    def load_item(item):
+        parse_date(item, 'creation')
+        parse_date(item, 'modification')
+        return item
+
+    return [load_item(item) for item in json_data]
