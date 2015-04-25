@@ -20,8 +20,14 @@
 
 from pyramid.testing import DummyRequest
 
+from pyramid_sqlalchemy import Session
+
+import transaction
+
 from yithlibraryserver import testing
 from yithlibraryserver.cors import CORSManager
+from yithlibraryserver.oauth2.models import Application
+from yithlibraryserver.user.models import User
 
 
 class CORSManagerTests(testing.TestCase):
@@ -56,15 +62,23 @@ class CORSManagerTests(testing.TestCase):
     def test_cors_headers_app_origins_access_denied(self):
         cm = CORSManager('')
 
-        self.db.applications.insert({
-            'name': 'test-app',
-            'client_id': 'client1',
-            'authorized_origins': ['http://localhost'],
-        })
+        user = User(twitter_id='twitter1',
+                    screen_name='John Doe',
+                    first_name='John',
+                    last_name='Doe',
+                    email='john@example.com')
+
+        app = Application(name='Test Application',
+                          client_id='client1',
+                          authorized_origins=['http://localhost'])
+        user.applications.append(app)
+
+        with transaction.manager:
+            Session.add(user)
+            Session.flush()
 
         request = DummyRequest(headers={'Origin': 'http://localhost'},
                                params={'client_id': 'client2'})
-        request.db = self.db
         response = request.response
 
         cm.add_cors_header(request, response)
@@ -77,15 +91,23 @@ class CORSManagerTests(testing.TestCase):
     def test_cors_headers_app_origins(self):
         cm = CORSManager('')
 
-        self.db.applications.insert({
-            'name': 'test-app',
-            'client_id': 'client1',
-            'authorized_origins': ['http://localhost'],
-        })
+        user = User(twitter_id='twitter1',
+                    screen_name='John Doe',
+                    first_name='John',
+                    last_name='Doe',
+                    email='john@example.com')
+
+        app = Application(name='Test Application',
+                          client_id='client1',
+                          authorized_origins=['http://localhost'])
+        user.applications.append(app)
+
+        with transaction.manager:
+            Session.add(user)
+            Session.flush()
 
         request = DummyRequest(headers={'Origin': 'http://localhost'},
                                params={'client_id': 'client1'})
-        request.db = self.db
         response = request.response
 
         cm.add_cors_header(request, response)

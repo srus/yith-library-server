@@ -48,14 +48,14 @@ class DummyValidationFailure(ValidationFailure):
         return 'dummy error'
 
 
-def create_user(email='', **kwargs):
+def create_user(email='', email_verified=False, **kwargs):
     date = datetime.datetime(2012, 12, 12, 12, 12)
     user = User(twitter_id='twitter1',
                 screen_name='John Doe',
                 first_name='John',
                 last_name='Doe',
                 email=email,
-                email_verified=False,
+                email_verified=email_verified,
                 creation=date,
                 last_login=date,
                 **kwargs)
