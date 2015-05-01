@@ -25,6 +25,8 @@ from yithlibraryserver.scripts.testing import ScriptTests
 
 class BuildAssetsTests(ScriptTests):
 
+    use_db = False
+
     def setUp(self):
         super(BuildAssetsTests, self).setUp()
 
