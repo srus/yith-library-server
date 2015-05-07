@@ -34,7 +34,7 @@ from yithlibraryserver.testing import (
 )
 from yithlibraryserver.user.analytics import GoogleAnalytics
 from yithlibraryserver.user.analytics import USER_ATTR
-from yithlibraryserver.user.models import User
+from yithlibraryserver.user.models import ExternalIdentity, User
 from yithlibraryserver.user.utils import split_name
 from yithlibraryserver.user.utils import register_or_update
 
@@ -69,46 +69,6 @@ class RegisterOrUpdateTests(unittest.TestCase):
         testing.tearDown()
         sqlalchemy_teardown(self.db_context)
 
-    # def test_update_user(self):
-    #     user_id = self.db.users.insert({
-    #         'screen_name': 'John Doe',
-    #         'first_name': 'John',
-    #         'last_name': '',
-    #     })
-    #     user = self.db.users.find_one({'_id': user_id})
-    #     update_user(self.db, user, {}, {})
-
-    #     updated_user = self.db.users.find_one({'_id': user_id})
-    #     # the user has not changed
-    #     self.assertEqual(updated_user['screen_name'], user['screen_name'])
-    #     self.assertEqual(updated_user['first_name'], user['first_name'])
-    #     self.assertEqual(updated_user['last_name'], user['last_name'])
-
-    #     # update the last_name
-    #     update_user(self.db, user, {'last_name': 'Doe'}, {})
-    #     updated_user = self.db.users.find_one({'_id': user_id})
-    #     self.assertEqual(updated_user['last_name'], 'Doe')
-
-    #     # add an email attribute
-    #     update_user(self.db, user, {'email': 'john@example.com'}, {})
-    #     updated_user = self.db.users.find_one({'_id': user_id})
-    #     self.assertEqual(updated_user['email'], 'john@example.com')
-
-    #     # if an attribute has no value, no update happens
-    #     update_user(self.db, user, {'first_name': ''}, {})
-    #     updated_user = self.db.users.find_one({'_id': user_id})
-    #     self.assertEqual(updated_user['first_name'], 'John')
-
-    #     # update a non existing attribute
-    #     update_user(self.db, user, {'foo': 'bar'}, {})
-    #     updated_user = self.db.users.find_one({'_id': user_id})
-    #     self.assertFalse('foo' in updated_user)
-
-    #     # update the same attribute within the last parameter
-    #     update_user(self.db, user, {}, {'foo': 'bar'})
-    #     updated_user = self.db.users.find_one({'_id': user_id})
-    #     self.assertEqual(updated_user['foo'], 'bar')
-
     @freeze_time('2013-01-02 10:11:12')
     def test_register_or_update_new_user(self):
         request = testing.DummyRequest()
@@ -129,16 +89,19 @@ class RegisterOrUpdateTests(unittest.TestCase):
             'last_name': 'Doe',
             'email': '',
             'provider': 'twitter',
-            'twitter_id': '1',
+            'external_id': '1',
         })
 
     @freeze_time('2013-01-02 10:11:12')
     def test_register_or_update_existing_user(self):
-        user = User(twitter_id='1',
-                    screen_name='JohnDoe',
+        user = User(screen_name='JohnDoe',
                     first_name='John',
                     last_name='')
+        identity = ExternalIdentity(provider='twitter',
+                                    external_id='1',
+                                    user=user)
         Session.add(user)
+        Session.add(identity)
         Session.flush()
         user_id = user.id
 
@@ -160,11 +123,14 @@ class RegisterOrUpdateTests(unittest.TestCase):
 
     @freeze_time('2013-01-02 10:11:12')
     def test_register_or_update_next_url_in_session(self):
-        user = User(twitter_id='1',
-                    screen_name='JohnDoe',
+        user = User(screen_name='JohnDoe',
                     first_name='John',
                     last_name='')
+        identity = ExternalIdentity(provider='twitter',
+                                    external_id='1',
+                                    user=user)
         Session.add(user)
+        Session.add(identity)
         Session.flush()
 
         request = testing.DummyRequest()

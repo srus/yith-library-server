@@ -26,8 +26,6 @@ from yithlibraryserver.password.models import Password
 from yithlibraryserver.scripts.utils import safe_print, setup_simple_command
 from yithlibraryserver.scripts.utils import get_user_display_name
 from yithlibraryserver.user.models import User
-from yithlibraryserver.user.providers import get_available_providers
-from yithlibraryserver.user.providers import get_provider_key
 
 
 def _get_user_info(user):

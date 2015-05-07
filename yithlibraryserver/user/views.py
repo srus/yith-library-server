@@ -38,7 +38,6 @@ from yithlibraryserver.user.accounts import merge_accounts
 from yithlibraryserver.user.accounts import notify_admins_of_account_removal
 from yithlibraryserver.user.email_verification import EmailVerificationCode
 from yithlibraryserver.user.models import User
-from yithlibraryserver.user.providers import get_provider_key
 from yithlibraryserver.user.schemas import UserSchema, NewUserSchema
 from yithlibraryserver.user.schemas import AccountDestroySchema
 from yithlibraryserver.user.schemas import UserPreferencesSchema
@@ -94,9 +93,6 @@ def register_new_user(request):
                 'next_url': next_url,
             }
 
-        provider = user_info['provider']
-        provider_key = get_provider_key(provider)
-
         email = appstruct['email']
         if email != '' and email == user_info['email']:
             email_verified = True
@@ -106,7 +102,6 @@ def register_new_user(request):
         now = datetime.datetime.utcnow()
 
         user_attrs = {
-            provider_key: user_info[provider_key],
             'screen_name': appstruct['screen_name'],
             'first_name': appstruct['first_name'],
             'last_name': appstruct['last_name'],
@@ -121,6 +116,9 @@ def register_new_user(request):
             request.google_analytics.clean_session()
 
         user = User(**user_attrs)
+        provider = user_info['provider']
+        external_id = user_info['external_id']
+        user.add_identity(provider, external_id)
         Session.add(user)
 
         if not email_verified and email != '':
@@ -330,7 +328,7 @@ def identity_providers(request):
                     return a['is_verified']
             return False
 
-        accounts_to_merge = [account.replace('account-', '')
+        accounts_to_merge = [int(account.replace('account-', ''))
                              for account in request.POST.keys()
                              if account != 'submit']
         accounts_to_merge = [account
@@ -451,4 +449,4 @@ class UserRESTView(object):
     @view_config(request_method='GET')
     @protected_method(['read-userinfo'])
     def get(self):
-        return self.request.user
+        return self.request.user.as_dict()

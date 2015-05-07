@@ -24,12 +24,13 @@ from pyramid_sqlalchemy import metadata
 from pyramid_sqlalchemy import Session
 
 from yithlibraryserver.compat import text_type
+from yithlibraryserver.password.models import Password
 from yithlibraryserver.testing import (
     get_test_db_uri,
     sqlalchemy_setup,
     sqlalchemy_teardown,
 )
-from yithlibraryserver.user.models import User
+from yithlibraryserver.user.models import ExternalIdentity, User
 
 
 class FullNameTests(unittest.TestCase):
@@ -192,34 +193,110 @@ class UpdateUserInfo(unittest.TestCase):
 
 class GetAccountsTests(unittest.TestCase):
 
-    def test_foo(self):
-        pass
+    def setUp(self):
+        self.db_uri = get_test_db_uri()
+        self.db_context = sqlalchemy_setup(self.db_uri)
 
+        self.config = testing.setUp()
+        self.config.include('yithlibraryserver.password')
+        self.config.include('yithlibraryserver.user')
 
-class GetProvidersTests(unittest.TestCase):
+        metadata.create_all()
 
-    def test_get_providers_none(self):
-        user = User(facebook_id='', google_id='', twitter_id='',
-                    persona_id='', liveconnect_id='')
-        self.assertEqual([], user.get_providers(''))
+    def tearDown(self):
+        testing.tearDown()
+        sqlalchemy_teardown(self.db_context)
 
-    def test_get_providers_one_provider_current(self):
-        user = User(facebook_id='1234', google_id='', twitter_id='',
-                    persona_id='', liveconnect_id='')
-        self.assertEqual([
-            {'name': 'facebook', 'is_current': True},
-        ], user.get_providers('facebook'))
+    def test_get_accounts_no_provider(self):
+        user = User(email='john@example.com')
+        Session.add(user)
+        Session.flush()
+        self.assertEqual(user.get_accounts(''), [
+            {'id': user.id,
+             'is_current': False,
+             'is_verified': False,
+             'passwords': 0,
+             'providers': []}
+        ])
 
-    def test_get_providers_multiple_providers(self):
-        user = User(facebook_id='1234', google_id='4321', twitter_id='6789',
-                    persona_id='', liveconnect_id='')
-        self.assertEqual([
-            {'name': 'facebook', 'is_current': True},
-            {'name': 'google', 'is_current': False},
-            {'name': 'twitter', 'is_current': False},
-        ], user.get_providers('facebook'))
+    def test_get_accounts_one_provider(self):
+        user = User(email='john@example.com')
+        identity = ExternalIdentity(user=user, provider='twitter',
+                                    external_id='1234')
+        Session.add(user)
+        Session.add(identity)
+        Session.flush()
+        self.assertEqual(user.get_accounts(''), [
+            {'id': user.id,
+             'is_current': False,
+             'is_verified': False,
+             'passwords': 0,
+             'providers': [{
+                 'name': 'twitter',
+                 'is_current': False,
+             }]}
+        ])
 
-    def test_get_providers_invalid_provider(self):
-        user = User(facebook_id='', google_id='', twitter_id='',
-                    persona_id='', liveconnect_id='')
-        self.assertEqual([], user.get_providers('myspace'))
+    def test_get_accounts_one_provider_email_verified(self):
+        user = User(email='john@example.com', email_verified=True)
+        identity = ExternalIdentity(user=user, provider='twitter',
+                                    external_id='1234')
+        Session.add(user)
+        Session.add(identity)
+        Session.flush()
+        self.assertEqual(user.get_accounts(''), [
+            {'id': user.id,
+             'is_current': False,
+             'is_verified': True,
+             'passwords': 0,
+             'providers': [{
+                 'name': 'twitter',
+                 'is_current': False,
+             }]}
+        ])
+
+    def test_get_accounts_with_passwords(self):
+        user = User(email='john@example.com', email_verified=True)
+        identity = ExternalIdentity(user=user, provider='twitter',
+                                    external_id='1234')
+        password = Password(user=user, secret='secret')
+        Session.add(user)
+        Session.add(identity)
+        Session.add(password)
+        Session.flush()
+        self.assertEqual(user.get_accounts(''), [
+            {'id': user.id,
+             'is_current': False,
+             'is_verified': True,
+             'passwords': 1,
+             'providers': [{
+                 'name': 'twitter',
+                 'is_current': False,
+             }]}
+        ])
+
+    def test_get_accounts_multiple_providers(self):
+        user = User(email='john@example.com', email_verified=True)
+        identity1 = ExternalIdentity(user=user, provider='twitter',
+                                     external_id='1234')
+        identity2 = ExternalIdentity(user=user, provider='google',
+                                     external_id='4321')
+        password = Password(user=user, secret='secret')
+        Session.add(user)
+        Session.add(identity1)
+        Session.add(identity2)
+        Session.add(password)
+        Session.flush()
+        self.assertEqual(user.get_accounts('google'), [
+            {'id': user.id,
+             'is_current': True,
+             'is_verified': True,
+             'passwords': 1,
+             'providers': [{
+                 'name': 'twitter',
+                 'is_current': False,
+             }, {
+                 'name': 'google',
+                 'is_current': True,
+             }]}
+        ])

@@ -27,8 +27,7 @@ from pyramid_sqlalchemy import Session
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from yithlibraryserver.user.models import User
-from yithlibraryserver.user.providers import get_provider_key
+from yithlibraryserver.user.models import ExternalIdentity
 
 
 def split_name(name):
@@ -43,21 +42,22 @@ def split_name(name):
     return first_name, last_name
 
 
-def user_from_provider_id(provider, user_id):
-    provider_key = get_provider_key(provider)
-    column = getattr(User, provider_key)
+def user_from_provider_id(provider, external_id):
     try:
-        return Session.query(User).filter(column==user_id).one()
+        identity = Session.query(ExternalIdentity).filter(
+            ExternalIdentity.provider==provider,
+            ExternalIdentity.external_id==external_id,
+        ).one()
+        return identity.user
     except NoResultFound:
         return None
 
 
-def register_or_update(request, provider, user_id, info, default_url='/'):
-    provider_key = get_provider_key(provider)
-    user = user_from_provider_id(provider, user_id)
+def register_or_update(request, provider, external_id, info, default_url='/'):
+    user = user_from_provider_id(provider, external_id)
     if user is None:
 
-        new_info = {'provider': provider, provider_key: user_id}
+        new_info = {'provider': provider, 'external_id': external_id}
         for attribute in ('screen_name', 'first_name', 'last_name', 'email'):
             if attribute in info:
                 new_info[attribute] = info[attribute]

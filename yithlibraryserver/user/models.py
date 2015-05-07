@@ -19,11 +19,13 @@
 from datetime import datetime
 
 from pyramid_sqlalchemy import BaseObject, Session
-from sqlalchemy import Boolean, Column, DateTime, Integer, String
+
+from sqlalchemy import Boolean, Column, Enum, DateTime, Integer, String
+from sqlalchemy import ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship, backref
 
 from yithlibraryserver.compat import text_type
-from yithlibraryserver.user import providers
 
 
 class User(BaseObject):
@@ -40,12 +42,6 @@ class User(BaseObject):
 
     creation = Column(DateTime, nullable=False, default=datetime.utcnow)
     last_login = Column(DateTime, nullable=False, default=datetime.utcnow)
-
-    twitter_id = Column(String, nullable=False, default='')
-    google_id = Column(String, nullable=False, default='')
-    facebook_id = Column(String, nullable=False, default='')
-    persona_id = Column(String, nullable=False, default='')
-    liveconnect_id = Column(String, nullable=False, default='')
 
     allow_google_analytics = Column(Boolean, nullable=True, default=None)
     send_passwords_periodically = Column(Boolean, nullable=False, default=False)
@@ -75,6 +71,20 @@ class User(BaseObject):
     def __str__(self):
         return self.__unicode__()
 
+    def as_dict(self):
+        return dict(
+            id=self.id,
+            creation=self.creation,
+            last_login=self.last_login,
+            first_name=self.first_name,
+            last_name=self.last_name,
+            screen_name=self.screen_name,
+            email=self.email,
+            email_verified=self.email_verified,
+            allow_google_analytics=self.allow_google_analytics,
+            send_passwords_periodically=self.send_passwords_periodically,
+        )
+
     def update_preferences(self, preferences):
         for preference in ('allow_google_analytics', 'send_passwords_periodically'):
             if preference in preferences:
@@ -99,7 +109,7 @@ class User(BaseObject):
         accounts = []
         for user in users:
             providers = user.get_providers(current_provider)
-            is_current = current_provider in [p['name'] for p in providers]
+            is_current = any([p['is_current'] for p in providers])
 
             accounts.append({
                 'providers': providers,
@@ -113,15 +123,33 @@ class User(BaseObject):
 
     def get_providers(self, current_provider):
         result = []
-        for provider in providers.get_available_providers():
-            key = providers.get_provider_key(provider)
-            if getattr(self, key, None) != '':
-                result.append({
-                    'name': provider,
-                    'is_current': current_provider == provider,
-                })
+        for identity in self.identities:
+            result.append({
+                'name': identity.provider,
+                'is_current': identity.provider == current_provider,
+            })
         return result
+
+    def add_identity(self, provider, external_id):
+        identity = ExternalIdentity(provider=provider, external_id=external_id)
+        self.identities.append(identity)
 
     def verify_email(self):
         self.email_verified = True
         self.email_verification_code = ''
+
+
+class ExternalIdentity(BaseObject):
+    __tablename__ = 'external_identities'
+
+    PROVIDERS = ('facebook', 'google', 'twitter', 'persona', 'liveconnect')
+
+    id = Column(Integer, primary_key=True)
+    provider = Column(Enum(*PROVIDERS, name='providers'), nullable=False)
+    external_id = Column(String, nullable=False)
+
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user = relationship(
+        'User',
+        backref=backref('identities', cascade='all, delete-orphan'),
+    )

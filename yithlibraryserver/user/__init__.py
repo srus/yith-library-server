@@ -23,7 +23,7 @@ import logging
 from yithlibraryserver.user.analytics import get_google_analytics
 from yithlibraryserver.user.gravatar import get_gravatar
 from yithlibraryserver.user.idp import add_identity_provider
-from yithlibraryserver.user.models import User
+from yithlibraryserver.user.models import User, ExternalIdentity
 from yithlibraryserver.user.security import get_user
 
 logger = logging.getLogger(__name__)
@@ -53,3 +53,4 @@ def includeme(config):
     config.add_route('user_view', '/user')
 
     logger.debug('Importing %s model so SQLAlchemy knows about it', User)
+    logger.debug('Importing %s model so SQLAlchemy knows about it', ExternalIdentity)

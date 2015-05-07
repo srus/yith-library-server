@@ -22,9 +22,14 @@ from pyramid_sqlalchemy import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from yithlibraryserver.email import send_email_to_admins
-from yithlibraryserver.user.models import User
-from yithlibraryserver.user.providers import get_available_providers
-
+from yithlibraryserver.oauth2.models import (
+    AccessCode,
+    Application,
+    AuthorizedApplication,
+    AuthorizationCode,
+)
+from yithlibraryserver.password.models import Password
+from yithlibraryserver.user.models import ExternalIdentity, User
 
 
 def merge_accounts(master_user, accounts):
@@ -48,38 +53,23 @@ def merge_accounts(master_user, accounts):
 
 
 def merge_users(user1, user2):
-    # move all passwords of user2 to user1
-    db.passwords.update({'owner': user2['_id']}, {
-        '$set': {
-            'owner': user1['_id'],
-        },
-    }, multi=True)
+    values = {'user_id': user1.id}
+    for Model in (Password, Application, AuthorizationCode, AccessCode,
+                  ExternalIdentity):
+        Session.query(Model).filter(Model.user==user2).update(values, False)
 
-    # move authorized_apps from user2 to user1
-    authorizator = Authorizator(db)
-    for auth in authorizator.get_user_authorizations(user2):
-        credentials = {
-            'client_id': auth['client_id'],
-            'user': user1,
-            'redirect_uri': auth['redirect_uri'],
-            'response_type': auth['response_type'],
-        }
-        scopes = auth['scope'].split(' ')
-        authorizator.store_user_authorization(scopes, credentials)
-    authorizator.remove_all_user_authorizations(user2)
+    for auth_app in Session.query(AuthorizedApplication).filter(
+            AuthorizedApplication.user==user2):
+        try:
+            Session.query(AuthorizedApplication).filter(
+                AuthorizedApplication.user==user1,
+                AuthorizedApplication.application==auth_app.application,
+            ).one()
+        except NoResultFound:
+            auth_app.user = user1
+            Session.add(auth_app)
 
-    updates = {}
-    # copy the providers
-    for provider in get_available_providers():
-        key = provider + '_id'
-        if key in user2 and key not in user1:
-            sets = updates.setdefault('$set', {})
-            sets[key] = user2[key]
-
-    db.users.update({'_id': user1['_id']}, updates)
-
-    # remove user2
-    db.users.remove(user2['_id'])
+    Session.delete(user2)
 
 
 def notify_admins_of_account_removal(request, user, reason):
