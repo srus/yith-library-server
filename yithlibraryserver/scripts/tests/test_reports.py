@@ -25,7 +25,7 @@ import transaction
 from yithlibraryserver.compat import StringIO
 from yithlibraryserver.scripts.reports import users, applications, statistics
 from yithlibraryserver.scripts.testing import ScriptTests
-from yithlibraryserver.user.models import User
+from yithlibraryserver.user.models import ExternalIdentity, User
 from yithlibraryserver.oauth2.models import Application
 
 
@@ -82,20 +82,28 @@ class UserReportTests(BaseReportTests):
                          creation=d(2012, 12, 12, 12, 12, 12),
                          last_login=d(2012, 12, 12, 12, 12, 12),
                          email='john2@example.com',
-                         email_verified=True,
-                         twitter_id='1234')
+                         email_verified=True)
+            identity2 = ExternalIdentity(user=user2, provider='twitter',
+                                         external_id='1234')
             Session.add(user2)
+            Session.add(identity2)
             self.add_passwords(user2, 1)
             user3 = User(first_name='John3',
                          last_name='Doe3',
                          creation=d(2012, 12, 12, 12, 12, 12),
                          last_login=d(2012, 12, 12, 12, 12, 12),
                          email='john3@example.com',
-                         email_verified=True,
-                         twitter_id='1234',
-                         facebook_id='5678',
-                         google_id='abcd')
+                         email_verified=True)
+            identity3_1 = ExternalIdentity(user=user3, provider='twitter',
+                                           external_id='1234')
+            identity3_2 = ExternalIdentity(user=user3, provider='facebook',
+                                           external_id='5678')
+            identity3_3 = ExternalIdentity(user=user3, provider='google',
+                                           external_id='abcd')
             Session.add(user3)
+            Session.add(identity3_1)
+            Session.add(identity3_2)
+            Session.add(identity3_3)
             self.add_passwords(user3, 2)
 
             Session.flush()
@@ -227,84 +235,104 @@ class StatisticsReportTests(BaseReportTests):
                          last_name='Doe',
                          email='john@example.com',
                          email_verified=True,
-                         allow_google_analytics=True,
-                         google_id='1')
+                         allow_google_analytics=True)
+            identity1 = ExternalIdentity(user=user1, provider='google',
+                                         external_id='1')
             Session.add(user1)
+            Session.add(identity1)
             self.add_passwords(user1, 10)
 
             user2 = User(first_name='Peter',
                          last_name='Doe',
                          email='peter@example.com',
                          email_verified=True,
-                         allow_google_analytics=False,
-                         twitter_id='1')
+                         allow_google_analytics=False)
+            identity2 = ExternalIdentity(user=user1, provider='twitter',
+                                         external_id='1')
             Session.add(user2)
+            Session.add(identity2)
             self.add_passwords(user2, 20)
 
             user3 = User(first_name='Susan',
                          last_name='Doe',
                          email='susan@example2.com',
                          email_verified=True,
-                         allow_google_analytics=False,
-                         facebook_id='1')
+                         allow_google_analytics=False)
+            identity3 = ExternalIdentity(user=user1, provider='facebook',
+                                         external_id='1')
             Session.add(user3)
+            Session.add(identity3)
             self.add_passwords(user3, 15)
 
             user4 = User(first_name='Alice',
                          last_name='Doe',
                          email='',
                          email_verified=False,
-                         allow_google_analytics=False,
-                         persona_id='1')
+                         allow_google_analytics=False)
+            identity4 = ExternalIdentity(user=user1, provider='persona',
+                                         external_id='1')
             Session.add(user4)
+            Session.add(identity4)
 
             user5 = User(first_name='Bob',
                          last_name='Doe',
                          email='',
                          email_verified=False,
-                         allow_google_analytics=False,
-                         google_id='2')
+                         allow_google_analytics=False)
+            identity5 = ExternalIdentity(user=user1, provider='google',
+                                         external_id='2')
             Session.add(user5)
+            Session.add(identity5)
 
             user6 = User(first_name='Kevin',
                          last_name='Doe',
                          email='',
                          email_verified=False,
-                         allow_google_analytics=False,
-                         google_id='3')
+                         allow_google_analytics=False)
+            identity6 = ExternalIdentity(user=user1, provider='google',
+                                         external_id='3')
             Session.add(user6)
+            Session.add(identity6)
 
             user7 = User(first_name='Maria',
                          last_name='Doe',
                          email='',
                          email_verified=False,
-                         allow_google_analytics=False,
-                         google_id='4')
+                         allow_google_analytics=False)
+            identity7 = ExternalIdentity(user=user1, provider='google',
+                                         external_id='4')
             Session.add(user7)
+            Session.add(identity7)
 
             user8 = User(first_name='Bran',
                          last_name='Doe',
                          email='',
                          email_verified=False,
-                         allow_google_analytics=False,
-                         twitter_id='2')
+                         allow_google_analytics=False)
+            identity8 = ExternalIdentity(user=user1, provider='twitter',
+                                         external_id='2')
             Session.add(user8)
+            Session.add(identity8)
 
             user9 = User(first_name='George',
                          last_name='Doe',
                          email='',
                          email_verified=False,
-                         allow_google_analytics=False,
-                         twitter_id='3')
+                         allow_google_analytics=False)
+            identity9 = ExternalIdentity(user=user1, provider='twitter',
+                                         external_id='3')
             Session.add(user9)
+            Session.add(identity9)
 
             user10 = User(first_name='Travis',
                          last_name='Doe',
                          email='',
                          email_verified=False,
-                         allow_google_analytics=False,
-                         persona_id='2')
+                         allow_google_analytics=False)
+            identity10 = ExternalIdentity(user=user1, provider='persona',
+                                          external_id='2')
             Session.add(user10)
+            Session.add(identity10)
             Session.flush()
 
         sys.argv = ['notused', self.conf_file_path]
@@ -322,7 +350,6 @@ Identity providers:
 %(tab)stwitter: 30.00%% (3)
 %(tab)spersona: 20.00%% (2)
 %(tab)sfacebook: 10.00%% (1)
-%(tab)sliveconnect: 0.00%% (0)
 Email providers:
 %(tab)sexample.com: 66.67%% (2)
 %(tab)sOthers: 33.33%% (1)

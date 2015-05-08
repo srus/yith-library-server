@@ -62,8 +62,7 @@ class CORSManagerTests(testing.TestCase):
     def test_cors_headers_app_origins_access_denied(self):
         cm = CORSManager('')
 
-        user = User(twitter_id='twitter1',
-                    screen_name='John Doe',
+        user = User(screen_name='John Doe',
                     first_name='John',
                     last_name='Doe',
                     email='john@example.com')
@@ -91,8 +90,7 @@ class CORSManagerTests(testing.TestCase):
     def test_cors_headers_app_origins(self):
         cm = CORSManager('')
 
-        user = User(twitter_id='twitter1',
-                    screen_name='John Doe',
+        user = User(screen_name='John Doe',
                     first_name='John',
                     last_name='Doe',
                     email='john@example.com')

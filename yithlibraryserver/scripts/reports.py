@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-import operator
-
 from pyramid_sqlalchemy import Session
 from sqlalchemy import desc, func, select
 
@@ -25,12 +23,11 @@ from yithlibraryserver.oauth2.models import Application
 from yithlibraryserver.password.models import Password
 from yithlibraryserver.scripts.utils import safe_print, setup_simple_command
 from yithlibraryserver.scripts.utils import get_user_display_name
-from yithlibraryserver.user.models import User
+from yithlibraryserver.user.models import ExternalIdentity, User
 
 
 def _get_user_info(user):
-    providers = ', '.join([prov for prov in get_available_providers()
-                           if getattr(user, '%s_id' % prov)])
+    providers = ', '.join(sorted([identity.provider for identity in user.identities]))
     return {
         'display_name': get_user_display_name(user),
         'passwords': len(user.passwords),
@@ -108,16 +105,6 @@ def applications():
         closer()
 
 
-def group_by_identity_provider(users):
-    providers = {}
-    for provider in get_available_providers():
-        key = get_provider_key(provider)
-        count = Session.query(User).filter(getattr(User, key)!='').count()
-        providers[provider] = count
-
-    return sorted(providers.items(), key=operator.itemgetter(1), reverse=True)
-
-
 def statistics():
     result = setup_simple_command(
         "statistics",
@@ -143,10 +130,13 @@ def statistics():
         n_allow_cookie = Session.query(User).filter(
             User.allow_google_analytics==True).count()
 
-        all_users = list(Session.query(User).all())
-
         # Identity providers
-        by_identity = group_by_identity_provider(all_users)
+        by_identity = Session.query(
+            ExternalIdentity.provider,
+            func.count(ExternalIdentity.provider).label('provider_count')
+        ).select_from(
+            ExternalIdentity
+        ).group_by(ExternalIdentity.provider).order_by(desc('provider_count'))
 
         # Email providers
         domains_with_counts = select([

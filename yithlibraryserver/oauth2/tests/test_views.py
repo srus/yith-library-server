@@ -528,8 +528,7 @@ https://example.com''',
                           callback_url='https://example.com/callback',
                           production_ready=False)
 
-        other_user = User(twitter_id='twitter2',
-                          screen_name='Alice doe',
+        other_user = User(screen_name='Alice doe',
                           first_name='Alice',
                           last_name='Doe',
                           email='alice@example.com')
@@ -546,8 +545,7 @@ https://example.com''',
         self.assertEqual(res.status, '401 Unauthorized')
 
     def test_application_delete(self):
-        user = User(twitter_id='twitter1',
-                    screen_name='John Doe',
+        user = User(screen_name='John Doe',
                     first_name='John',
                     last_name='Doe',
                     email='john@example.com')
@@ -631,8 +629,7 @@ https://example.com''',
                           image_url='http://example.com/image.png',
                           description='example description')
 
-        other_user = User(twitter_id='twitter2',
-                          screen_name='Alice doe',
+        other_user = User(screen_name='Alice doe',
                           first_name='Alice',
                           last_name='Doe',
                           email='alice@example.com')
@@ -650,8 +647,7 @@ https://example.com''',
         self.assertEqual(res.status, '401 Unauthorized')
 
     def test_application_edit(self):
-        user = User(twitter_id='twitter1',
-                    screen_name='John Doe',
+        user = User(screen_name='John Doe',
                     first_name='John',
                     last_name='Doe',
                     email='john@example.com')
@@ -732,8 +728,7 @@ https://example.com""")
         self.assertEqual(old_count, new_count)
 
     def test_application_edit_invalid_change(self):
-        user = User(twitter_id='twitter1',
-                    screen_name='John Doe',
+        user = User(screen_name='John Doe',
                     first_name='John',
                     last_name='Doe',
                     email='john@example.com')
@@ -766,8 +761,7 @@ https://example.com""")
         res.mustcontain('Required')
 
     def test_application_edit_delete(self):
-        user = User(twitter_id='twitter1',
-                    screen_name='John Doe',
+        user = User(screen_name='John Doe',
                     first_name='John',
                     last_name='Doe',
                     email='john@example.com')
@@ -801,8 +795,7 @@ https://example.com""")
                          % str(app_id))
 
     def test_application_edit_cancel(self):
-        user = User(twitter_id='twitter1',
-                    screen_name='John Doe',
+        user = User(screen_name='John Doe',
                     first_name='John',
                     last_name='Doe',
                     email='john@example.com')
@@ -839,13 +832,11 @@ https://example.com""")
         res.mustcontain('Log in')
 
     def test_authorized_applications(self):
-        administrator = User(twitter_id='twitter2',
-                          screen_name='Alice doe',
-                          first_name='Alice',
-                          last_name='Doe',
-                          email='alice@example.com')
-        user = User(twitter_id='twitter1',
-                    screen_name='John Doe',
+        administrator = User(screen_name='Alice doe',
+                             first_name='Alice',
+                             last_name='Doe',
+                             email='alice@example.com')
+        user = User(screen_name='John Doe',
                     first_name='John',
                     last_name='Doe',
                     email='john@example.com')
@@ -915,13 +906,11 @@ https://example.com""")
         self.assertEqual(res.status, '404 Not Found')
 
     def test_revoke_application_app(self):
-        administrator = User(twitter_id='twitter2',
-                          screen_name='Alice doe',
-                          first_name='Alice',
-                          last_name='Doe',
-                          email='alice@example.com')
-        user = User(twitter_id='twitter1',
-                    screen_name='John Doe',
+        administrator = User(screen_name='Alice doe',
+                             first_name='Alice',
+                             last_name='Doe',
+                             email='alice@example.com')
+        user = User(screen_name='John Doe',
                     first_name='John',
                     last_name='Doe',
                     email='john@example.com')
@@ -982,11 +971,10 @@ https://example.com""")
         res.mustcontain('Available Clients')
 
     def test_clients_two_apps(self):
-        administrator = User(twitter_id='twitter2',
-                          screen_name='Alice doe',
-                          first_name='Alice',
-                          last_name='Doe',
-                          email='alice@example.com')
+        administrator = User(screen_name='Alice doe',
+                             first_name='Alice',
+                             last_name='Doe',
+                             email='alice@example.com')
 
         app1 = Application(name='Example app 1',
                            client_id='123456',

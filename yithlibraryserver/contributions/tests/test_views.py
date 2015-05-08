@@ -34,8 +34,7 @@ from yithlibraryserver.user.models import User
 
 def create_and_login_user(testapp):
 
-    user = User(twitter_id='twitter1',
-                screen_name='John Doe',
+    user = User(screen_name='John Doe',
                 first_name='John',
                 last_name='Doe',
                 email='john@example.com')

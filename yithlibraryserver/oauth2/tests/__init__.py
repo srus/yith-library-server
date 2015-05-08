@@ -27,8 +27,7 @@ from yithlibraryserver.user.models import User
 
 
 def create_client():
-    user = User(twitter_id='twitter2',
-                screen_name='Administrator',
+    user = User(screen_name='Administrator',
                 first_name='Alice',
                 last_name='Doe',
                 email='alice@example.com')
@@ -54,8 +53,7 @@ def create_client():
 
 def create_user():
 
-    user = User(twitter_id='twitter1',
-                screen_name='John Doe',
+    user = User(screen_name='John Doe',
                 first_name='John',
                 last_name='Doe',
                 email='john@example.com')
