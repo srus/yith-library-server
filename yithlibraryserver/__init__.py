@@ -23,6 +23,16 @@ import re
 
 from pkg_resources import resource_filename
 from deform import Form
+
+try:
+    import psycopg2
+    psycopg2.__version__
+except ImportError:
+    # psycopg2cffi is psycopg2 compatible for pypy
+    from psycopg2cffi import compat
+    # by calling this hook SQLAlchemy will find the psycopg2 packageb
+    compat.register()
+
 from pyramid.config import Configurator
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy

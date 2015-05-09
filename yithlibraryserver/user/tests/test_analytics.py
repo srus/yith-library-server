@@ -74,7 +74,7 @@ class GoogleAnalyticsTests(unittest.TestCase):
         request.session = {}
         request.user = User()
         ga = GoogleAnalytics(request)
-        self.assertIsNone(ga.first_time)
+        self.assertEqual(ga.first_time, None)
 
     def test_first_time_empty_session_true_user(self):
         request = DummyRequest()

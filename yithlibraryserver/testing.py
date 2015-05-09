@@ -47,7 +47,6 @@ from yithlibraryserver import main
 # each of this test executions
 PY_VERSION = '%d%d' % (sys.version_info[0], sys.version_info[1])
 DB_NAME = 'test_yithlibrary_%s' % PY_VERSION
-DB_URL = 'postgres://yithian:123456@localhost:5432/%s' % DB_NAME
 
 
 class FakeRequest(DummyRequest):
@@ -91,7 +90,7 @@ def sqlalchemy_teardown(context):
 
 
 def get_test_db_uri():
-    return 'postgres://yithian:123456@localhost:5432/%s' % DB_NAME
+    return 'postgresql://yithian:123456@localhost:5432/%s' % DB_NAME
 
 
 class TestCase(unittest.TestCase):

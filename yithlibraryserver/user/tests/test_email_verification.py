@@ -56,7 +56,7 @@ class EmailVerificationCodeTests(unittest.TestCase):
     def test_email_verification_code_verify_negative(self):
         evc = EmailVerificationCode()
 
-        self.assertIsNotNone(evc.code)
+        self.assertNotEqual(evc.code, None)
 
         user = User(first_name='John',
                     last_name='Doe',
@@ -66,12 +66,12 @@ class EmailVerificationCodeTests(unittest.TestCase):
 
         evc2 = EmailVerificationCode(evc.code)
         result = evc2.verify('john@example.com')
-        self.assertIsNone(result)
+        self.assertEqual(result, None)
 
     def test_email_verification_code_verify_positive(self):
         evc = EmailVerificationCode()
 
-        self.assertIsNotNone(evc.code)
+        self.assertNotEqual(evc.code, None)
 
         user = User(first_name='John',
                     last_name='Doe',
@@ -82,7 +82,7 @@ class EmailVerificationCodeTests(unittest.TestCase):
 
         evc2 = EmailVerificationCode(evc.code)
         result = evc2.verify('john@example.com')
-        self.assertIsNotNone(result)
+        self.assertNotEqual(result, None)
         self.assertEqual(user.id, result.id)
 
     def test_email_verification_code_send(self):

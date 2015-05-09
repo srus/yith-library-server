@@ -141,7 +141,7 @@ class MergeUsersTests(BaseMergeTests):
             user2_refreshed = Session.query(User).filter(User.id==user2_id).one()
         except NoResultFound:
             user2_refreshed = None
-        self.assertIsNone(user2_refreshed)
+        self.assertEqual(user2_refreshed, None)
 
         user1 = Session.query(User).filter(User.id==user1_id).one()
         self.assertEqual(2, len(user1.identities))

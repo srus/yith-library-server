@@ -357,7 +357,7 @@ class RequestValidatorTests(TestCase):
             ).one()
         except NoResultFound:
             auth_code = None
-        self.assertIsNone(auth_code)
+        self.assertEqual(auth_code, None)
 
     def test_validate_bearer_token_no_token(self):
         rv, request = self._create_request_validator()

@@ -273,4 +273,4 @@ class ViewTests(TestCase):
         except NoResultFound:
             password = None
 
-        self.assertIsNone(password)
+        self.assertEqual(password, None)

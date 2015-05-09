@@ -44,6 +44,9 @@ newrelic==2.36.0.30
 # python2 #
 wsgiref==0.1.2  # required only in Heroku (which uses Python 2)
 
+# pypy #
+psycopg2cffi==2.6.1  # psycopg2 for pypy
+
 # test support #
 WebTest==2.0.16
 freezegun==0.3.1

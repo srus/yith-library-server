@@ -19,6 +19,7 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import platform
 import sys
 
 from setuptools import setup, find_packages
@@ -83,6 +84,10 @@ requirements = parse_requirements()
 if sys.version_info[0] < 3:
     # packages that only work in Python 2.x
     requirements['base'].extend(requirements['python2'])
+
+if platform.python_implementation() == 'PyPy':
+    requirements['base'].extend(requirements['pypy'])
+    requirements['base'].remove('psycopg2==2.6')
 
 
 setup(

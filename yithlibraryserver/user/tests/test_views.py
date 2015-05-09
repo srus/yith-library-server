@@ -89,7 +89,7 @@ class ViewTests(TestCase):
 
         def parse_cookie(raw_string):
             pieces = [p.split('=') for p in raw_string.split(';')]
-            return {key.strip(): value for key, value in pieces}
+            return dict([(key.strip(), value) for key, value in pieces])
 
         cookies = [parse_cookie(value) for value in headers.getall('Set-Cookie')]
 
@@ -452,7 +452,7 @@ class ViewTests(TestCase):
             user = Session.query(User).filter(User.id==user_id).one()
         except NoResultFound:
             user = None
-        self.assertIsNone(user)
+        self.assertEqual(user, None)
 
         identities = Session.query(ExternalIdentity).filter(
             ExternalIdentity.user_id==user_id
@@ -789,7 +789,7 @@ class IdentityProviderViewTests(TestCase):
             user2_refreshed = Session.query(User).filter(User.id==user2_id).one()
         except NoResultFound:
             user2_refreshed = None
-        self.assertIsNone(user2_refreshed)
+        self.assertEqual(user2_refreshed, None)
 
         self.assertEqual(2, Session.query(Password).filter(
             Password.user_id==user1_id).count())

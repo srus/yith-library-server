@@ -17,6 +17,7 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import gzip
+import json
 
 from freezegun import freeze_time
 
@@ -41,10 +42,10 @@ def get_gzip_data(text):
 
 class ViewTests(TestCase):
 
-    def assertUncompressData(self, body, data):
+    def getUncompressData(self, body):
         buf = BytesIO(body)
         gzip_file = gzip.GzipFile(fileobj=buf, mode='rb')
-        self.assertEqual(gzip_file.read().decode('utf-8'), data)
+        return gzip_file.read().decode('utf-8')
 
     def test_backups_index_requires_authentication(self):
         res = self.testapp.get('/backup')
@@ -69,7 +70,7 @@ class ViewTests(TestCase):
             res = self.testapp.get('/backup/export')
             self.assertEqual(res.status, '200 OK')
             self.assertEqual(res.content_type, 'application/yith-library')
-            self.assertUncompressData(res.body, '[]')
+            self.assertEqual(self.getUncompressData(res.body), '[]')
             self.assertEqual(
                 res.content_disposition,
                 'attachment; filename=yith-library-backup-2012-01-10.yith',
@@ -91,11 +92,15 @@ class ViewTests(TestCase):
             res = self.testapp.get('/backup/export')
             self.assertEqual(res.status, '200 OK')
             self.assertEqual(res.content_type, 'application/yith-library')
-            self.assertUncompressData(
-                res.body,
-                '[{"account": "", "service": "", "tags": [], "notes": "", "creation": "2012-12-12T12:12:12", "secret": "secret1", "expiration": null, "modification": "2012-12-12T12:12:12"}, '
-                '{"account": "", "service": "", "tags": [], "notes": "", "creation": "2012-12-12T12:12:12", "secret": "secret2", "expiration": null, "modification": "2012-12-12T12:12:12"}]',
-            )
+            uncompressedData = self.getUncompressData(res.body)
+            self.assertEqual(json.loads(uncompressedData), [
+                {"account": "", "service": "", "tags": [], "notes": "",
+                 "creation": "2012-12-12T12:12:12", "secret": "secret1",
+                 "expiration": None, "modification": "2012-12-12T12:12:12"},
+                {"account": "", "service": "", "tags": [], "notes": "",
+                 "creation": "2012-12-12T12:12:12", "secret": "secret2",
+                 "expiration": None, "modification": "2012-12-12T12:12:12"},
+            ])
             self.assertEqual(
                 res.content_disposition,
                 'attachment; filename=yith-library-backup-2012-01-10.yith',

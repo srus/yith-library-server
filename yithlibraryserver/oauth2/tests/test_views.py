@@ -408,7 +408,7 @@ class TokenEndpointTests(TestCase):
             ).one()
         except NoResultFound:
             grant = None
-        self.assertIsNone(grant)
+        self.assertEqual(grant, None)
 
         # and an access token should be created
         self.assertEqual(res.json['token_type'], 'Bearer')
@@ -417,7 +417,7 @@ class TokenEndpointTests(TestCase):
         access_code = Session.query(AccessCode).filter(
             AccessCode.code==res.json['access_token'],
         ).one()
-        self.assertIsNotNone(access_code)
+        self.assertNotEqual(access_code, None)
 
 
 class ApplicationViewTests(TestCase):
@@ -593,7 +593,7 @@ https://example.com''',
         except NoResultFound:
             app = None
 
-        self.assertIsNone(app)
+        self.assertEqual(app, None)
 
         self.assertEqual(Session.query(User).count(), 1)
         self.assertEqual(Session.query(Application).count(), 0)
@@ -960,7 +960,7 @@ https://example.com""")
         except NoResultFound:
             auth_app = None
 
-        self.assertIsNone(auth_app)
+        self.assertEqual(auth_app, None)
 
         # the application should not be removed on cascade
         self.assertEqual(Session.query(Application).count(), 1)

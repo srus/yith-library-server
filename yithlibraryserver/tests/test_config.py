@@ -55,7 +55,7 @@ class ConfigTests(unittest.TestCase):
 
         settings = {
             'auth_tk_secret': '1234',
-            'database_url': 'postgres://foo:bar@localhost:5432/test',
+            'database_url': 'postgresql://foo:bar@localhost:5432/test',
         }
         app = main({}, **settings)
         self.assertEqual(settings['auth_tk_secret'],

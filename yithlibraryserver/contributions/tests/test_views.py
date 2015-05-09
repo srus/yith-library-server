@@ -234,7 +234,7 @@ class TestViews(TestCase):
             self.assertEqual(donation.creation,
                              datetime.datetime(2013, 1, 2, 10, 11, 2))
             self.assertTrue(donation.send_sticker)
-            self.assertIsNone(donation.user, None)
+            self.assertEqual(donation.user, None)
 
     @freeze_time('2013-01-02 10:11:02')
     def test_contributions_confirm_success_with_no_sticker_small_contribution(self):
@@ -312,7 +312,7 @@ class TestViews(TestCase):
             self.assertEqual(donation.creation,
                              datetime.datetime(2013, 1, 2, 10, 11, 2))
             self.assertFalse(donation.send_sticker)
-            self.assertIsNone(donation.user, None)
+            self.assertEqual(donation.user, None)
 
     @freeze_time('2013-01-02 10:11:02')
     def test_contributions_confirm_success_with_no_sticker_user_donate_all_money(self):
@@ -391,8 +391,8 @@ class TestViews(TestCase):
             self.assertEqual(donation.creation,
                              datetime.datetime(2013, 1, 2, 10, 11, 2))
             self.assertFalse(donation.send_sticker)
-            self.assertIsNone(donation.user, None
-)
+            self.assertEqual(donation.user, None)
+
     @freeze_time('2013-01-02 10:11:02')
     def test_contributions_confirm_success_with_user(self):
         user, user_id = create_and_login_user(self.testapp)
