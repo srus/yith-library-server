@@ -27,7 +27,7 @@ from deform import Form
 try:
     import psycopg2
     psycopg2.__version__
-except ImportError:
+except ImportError:  # pragma: no cover
     # psycopg2cffi is psycopg2 compatible for pypy
     from psycopg2cffi import compat
     # by calling this hook SQLAlchemy will find the psycopg2 packageb
