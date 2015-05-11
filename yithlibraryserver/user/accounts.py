@@ -58,6 +58,10 @@ def merge_users(user1, user2):
                   ExternalIdentity):
         Session.query(Model).filter(Model.user==user2).update(values, False)
 
+    # Because the previous updates break the Unit of Work pattern we need
+    # to refresh the current objects in the session
+    Session.expire_all()
+
     for auth_app in Session.query(AuthorizedApplication).filter(
             AuthorizedApplication.user==user2):
         try:
