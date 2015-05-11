@@ -14,7 +14,7 @@ repoze.sendmail==4.2     # required by pyramid_mailer
 transaction==1.4.3       # required by pyramid_mailer and zope.sqlalchemy
 translationstring==1.1   # required by deform, pyramid
 venusian==1.0            # required by pyramid
-SQLAlchemy==0.9.9        # required by pyramid_sqlalchemy
+SQLAlchemy==1.0.4        # required by pyramid_sqlalchemy
 webassets==0.10.1        # required by pyramid_webassets
 WebOb==1.4               # required by pyramid
 zope.deprecation==4.1.1  # required by deform
