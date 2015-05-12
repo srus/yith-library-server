@@ -5,6 +5,8 @@ python:
   - "3.3"
   - "3.4"
   - "pypy"
+addons:
+  - postgresql: "9.3"
 install:
   - python setup.py develop
   - pip install coveralls
