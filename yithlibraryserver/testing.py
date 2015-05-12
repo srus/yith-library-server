@@ -19,6 +19,7 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import collections
+import platform
 import sys
 import unittest
 
@@ -46,7 +47,8 @@ from yithlibraryserver import main
 # version we support. We should not share the test database on
 # each of this test executions
 PY_VERSION = '%d%d' % (sys.version_info[0], sys.version_info[1])
-DB_NAME = 'test_yithlibrary_%s' % PY_VERSION
+PY_IMPLEMENTATION = platform.python_implementation().lower()
+DB_NAME = 'test_yithlibrary_%s_%s' % (PY_IMPLEMENTATION, PY_VERSION)
 
 
 class FakeRequest(DummyRequest):

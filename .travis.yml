@@ -8,9 +8,17 @@ python:
 install:
   - python setup.py develop
   - pip install coveralls
+before_script:
+  - psql -c "create user yithian with password '123456';" -U postgres
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then psql -c 'create database test_yithlibrary_cpython_26 with owner yithian;' -U postgres; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then psql -c 'create database test_yithlibrary_cpython_27 with owner yithian;' -U postgres; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.3' ]]; then psql -c 'create database test_yithlibrary_cpython_33 with owner yithian;' -U postgres; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.4' ]]; then psql -c 'create database test_yithlibrary_cpython_34 with owner yithian;' -U postgres; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 'pypy' ]]; then psql -c 'create database test_yithlibrary_pypy_27 with owner yithian;' -U postgres; fi
 script:
   - coverage run --source=yithlibraryserver setup.py test
 after_success:
   - coveralls
 services:
   - mongodb
+  - postgresql
