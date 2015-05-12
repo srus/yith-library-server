@@ -92,7 +92,7 @@ def sqlalchemy_teardown(context):
 
 
 def get_test_db_uri():
-    return 'postgresql://localhost:5432/%s' % DB_NAME
+    return 'postgresql://postgres@localhost:5432/%s' % DB_NAME
 
 
 class TestCase(unittest.TestCase):
