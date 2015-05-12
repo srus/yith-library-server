@@ -7,6 +7,12 @@ python:
   - "pypy"
 addons:
   postgresql: "9.3"
+before_install:
+  - CONFIG_FILE=$(sudo -u postgres psql postgres -c "SHOW config_file;" -q -t | head -1)
+  - 'CONFIG_FILE="${CONFIG_FILE:1}"'
+  - echo "max_prepared_transactions = 10" | sudo tee -a "$CONFIG_FILE"
+  - sudo cat "$CONFIG_FILE"
+  - sudo service postgresql restart 9.3
 install:
   - python setup.py develop
   - pip install coveralls
