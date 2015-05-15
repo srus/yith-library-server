@@ -136,5 +136,6 @@ setup(
     yith_send_backups_via_email = yithlibraryserver.scripts.backups:send_backups_via_email
     yith_announce = yithlibraryserver.scripts.announce:announce
     yith_build_assets = yithlibraryserver.scripts.buildassets:buildassets
-    yith_create_db = yithlibraryserver.scripts.createdb:createdb""",
+    yith_create_db = yithlibraryserver.scripts.createdb:createdb
+    yith_mongo2postgres = yithlibraryserver.scripts.mongo2postgres:mongo2postgres""",
 )
