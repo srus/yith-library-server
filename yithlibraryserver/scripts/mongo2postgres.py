@@ -27,6 +27,10 @@ import transaction
 
 from yithlibraryserver.compat import urlparse
 from yithlibraryserver.contributions.models import Donation
+from yithlibraryserver.oauth2.models import (
+    Application,
+    AuthorizedApplication,
+)
 from yithlibraryserver.password.models import Password
 from yithlibraryserver.scripts.utils import setup_simple_command
 from yithlibraryserver.user.models import ExternalIdentity, User
@@ -44,6 +48,77 @@ def get_date_from_js_timestamp(timestamp, now):
         return now
     else:
         return datetime.datetime.utcfromtimestamp(timestamp / 1000.0)
+
+
+def migrate_authorized_applications(mongodb, user_mapping, app_mapping, now):
+
+    orphan_auth_apps = []
+    seen = set()
+
+    for mongo_auth_app in mongodb.authorized_apps.find():
+        try:
+            user_id = user_mapping[mongo_auth_app['user']]
+        except KeyError:
+            orphan_auth_apps.append(mongo_auth_app)
+        else:
+            try:
+                app_id = app_mapping[mongo_auth_app['client_id']]
+            except KeyError:
+                orphan_auth_apps.append(mongo_auth_app)
+            else:
+                if (user_id, app_id) in seen:
+                    print('Duplicated authorized app %d %d:' % (user_id, app_id))
+                    print(mongo_auth_app)
+                else:
+                    scope = mongo_auth_app.get('scope', '').split(' ')
+                    postgres_auth_app = AuthorizedApplication(
+                        scope=[s for s in scope if s],
+                        response_type=mongo_auth_app.get('response_type', ''),
+                        redirect_uri=mongo_auth_app.get('redirect_uri', ''),
+                        application_id=app_id,
+                        user_id=user_id,
+                    )
+                    Session.add(postgres_auth_app)
+                    seen.add((user_id, app_id))
+
+    return orphan_auth_apps
+
+
+def migrate_applications(mongodb, user_mapping, now):
+
+    orphan_apps = []
+    mapping = {}
+
+    for mongo_application in mongodb.applications.find():
+        try:
+            user_id = user_mapping[mongo_application['owner']]
+        except KeyError:
+            orphan_apps.append(mongo_application)
+        else:
+            client_id = mongo_application.get('client_id', '')
+            postgres_application = Application(
+                name=mongo_application.get('name', ''),
+                creation=now,
+                modification=now,
+                main_url=mongo_application.get('main_url', ''),
+                callback_url=mongo_application.get('callback_url', ''),
+                authorized_origins=mongo_application.get('authorized_origins', []),
+                client_id=client_id,
+                client_secret=mongo_application.get('client_secret', ''),
+                image_url=mongo_application.get('image_url', ''),
+                description=mongo_application.get('description', ''),
+                production_ready=mongo_application.get('production_ready', False),
+                user_id=user_id,
+            )
+            Session.add(postgres_application)
+            if client_id:
+                mapping[client_id] = postgres_application
+
+    Session.flush()
+    for client_id in mapping.iterkeys():
+        mapping[client_id] = mapping[client_id].id
+
+    return mapping, orphan_apps
 
 
 def migrate_donations(mongodb, user_mapping, now):
@@ -171,16 +246,32 @@ def mongo2postgres():
         now = datetime.datetime.utcnow()
 
         with transaction.manager:
+            print('Migrating users')
             user_mapping = migrate_users(database, now)
+
+            print('Migrating passwords')
             orphan_passwords = migrate_passwords(database, user_mapping, now)
             if orphan_passwords:
                 print("There are orphan passwords:")
                 print(orphan_passwords)
 
+            print('Migrating donations')
             orphan_donations = migrate_donations(database, user_mapping, now)
             if orphan_donations:
                 print("There are orphan donations:")
                 print(orphan_donations)
+
+            print('Migratig applications')
+            app_mapping, orphan_apps = migrate_applications(database, user_mapping, now)
+            if orphan_apps:
+                print("There are orphan applications:")
+                print(orphan_apps)
+
+            print('Migratig authorized applications')
+            orphan_auth_apps = migrate_authorized_applications(database, user_mapping, app_mapping, now)
+            if orphan_auth_apps:
+                print("There are orphan authorized applications:")
+                print(orphan_auth_apps)
 
     finally:
         closer()
