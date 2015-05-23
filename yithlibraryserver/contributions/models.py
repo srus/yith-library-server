@@ -21,7 +21,8 @@ from datetime import datetime
 from pyramid_sqlalchemy import BaseObject
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, func
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship, backref
 
 
@@ -32,7 +33,7 @@ def now():
 class Donation(BaseObject):
     __tablename__ = 'donations'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(UUID, primary_key=True, default=func.uuid_generate_v1())
     creation = Column(DateTime, nullable=False, default=now)
     modification = Column(DateTime, nullable=False, default=now, onupdate=now)
 
