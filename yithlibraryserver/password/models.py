@@ -23,8 +23,8 @@ from datetime import datetime
 from pyramid_sqlalchemy import BaseObject
 
 from sqlalchemy import Column, DateTime, Integer, String, Text
-from sqlalchemy import ForeignKey
-from sqlalchemy.dialects.postgresql import ARRAY, JSON
+from sqlalchemy import ForeignKey, func
+from sqlalchemy.dialects.postgresql import ARRAY, JSON, UUID
 from sqlalchemy.orm import relationship, backref
 
 
@@ -35,7 +35,7 @@ def now():
 class Password(BaseObject):
     __tablename__ = 'passwords'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(UUID, primary_key=True, default=func.uuid_generate_v4())
     creation = Column(DateTime, nullable=False, default=now)
     modification = Column(DateTime, nullable=False, default=now, onupdate=now)
 

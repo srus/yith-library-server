@@ -33,7 +33,7 @@ def now():
 class Donation(BaseObject):
     __tablename__ = 'donations'
 
-    id = Column(UUID, primary_key=True, default=func.uuid_generate_v1())
+    id = Column(UUID, primary_key=True, default=func.uuid_generate_v4())
     creation = Column(DateTime, nullable=False, default=now)
     modification = Column(DateTime, nullable=False, default=now, onupdate=now)
 

@@ -19,6 +19,7 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
+import uuid
 
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.view import view_config, view_defaults
@@ -27,7 +28,7 @@ from pyramid_sqlalchemy import Session
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from yithlibraryserver.errors import password_not_found
+from yithlibraryserver.errors import invalid_password_id, password_not_found
 from yithlibraryserver.oauth2.decorators import protected_method
 from yithlibraryserver.password.models import Password
 from yithlibraryserver.password.validation import validate_password
@@ -100,6 +101,11 @@ class PasswordRESTView(object):
     @view_config(request_method='GET')
     @protected_method(['read-passwords'])
     def get(self):
+        try:
+            uuid.UUID(self.password_id)
+        except ValueError:
+            return invalid_password_id()
+
         password = self._get_password()
         if password is None:
             return password_not_found()
@@ -109,6 +115,11 @@ class PasswordRESTView(object):
     @view_config(request_method='PUT')
     @protected_method(['write-passwords'])
     def put(self):
+        try:
+            uuid.UUID(self.password_id)
+        except ValueError:
+            return invalid_password_id()
+
         password = self._get_password()
         if password is None:
             return password_not_found()
@@ -136,6 +147,11 @@ class PasswordRESTView(object):
     @view_config(request_method='DELETE')
     @protected_method(['write-passwords'])
     def delete(self):
+        try:
+            uuid.UUID(self.password_id)
+        except ValueError:
+            return invalid_password_id()
+
         password = self._get_password()
 
         if password is None:

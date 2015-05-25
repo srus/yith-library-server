@@ -128,8 +128,17 @@ class ViewTests(TestCase):
                          'Origin, Content-Type, Accept, Authorization')
 
     @freeze_time('2014-02-23 08:00:00')
-    def test_password_get_password_not_found(self):
+    def test_password_get_password_invalid_id(self):
         res = self.testapp.get('/passwords/000000000000000000000000',
+                               headers=self.auth_header,
+                               status=400)
+        self.assertEqual(res.status, '400 Bad Request')
+        self.assertEqual(res.body,
+                         b'{"message": "Invalid password id"}')
+
+    @freeze_time('2014-02-23 08:00:00')
+    def test_password_get_password_not_found(self):
+        res = self.testapp.get('/passwords/00000000-0000-0000-0000-000000000000',
                                headers=self.auth_header,
                                status=404)
         self.assertEqual(res.status, '404 Not Found')
@@ -167,8 +176,17 @@ class ViewTests(TestCase):
         })
 
     @freeze_time('2014-02-23 08:00:00')
-    def test_password_put_not_found(self):
+    def test_password_put_invalid_id(self):
         res = self.testapp.put('/passwords/000000000000000000000000',
+                               headers=self.auth_header,
+                               status=400)
+        self.assertEqual(res.status, '400 Bad Request')
+        self.assertEqual(res.body,
+                         b'{"message": "Invalid password id"}')
+
+    @freeze_time('2014-02-23 08:00:00')
+    def test_password_put_not_found(self):
+        res = self.testapp.put('/passwords/00000000-0000-0000-0000-000000000000',
                                headers=self.auth_header, status=404)
         self.assertEqual(res.status, '404 Not Found')
         self.assertEqual(res.body,
@@ -237,8 +255,17 @@ class ViewTests(TestCase):
         self.assertEqual(password.secret, 'sup3rs3cr3t')
 
     @freeze_time('2014-02-23 08:00:00')
-    def test_password_delete_not_found(self):
+    def test_password_delete_invalid_id(self):
         res = self.testapp.delete('/passwords/000000000000000000000000',
+                                  headers=self.auth_header,
+                                  status=400)
+        self.assertEqual(res.status, '400 Bad Request')
+        self.assertEqual(res.body,
+                         b'{"message": "Invalid password id"}')
+
+    @freeze_time('2014-02-23 08:00:00')
+    def test_password_delete_not_found(self):
+        res = self.testapp.delete('/passwords/00000000-0000-0000-0000-000000000000',
                                   headers=self.auth_header, status=404)
         self.assertEqual(res.status, '404 Not Found')
         self.assertEqual(res.body,
