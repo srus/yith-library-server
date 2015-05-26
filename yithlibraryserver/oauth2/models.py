@@ -22,8 +22,8 @@ import uuid
 from pyramid_sqlalchemy import BaseObject
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
-from sqlalchemy import ForeignKey, UniqueConstraint
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy import ForeignKey, UniqueConstraint, func
+from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.orm import relationship, backref
 
 
@@ -60,7 +60,7 @@ class Application(BaseObject):
 class AuthorizedApplication(BaseObject):
     __tablename__ = 'authorized_applications'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(UUID, primary_key=True, default=func.uuid_generate_v4())
     scope = Column(ARRAY(Text, dimensions=1), nullable=True)
     response_type = Column(String, nullable=False, default='')
     redirect_uri = Column(String, nullable=False, default='')
