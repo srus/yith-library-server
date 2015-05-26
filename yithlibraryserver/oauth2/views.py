@@ -18,9 +18,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import uuid
+
 from deform import Button, Form, ValidationFailure
 
 from pyramid.httpexceptions import (
+    HTTPBadRequest,
     HTTPFound,
     HTTPNotFound,
 )
@@ -119,6 +122,11 @@ def developer_application_edit(request):
     app_id = request.matchdict['app']
 
     try:
+        uuid.UUID(app_id)
+    except ValueError:
+        return HTTPBadRequest()
+
+    try:
         app = Session.query(Application).filter(Application.id==app_id).one()
     except NoResultFound:
         return HTTPNotFound()
@@ -190,6 +198,12 @@ def developer_application_edit(request):
              permission='delete-application')
 def developer_application_delete(request):
     app_id = request.matchdict['app']
+
+    try:
+        uuid.UUID(app_id)
+    except ValueError:
+        return HTTPBadRequest()
+
     try:
         app = Session.query(Application).filter(Application.id==app_id).one()
     except NoResultFound:
@@ -348,6 +362,12 @@ def authorized_applications(request):
              permission='revoke-authorized-app')
 def revoke_application(request):
     app_id = request.matchdict['app']
+
+    try:
+        uuid.UUID(app_id)
+    except ValueError:
+        return HTTPBadRequest()
+
     try:
         app = Session.query(Application).filter(Application.id==app_id).one()
     except NoResultFound:

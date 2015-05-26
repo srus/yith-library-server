@@ -30,7 +30,7 @@ from sqlalchemy.orm import relationship, backref
 class Application(BaseObject):
     __tablename__ = 'applications'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(UUID, primary_key=True, default=func.uuid_generate_v4())
     name = Column(String, nullable=False, default='')
 
     creation = Column(DateTime, nullable=False, default=datetime.utcnow)
@@ -66,7 +66,7 @@ class AuthorizedApplication(BaseObject):
     redirect_uri = Column(String, nullable=False, default='')
 
     application_id = Column(
-        Integer,
+        UUID,
         ForeignKey('applications.id'),
         nullable=False,
     )
@@ -103,7 +103,7 @@ class AuthorizationCode(BaseObject):
     redirect_uri = Column(String, nullable=False, default='')
 
     application_id = Column(
-        Integer,
+        UUID,
         ForeignKey('applications.id'),
         nullable=False,
     )
@@ -137,7 +137,7 @@ class AccessCode(BaseObject):
     scope = Column(ARRAY(Text, dimensions=1), nullable=True)
 
     application_id = Column(
-        Integer,
+        UUID,
         ForeignKey('applications.id'),
         nullable=False,
     )

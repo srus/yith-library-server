@@ -513,11 +513,20 @@ https://example.com''',
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Log in')
 
-    def test_application_delete_app_id_doesnt_exist(self):
+    def test_application_delete_invalid_app_id(self):
         create_and_login_user(self.testapp)
 
         res = self.testapp.get('/oauth2/applications/000000000000000000000000/delete',
-                               status=404)
+                               status=400)
+        self.assertEqual(res.status, '400 Bad Request')
+
+    def test_application_delete_app_id_doesnt_exist(self):
+        create_and_login_user(self.testapp)
+
+        res = self.testapp.get(
+            '/oauth2/applications/00000000-0000-0000-0000-000000000000/delete',
+            status=404
+        )
         self.assertEqual(res.status, '404 Not Found')
 
     def test_application_delete_unauthorized(self):
@@ -606,11 +615,20 @@ https://example.com''',
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Log in')
 
-    def test_application_edit_app_id_doesnt_exist(self):
+    def test_application_edit_invalid_app_id(self):
         create_and_login_user(self.testapp)
 
         res = self.testapp.get(
             '/oauth2/applications/000000000000000000000000/edit',
+            status=400,
+        )
+        self.assertEqual(res.status, '400 Bad Request')
+
+    def test_application_edit_app_id_doesnt_exist(self):
+        create_and_login_user(self.testapp)
+
+        res = self.testapp.get(
+            '/oauth2/applications/00000000-0000-0000-0000-000000000000/edit',
             status=404,
         )
         self.assertEqual(res.status, '404 Not Found')
@@ -897,11 +915,19 @@ https://example.com""")
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Log in')
 
-    def test_revoke_application_app_id_doesnt_exist(self):
+    def test_revoke_application_invalid_app_id(self):
         create_and_login_user(self.testapp)
 
         res = self.testapp.get(
             '/oauth2/applications/000000000000000000000000/revoke',
+            status=400)
+        self.assertEqual(res.status, '400 Bad Request')
+
+    def test_revoke_application_app_id_doesnt_exist(self):
+        create_and_login_user(self.testapp)
+
+        res = self.testapp.get(
+            '/oauth2/applications/00000000-0000-0000-0000-000000000000/revoke',
             status=404)
         self.assertEqual(res.status, '404 Not Found')
 
