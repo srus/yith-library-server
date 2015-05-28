@@ -17,7 +17,6 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
-import uuid
 
 from pyramid_sqlalchemy import BaseObject
 
@@ -31,6 +30,8 @@ class Application(BaseObject):
     __tablename__ = 'applications'
 
     id = Column(UUID, primary_key=True, default=func.uuid_generate_v4())
+    secret = Column(UUID, nullable=False, default=func.uuid_generate_v4())
+
     name = Column(String, nullable=False, default='')
 
     creation = Column(DateTime, nullable=False, default=datetime.utcnow)
@@ -41,8 +42,6 @@ class Application(BaseObject):
     callback_url = Column(String, nullable=False, default='')
     authorized_origins = Column(ARRAY(Text, dimensions=1), nullable=True)
 
-    client_id = Column(String, nullable=False, default='')
-    client_secret = Column(String, nullable=False, default='')
 
     image_url = Column(String, nullable=False, default='')
     description = Column(Text, nullable=False, default='')
@@ -51,10 +50,6 @@ class Application(BaseObject):
 
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     user = relationship('User', backref=backref('applications'))
-
-    def create_client_id_and_secret(self):
-        self.client_id = str(uuid.uuid4())
-        self.client_secret = str(uuid.uuid4())
 
 
 class AuthorizedApplication(BaseObject):

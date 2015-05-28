@@ -18,6 +18,7 @@
 
 import datetime
 import logging
+import uuid
 
 import oauthlib.oauth2
 from oauthlib.common import to_unicode
@@ -54,11 +55,16 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
 
     def get_client(self, client_id):
         try:
-            client = Session.query(Application).filter(
-                Application.client_id==client_id
-            ).one()
-        except NoResultFound:
+            uuid.UUID(client_id)
+        except ValueError:
             client = None
+        else:
+            try:
+                client = Session.query(Application).filter(
+                    Application.id==client_id
+                ).one()
+            except NoResultFound:
+                client = None
 
         return client
 
@@ -159,7 +165,10 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
         request.client = client
         request.client_id = client_id
 
-        if client.client_secret != client_secret:
+        # oauthlib expect the client to has a client_id attribute
+        request.client.client_id = client_id
+
+        if client.secret != client_secret:
             return False
 
         # if client.client_type != 'confidential':

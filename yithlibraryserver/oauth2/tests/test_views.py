@@ -82,9 +82,9 @@ class AuthorizationEndpointTests(TestCase):
 
     def test_no_response_type(self):
         create_and_login_user(self.testapp)
-        create_client()
+        _, app_id, _ = create_client()
         res = self.testapp.get('/oauth2/endpoints/authorization', {
-            'client_id': '123456',
+            'client_id': app_id,
         }, status=302)
         self.assertEqual(res.status, '302 Found')
         self._assert_error(res.location, 'invalid_request',
@@ -92,9 +92,9 @@ class AuthorizationEndpointTests(TestCase):
 
     def test_invalid_redirect_callback(self):
         create_and_login_user(self.testapp)
-        create_client()
+        _, app_id, _ = create_client()
         res = self.testapp.get('/oauth2/endpoints/authorization', {
-            'client_id': '123456',
+            'client_id': app_id,
             'response_type': 'code',
             'redirect_uri': 'https://example.com/bad-callback',
         }, status=400)
@@ -103,9 +103,9 @@ class AuthorizationEndpointTests(TestCase):
 
     def test_user_cancel(self):
         create_and_login_user(self.testapp)
-        create_client()
+        _, app_id, _ = create_client()
         res = self.testapp.get('/oauth2/endpoints/authorization', {
-            'client_id': '123456',
+            'client_id': app_id,
             'response_type': 'code',
             'redirect_uri': 'https://example.com/callback',
         })
@@ -114,7 +114,7 @@ class AuthorizationEndpointTests(TestCase):
         res = self.testapp.post('/oauth2/endpoints/authorization', {
             'cancel': 'No thanks',
             'response_type': 'code',
-            'client_id': '123456',
+            'client_id': app_id,
             'redirect_uri': 'https://example.com/callback',
             'scope': 'read-passwords',
         })
@@ -125,7 +125,7 @@ class AuthorizationEndpointTests(TestCase):
     @freeze_time('2012-01-10 15:31:11')
     def test_non_authorized_app_yet(self):
         _, user_id = create_and_login_user(self.testapp)
-        _, application_id = create_client()
+        _, application_id, _ = create_client()
 
         count = Session.query(AuthorizedApplication).filter(
             AuthorizedApplication.user_id==user_id,
@@ -134,7 +134,7 @@ class AuthorizationEndpointTests(TestCase):
 
         res = self.testapp.get('/oauth2/endpoints/authorization', {
             'response_type': 'code',
-            'client_id': '123456',
+            'client_id': application_id,
             'redirect_uri': 'https://example.com/callback',
         })
         self.assertEqual(res.status, '200 OK')
@@ -148,7 +148,7 @@ class AuthorizationEndpointTests(TestCase):
         res = self.testapp.post('/oauth2/endpoints/authorization', {
             'submit': 'Authorize',
             'response_type': 'code',
-            'client_id': '123456',
+            'client_id': application_id,
             'redirect_uri': 'https://example.com/callback',
             'scope': 'read-passwords',
         })
@@ -163,7 +163,7 @@ class AuthorizationEndpointTests(TestCase):
         auth = query[0]
         self.assertEqual(auth.redirect_uri, 'https://example.com/callback')
         self.assertEqual(auth.response_type, 'code')
-        self.assertEqual(auth.application.client_id, '123456')
+        self.assertEqual(auth.application.id, application_id)
         self.assertEqual(auth.scope, ['read-passwords'])
         self.assertEqual(auth.user_id, user_id)
         self.assertEqual(auth.application_id, application_id)
@@ -173,14 +173,14 @@ class AuthorizationEndpointTests(TestCase):
             AuthorizationCode.application_id==application_id,
             AuthorizationCode.user_id==user_id,
         ).one()
-        self.assertEqual(grant.application.client_id, '123456')
+        self.assertEqual(grant.application.id, application_id)
         location = 'https://example.com/callback?code=%s' % grant.code
         self.assertEqual(res.location, location)
 
     @freeze_time('2012-01-10 15:31:11')
     def test_already_authorized_app(self):
         _, user_id = create_and_login_user(self.testapp)
-        _, application_id = create_client()
+        _, application_id, _ = create_client()
 
         count = Session.query(AuthorizedApplication).filter(
             AuthorizedApplication.user_id==user_id,
@@ -190,7 +190,7 @@ class AuthorizationEndpointTests(TestCase):
         # do an initial authorization
         res = self.testapp.get('/oauth2/endpoints/authorization', {
             'response_type': 'code',
-            'client_id': '123456',
+            'client_id': application_id,
             'redirect_uri': 'https://example.com/callback',
         })
         self.assertEqual(res.status, '200 OK')
@@ -198,7 +198,7 @@ class AuthorizationEndpointTests(TestCase):
         res = self.testapp.post('/oauth2/endpoints/authorization', {
             'submit': 'Authorize',
             'response_type': 'code',
-            'client_id': '123456',
+            'client_id': application_id,
             'redirect_uri': 'https://example.com/callback',
             'scope': 'read-passwords',
         })
@@ -212,7 +212,7 @@ class AuthorizationEndpointTests(TestCase):
         # Now do a second authorization
         res = self.testapp.get('/oauth2/endpoints/authorization', {
             'response_type': 'code',
-            'client_id': '123456',
+            'client_id': application_id,
             'redirect_uri': 'https://example.com/callback',
         })
         self.assertEqual(res.status, '302 Found')
@@ -236,11 +236,11 @@ class AuthorizationEndpointTests(TestCase):
     @freeze_time('2012-01-10 15:31:11')
     def test_invalid_redirect_callback_in_post(self):
         create_and_login_user(self.testapp)
-        create_client()
+        _, app_id, _ = create_client()
 
         res = self.testapp.get('/oauth2/endpoints/authorization', {
             'response_type': 'code',
-            'client_id': '123456',
+            'client_id': app_id,
             'redirect_uri': 'https://example.com/callback',
         })
         self.assertEqual(res.status, '200 OK')
@@ -248,7 +248,7 @@ class AuthorizationEndpointTests(TestCase):
         res = self.testapp.post('/oauth2/endpoints/authorization', {
             'submit': 'Authorize',
             'response_type': 'code',
-            'client_id': '123456',
+            'client_id': app_id,
             'redirect_uri': 'https://example.malicious.com/callback',
             'scope': 'read-passwords',
         }, status=400)
@@ -258,11 +258,11 @@ class AuthorizationEndpointTests(TestCase):
     @freeze_time('2012-01-10 15:31:11')
     def test_no_response_type_in_post(self):
         create_and_login_user(self.testapp)
-        create_client()
+        _, app_id, _ = create_client()
 
         res = self.testapp.get('/oauth2/endpoints/authorization', {
             'response_type': 'code',
-            'client_id': '123456',
+            'client_id': app_id,
             'redirect_uri': 'https://example.com/callback',
         })
         self.assertEqual(res.status, '200 OK')
@@ -270,7 +270,7 @@ class AuthorizationEndpointTests(TestCase):
         res = self.testapp.post('/oauth2/endpoints/authorization', {
             'submit': 'Authorize',
             # missing response_type
-            'client_id': '123456',
+            'client_id': app_id,
             'redirect_uri': 'https://example.com/callback',
             'scope': 'read-passwords',
         }, status=302)
@@ -310,9 +310,9 @@ class TokenEndpointTests(TestCase):
         })
 
     def test_bad_client_secret(self):
-        create_client()
+        _, app_id, _ = create_client()
         headers = {
-            'Authorization': auth_basic_encode('123456', 'secret'),
+            'Authorization': auth_basic_encode(app_id, 'secret'),
         }
         res = self.testapp.post('/oauth2/endpoints/token', {
             'grant_type': 'password',
@@ -322,9 +322,9 @@ class TokenEndpointTests(TestCase):
         })
 
     def test_usupported_grant_type(self):
-        create_client()
+        _, app_id, app_secret = create_client()
         headers = {
-            'Authorization': auth_basic_encode('123456', 's3cr3t'),
+            'Authorization': auth_basic_encode(app_id, app_secret),
         }
         res = self.testapp.post('/oauth2/endpoints/token', {
             'grant_type': 'foo',
@@ -334,9 +334,9 @@ class TokenEndpointTests(TestCase):
         })
 
     def test_missing_code(self):
-        create_client()
+        _, app_id, app_secret = create_client()
         headers = {
-            'Authorization': auth_basic_encode('123456', 's3cr3t'),
+            'Authorization': auth_basic_encode(app_id, app_secret),
         }
         res = self.testapp.post('/oauth2/endpoints/token', {
             'grant_type': 'authorization_code',
@@ -348,9 +348,9 @@ class TokenEndpointTests(TestCase):
         })
 
     def test_invalid_code(self):
-        create_client()
+        _, app_id, app_secret = create_client()
         headers = {
-            'Authorization': auth_basic_encode('123456', 's3cr3t'),
+            'Authorization': auth_basic_encode(app_id, app_secret),
         }
         res = self.testapp.post('/oauth2/endpoints/token', {
             'grant_type': 'authorization_code',
@@ -364,12 +364,12 @@ class TokenEndpointTests(TestCase):
     @freeze_time('2012-01-10 15:31:11')
     def test_valid_request(self):
         _, user_id = create_and_login_user(self.testapp)
-        _, application_id = create_client()
+        _, application_id, application_secret = create_client()
 
         # First authorize the app
         res = self.testapp.get('/oauth2/endpoints/authorization', {
             'response_type': 'code',
-            'client_id': '123456',
+            'client_id': application_id,
             'redirect_uri': 'https://example.com/callback',
         })
         self.assertEqual(res.status, '200 OK')
@@ -377,7 +377,7 @@ class TokenEndpointTests(TestCase):
         res = self.testapp.post('/oauth2/endpoints/authorization', {
             'submit': 'Authorize',
             'response_type': 'code',
-            'client_id': '123456',
+            'client_id': application_id,
             'redirect_uri': 'https://example.com/callback',
             'scope': 'read-passwords',
         })
@@ -390,7 +390,8 @@ class TokenEndpointTests(TestCase):
 
         # now send the token request
         headers = {
-            'Authorization': auth_basic_encode('123456', 's3cr3t'),
+            'Authorization': auth_basic_encode(application_id,
+                                               application_secret),
         }
         res = self.testapp.post('/oauth2/endpoints/token', {
             'grant_type': 'authorization_code',
@@ -476,8 +477,8 @@ https://example.com''',
             Application.authorized_origins==['http://example.com',
                                              'https://example.com']
         ).one()
-        self.assertNotEqual(app.client_id, '')
-        self.assertNotEqual(app.client_secret, '')
+        self.assertNotEqual(app.id, '')
+        self.assertNotEqual(app.secret, '')
         self.assertEqual(app.user.id, user_id)
         self.assertEqual(app.name, 'Test Application')
         self.assertEqual(app.main_url, 'http://example.com')
@@ -533,7 +534,6 @@ https://example.com''',
         create_and_login_user(self.testapp)
 
         app = Application(name='Test Application',
-                          client_id='123456',
                           callback_url='https://example.com/callback',
                           production_ready=False)
 
@@ -560,7 +560,6 @@ https://example.com''',
                     email='john@example.com')
 
         app = Application(name='Test Application',
-                          client_id='123456',
                           callback_url='https://example.com/callback',
                           production_ready=False)
         user.applications.append(app)
@@ -637,8 +636,6 @@ https://example.com''',
         create_and_login_user(self.testapp)
 
         app = Application(name='Test Application',
-                          client_id='123456',
-                          client_secret='secret',
                           main_url='http://example.com',
                           callback_url='http://example.com/callback',
                           authorized_origins=['http://example.com',
@@ -671,8 +668,6 @@ https://example.com''',
                     email='john@example.com')
 
         app = Application(name='Test Application',
-                          client_id='123456',
-                          client_secret='secret',
                           main_url='http://example.com',
                           callback_url='http://example.com/callback',
                           authorized_origins=['http://example.com',
@@ -686,6 +681,7 @@ https://example.com''',
             Session.add(user)
             Session.flush()
             app_id = app.id
+            app_secret = app.secret
             user_id = user.id
 
         self.testapp.get('/__login/' + str(user_id))
@@ -708,9 +704,9 @@ https://example.com""")
         res.mustcontain('Description')
         res.mustcontain('example description')
         res.mustcontain('Client Id')
-        res.mustcontain('123456')
+        res.mustcontain(app_id)
         res.mustcontain('Client secret')
-        res.mustcontain('secret')
+        res.mustcontain(app_secret)
         res.mustcontain('Save application')
         res.mustcontain('Delete application')
         res.mustcontain('Cancel')
@@ -740,8 +736,8 @@ https://example.com""")
         self.assertEqual(new_app.image_url, 'http://example.com/image2.png')
         self.assertEqual(new_app.description, 'example description 2')
         # the Id and Secret shouldn't change
-        self.assertEqual(new_app.client_id, '123456')
-        self.assertEqual(new_app.client_secret, 'secret')
+        self.assertEqual(new_app.id, app_id)
+        self.assertEqual(new_app.secret, app_secret)
         new_count = Session.query(Application).count()
         self.assertEqual(old_count, new_count)
 
@@ -752,8 +748,6 @@ https://example.com""")
                     email='john@example.com')
 
         app = Application(name='Test Application',
-                          client_id='123456',
-                          client_secret='secret',
                           main_url='http://example.com',
                           callback_url='http://example.com/callback',
                           authorized_origins=['http://example.com',
@@ -785,8 +779,6 @@ https://example.com""")
                     email='john@example.com')
 
         app = Application(name='Test Application',
-                          client_id='123456',
-                          client_secret='secret',
                           main_url='http://example.com',
                           callback_url='http://example.com/callback',
                           authorized_origins=['http://example.com',
@@ -819,8 +811,6 @@ https://example.com""")
                     email='john@example.com')
 
         app = Application(name='Test Application',
-                          client_id='123456',
-                          client_secret='secret',
                           main_url='http://example.com',
                           callback_url='http://example.com/callback',
                           authorized_origins=['http://example.com',
@@ -860,8 +850,6 @@ https://example.com""")
                     email='john@example.com')
 
         app1 = Application(name='Test Application 1',
-                           client_id='123456',
-                           client_secret='secret',
                            main_url='http://example.com/1',
                            callback_url='http://example.com/1/callback',
                            image_url='http://example.com/1/image.png',
@@ -877,8 +865,6 @@ https://example.com""")
         )
 
         app2 = Application(name='Test Application 2',
-                           client_id='789012',
-                           client_secret='secret',
                            main_url='http://example.com/2',
                            callback_url='http://example.com/2/callback',
                            image_url='http://example.com/2/image.png',
@@ -942,8 +928,6 @@ https://example.com""")
                     email='john@example.com')
 
         app = Application(name='Test Application',
-                           client_id='123456',
-                           client_secret='secret',
                            main_url='http://example.com',
                            callback_url='http://example.com/callback',
                            user=administrator)
@@ -1003,8 +987,6 @@ https://example.com""")
                              email='alice@example.com')
 
         app1 = Application(name='Example app 1',
-                           client_id='123456',
-                           client_secret='secret',
                            main_url='https://example.com',
                            callback_url='https://example.com/callback',
                            image_url='https://example.com/image.png',
@@ -1013,8 +995,6 @@ https://example.com""")
                            user=administrator)
 
         app2 = Application(name='Example app 2',
-                           client_id='654321',
-                           client_secret='secret',
                            main_url='https://2.example.com',
                            callback_url='https://2.example.com/callback',
                            production_ready=False,

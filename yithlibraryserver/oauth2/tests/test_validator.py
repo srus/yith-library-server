@@ -41,7 +41,7 @@ class RequestValidatorTests(TestCase):
 
     def setUp(self):
         super(RequestValidatorTests, self).setUp()
-        self.owner_id, self.app_id = create_client()
+        self.owner_id, self.app_id, self.app_secret = create_client()
         _, self.user_id = create_user()
 
     def _create_request_validator(self, scopes=None):
@@ -59,12 +59,21 @@ class RequestValidatorTests(TestCase):
 
     def test_get_client(self):
         rv, _ = self._create_request_validator()
-        client = rv.get_client('123456')
+        client = rv.get_client(self.app_id)
         self.assertEqual(client.user_id, self.owner_id)
-        self.assertEqual(client.client_id, '123456')
-        self.assertEqual(client.client_secret, 's3cr3t')
+        self.assertEqual(client.id, self.app_id)
         self.assertEqual(client.name, 'Example')
         self.assertEqual(client.callback_url, 'https://example.com/callback')
+
+    def test_get_client_invalid_client_id_bad_format(self):
+        rv, _ = self._create_request_validator()
+        client = rv.get_client('123456')
+        self.assertEqual(client, None)
+
+    def test_get_client_invalid_client_id_does_not_exist(self):
+        rv, _ = self._create_request_validator()
+        client = rv.get_client('00000000-0000-0000-0000-000000000000')
+        self.assertEqual(client, None)
 
     def test_get_pretty_scopes(self):
         rv, _ = self._create_request_validator()
@@ -80,8 +89,8 @@ class RequestValidatorTests(TestCase):
 
     def test_validate_client_id_true(self):
         rv, request = self._create_request_validator()
-        self.assertTrue(rv.validate_client_id('123456', request))
-        self.assertEqual(request.client.client_id, '123456')
+        self.assertTrue(rv.validate_client_id(self.app_id, request))
+        self.assertEqual(request.client.id, self.app_id)
 
     def test_validate_client_id_false(self):
         rv, request = self._create_request_validator()
@@ -91,32 +100,32 @@ class RequestValidatorTests(TestCase):
     def test_validate_redirect_uri_true(self):
         rv, request = self._create_request_validator()
         self.assertTrue(rv.validate_redirect_uri(
-            '123456', 'https://example.com/callback', request))
+            self.app_id, 'https://example.com/callback', request))
 
     def test_validate_redirect_uri_false(self):
         rv, request = self._create_request_validator()
         self.assertFalse(rv.validate_redirect_uri(
-            '123456', 'https://phising.example.com/callback', request))
+            self.app_id, 'https://phising.example.com/callback', request))
 
     def test_get_default_redirect_uri(self):
         rv, request = self._create_request_validator()
-        self.assertEquals(rv.get_default_redirect_uri('123456', request),
+        self.assertEquals(rv.get_default_redirect_uri(self.app_id, request),
                           'https://example.com/callback')
 
     def test_validate_scopes_true(self):
         rv, request = self._create_request_validator()
         self.assertTrue(rv.validate_scopes(
-            '123456',
+            self.app_id,
             ['read-passwords'],
             None, request,
         ))
         self.assertTrue(rv.validate_scopes(
-            '123456',
+            self.app_id,
             ['read-passwords', 'write-passwords'],
             None, request,
         ))
         self.assertTrue(rv.validate_scopes(
-            '123456',
+            self.app_id,
             ['read-passwords', 'write-passwords', 'read-userinfo'],
             None, request,
         ))
@@ -124,39 +133,39 @@ class RequestValidatorTests(TestCase):
     def test_validate_scopes_false(self):
         rv, request = self._create_request_validator()
         self.assertFalse(rv.validate_scopes(
-            '123456',
+            self.app_id,
             ['read-userinfo', 'write-userinfo'],
             None, request,
         ))
 
     def test_get_default_scopes(self):
         rv, request = self._create_request_validator()
-        self.assertEquals(rv.get_default_scopes('123456', request),
+        self.assertEquals(rv.get_default_scopes(self.app_id, request),
                           ['read-passwords'])
 
     def test_validate_response_type_code(self):
         rv, request = self._create_request_validator()
-        self.assertTrue(rv.validate_response_type('123456', 'code',
+        self.assertTrue(rv.validate_response_type(self.app_id, 'code',
                                                   None, request))
 
     def test_validate_response_type_token(self):
         rv, request = self._create_request_validator()
-        self.assertTrue(rv.validate_response_type('123456', 'token',
+        self.assertTrue(rv.validate_response_type(self.app_id, 'token',
                                                   None, request))
 
     def test_validate_response_type_invalid(self):
         rv, request = self._create_request_validator()
-        self.assertFalse(rv.validate_response_type('123456', 'invalid',
+        self.assertFalse(rv.validate_response_type(self.app_id, 'invalid',
                                                    None, request))
 
     @freeze_time('2012-01-10 15:31:11')
     def test_save_authorization_code(self):
         rv, request = self._create_request_validator()
         request.user = Session.query(User).filter(User.id==self.user_id).one()
-        request.client = rv.get_client('123456')
+        request.client = rv.get_client(self.app_id)
         request.scopes = ['read-passwords', 'write-passwords']
         request.redirect_uri = 'https://example.com/callback'
-        rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
+        rv.save_authorization_code(self.app_id, {'code': 'abcdef'}, request)
 
         auth_code = Session.query(AuthorizationCode).filter(
             AuthorizationCode.code=='abcdef',
@@ -179,14 +188,14 @@ class RequestValidatorTests(TestCase):
 
     def test_authenticate_client_no_headers_bad_client_secret(self):
         rv, request = self._create_request_validator()
-        request.client_id = '123456'
+        request.client_id = self.app_id
         request.client_secret = 'secret'
         self.assertFalse(rv.authenticate_client(request))
 
     def test_authenticate_client_no_headers_good_request_attrs(self):
         rv, request = self._create_request_validator()
-        request.client_id = '123456'
-        request.client_secret = 's3cr3t'
+        request.client_id = self.app_id
+        request.client_secret = self.app_secret
         self.assertTrue(rv.authenticate_client(request))
 
     def test_authenticate_client_headers_bad_type(self):
@@ -210,7 +219,8 @@ class RequestValidatorTests(TestCase):
 
     def test_authenticate_client_headers_good(self):
         rv, request = self._create_request_validator()
-        auth = to_unicode(base64.b64encode('123456:s3cr3t'.encode('utf-8')),
+        credentials = "%s:%s" % (self.app_id, self.app_secret)
+        auth = to_unicode(base64.b64encode(credentials.encode('utf-8')),
                           'utf-8')
         request.headers['Authorization'] = 'Basic ' + auth
         self.assertTrue(rv.authenticate_client(request))
@@ -218,56 +228,56 @@ class RequestValidatorTests(TestCase):
     def test_authenticate_client_id_non_implemented(self):
         rv, request = self._create_request_validator()
         self.assertRaises(NotImplementedError, rv.authenticate_client_id,
-                          '123456', request)
+                          self.app_id, request)
 
     def test_validate_code_bad_code(self):
         rv, request = self._create_request_validator()
-        client = rv.get_client('123456')
-        self.assertFalse(rv.validate_code('123456', 'abcdef', client, request))
+        client = rv.get_client(self.app_id)
+        self.assertFalse(rv.validate_code(self.app_id, 'abcdef', client, request))
 
     def test_validate_code_expired_code(self):
         with freeze_time('2012-01-10 15:31:11'):
             rv, request = self._create_request_validator()
-            client = rv.get_client('123456')
+            client = rv.get_client(self.app_id)
 
             request.user = Session.query(User).filter(User.id==self.user_id).one()
             request.client = client
             request.scopes = ['read-passwords', 'write-passwords']
             request.redirect_uri = 'https://example.com/callback'
-            rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
+            rv.save_authorization_code(self.app_id, {'code': 'abcdef'}, request)
 
         # move time forward 11 minutes
         with freeze_time('2012-01-10 15:42:11'):
-            self.assertFalse(rv.validate_code('123456', 'abcdef', client, request))
+            self.assertFalse(rv.validate_code(self.app_id, 'abcdef', client, request))
 
     def test_validate_code_good(self):
         with freeze_time('2012-01-10 15:31:11'):
             rv, request = self._create_request_validator()
             request.user = Session.query(User).filter(User.id==self.user_id).one()
-            request.client = rv.get_client('123456')
+            request.client = rv.get_client(self.app_id)
             request.scopes = ['read-passwords', 'write-passwords']
             request.redirect_uri = 'https://example.com/callback'
-            rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
+            rv.save_authorization_code(self.app_id, {'code': 'abcdef'}, request)
 
         # move time forward 5 minutes
         with freeze_time('2012-01-10 15:36:11'):
             rv2, request2 = self._create_request_validator()
-            client2 = rv2.get_client('123456')
+            client2 = rv2.get_client(self.app_id)
             request2.client = client2
-            self.assertTrue(rv2.validate_code('123456', 'abcdef', client2, request2))
+            self.assertTrue(rv2.validate_code(self.app_id, 'abcdef', client2, request2))
             self.assertEquals(request2.user.id, self.user_id)
             self.assertEquals(request2.scopes, ['read-passwords', 'write-passwords'])
 
     def test_confirm_redirect_uri_no_redirect_uri(self):
         rv, request = self._create_request_validator()
-        client = rv.get_client('123456')
-        self.assertTrue(rv.confirm_redirect_uri('123456', 'abcdef',
+        client = rv.get_client(self.app_id)
+        self.assertTrue(rv.confirm_redirect_uri(self.app_id, 'abcdef',
                                                 None, client))
 
     def test_confirm_redirect_uri_bad_code(self):
         rv, request = self._create_request_validator()
-        client = rv.get_client('123456')
-        self.assertFalse(rv.confirm_redirect_uri('123456', 'abcdef',
+        client = rv.get_client(self.app_id)
+        self.assertFalse(rv.confirm_redirect_uri(self.app_id, 'abcdef',
                                                  'https://example.com/callback',
                                                  client))
 
@@ -275,14 +285,14 @@ class RequestValidatorTests(TestCase):
     def test_confirm_redirect_uri_bad_redirect_uri(self):
         rv, request = self._create_request_validator()
         request.user = Session.query(User).filter(User.id==self.user_id).one()
-        request.client = rv.get_client('123456')
+        request.client = rv.get_client(self.app_id)
         request.scopes = ['read-passwords', 'write-passwords']
         request.redirect_uri = 'https://example.com/callback'
-        rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
+        rv.save_authorization_code(self.app_id, {'code': 'abcdef'}, request)
 
         rv, request = self._create_request_validator()
-        client = rv.get_client('123456')
-        self.assertFalse(rv.confirm_redirect_uri('123456', 'abcdef',
+        client = rv.get_client(self.app_id)
+        self.assertFalse(rv.confirm_redirect_uri(self.app_id, 'abcdef',
                                                  'http://example.com/callback',
                                                  client))
 
@@ -290,27 +300,27 @@ class RequestValidatorTests(TestCase):
     def test_confirm_redirect_uri_good_redirect_uri(self):
         rv, request = self._create_request_validator()
         request.user = Session.query(User).filter(User.id==self.user_id).one()
-        request.client = rv.get_client('123456')
+        request.client = rv.get_client(self.app_id)
         request.scopes = ['read-passwords', 'write-passwords']
         request.redirect_uri = 'https://example.com/callback'
-        rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
+        rv.save_authorization_code(self.app_id, {'code': 'abcdef'}, request)
 
         rv, request = self._create_request_validator()
-        client = rv.get_client('123456')
-        self.assertTrue(rv.confirm_redirect_uri('123456', 'abcdef',
+        client = rv.get_client(self.app_id)
+        self.assertTrue(rv.confirm_redirect_uri(self.app_id, 'abcdef',
                                                 'https://example.com/callback',
                                                 client))
 
     def test_validate_grant_type_bad(self):
         rv, request = self._create_request_validator()
-        client = rv.get_client('123456')
-        self.assertFalse(rv.validate_grant_type('123456', 'bad-code',
+        client = rv.get_client(self.app_id)
+        self.assertFalse(rv.validate_grant_type(self.app_id, 'bad-code',
                                                 client, request))
 
     def test_validate_grant_type_good(self):
         rv, request = self._create_request_validator()
-        client = rv.get_client('123456')
-        self.assertTrue(rv.validate_grant_type('123456', 'authorization_code',
+        client = rv.get_client(self.app_id)
+        self.assertTrue(rv.validate_grant_type(self.app_id, 'authorization_code',
                                                client, request))
 
     @freeze_time('2012-01-10 15:31:11')
@@ -324,7 +334,7 @@ class RequestValidatorTests(TestCase):
         }
         request.user = Session.query(User).filter(User.id==self.user_id).one()
         request.scopes = ['read-passwords', 'write-passwords']
-        request.client = rv.get_client('123456')
+        request.client = rv.get_client(self.app_id)
         rv.save_bearer_token(token, request)
 
         access_code = Session.query(AccessCode).filter(
@@ -343,14 +353,14 @@ class RequestValidatorTests(TestCase):
     def test_invalidate_authorization_code(self):
         rv, request = self._create_request_validator()
         request.user = Session.query(User).filter(User.id==self.user_id).one()
-        request.client = rv.get_client('123456')
+        request.client = rv.get_client(self.app_id)
         request.scopes = ['read-passwords', 'write-passwords']
         request.redirect_uri = 'https://example.com/callback'
-        rv.save_authorization_code('123456', {'code': 'abcdef'}, request)
+        rv.save_authorization_code(self.app_id, {'code': 'abcdef'}, request)
 
         rv, request = self._create_request_validator()
-        request.client = rv.get_client('123456')
-        rv.invalidate_authorization_code('123456', 'abcdef', request)
+        request.client = rv.get_client(self.app_id)
+        rv.invalidate_authorization_code(self.app_id, 'abcdef', request)
         try:
             auth_code = Session.query(AuthorizationCode).filter(
                 AuthorizationCode.code=='abcdef',
@@ -378,7 +388,7 @@ class RequestValidatorTests(TestCase):
             }
             request.user = Session.query(User).filter(User.id==self.user_id).one()
             request.scopes = ['read-passwords', 'write-passwords']
-            request.client = rv.get_client('123456')
+            request.client = rv.get_client(self.app_id)
             rv.save_bearer_token(token, request)
 
         # move time forward 2 hours
@@ -401,7 +411,7 @@ class RequestValidatorTests(TestCase):
             }
             request.user = Session.query(User).filter(User.id==self.user_id).one()
             request.scopes = ['read-passwords', 'write-passwords']
-            request.client = rv.get_client('123456')
+            request.client = rv.get_client(self.app_id)
             rv.save_bearer_token(token, request)
 
         # move time forward 1/2 hour
@@ -424,7 +434,7 @@ class RequestValidatorTests(TestCase):
             }
             request.user = Session.query(User).filter(User.id==self.user_id).one()
             request.scopes = ['read-passwords', 'write-passwords']
-            request.client = rv.get_client('123456')
+            request.client = rv.get_client(self.app_id)
             rv.save_bearer_token(token, request)
 
         # move time forward 1/2 hour

@@ -174,14 +174,12 @@ class ApplicationsReportTests(BaseReportTests):
             Session.add(user)
 
             app1 = Application(user=user,
-                              client_id='1234',
                               name='Test application 1',
                               main_url='http://example.com',
                               callback_url='http://example.com/callback')
             Session.add(app1)
 
             app2 = Application(user=user,
-                              client_id='5678',
                               name='Test application 2',
                               main_url='http://2.example.com',
                               callback_url='http://2.example.com/callback')

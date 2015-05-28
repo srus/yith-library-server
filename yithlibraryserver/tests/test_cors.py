@@ -68,16 +68,17 @@ class CORSManagerTests(testing.TestCase):
                     email='john@example.com')
 
         app = Application(name='Test Application',
-                          client_id='client1',
                           authorized_origins=['http://localhost'])
         user.applications.append(app)
 
         with transaction.manager:
             Session.add(user)
+            Session.add(app)
             Session.flush()
 
+        bad_app_id = '00000000-0000-0000-0000-000000000000'
         request = DummyRequest(headers={'Origin': 'http://localhost'},
-                               params={'client_id': 'client2'})
+                               params={'client_id': bad_app_id})
         response = request.response
 
         cm.add_cors_header(request, response)
@@ -96,16 +97,17 @@ class CORSManagerTests(testing.TestCase):
                     email='john@example.com')
 
         app = Application(name='Test Application',
-                          client_id='client1',
                           authorized_origins=['http://localhost'])
         user.applications.append(app)
 
         with transaction.manager:
             Session.add(user)
+            Session.add(app)
             Session.flush()
+            app_id = app.id
 
         request = DummyRequest(headers={'Origin': 'http://localhost'},
-                               params={'client_id': 'client1'})
+                               params={'client_id': app_id})
         response = request.response
 
         cm.add_cors_header(request, response)

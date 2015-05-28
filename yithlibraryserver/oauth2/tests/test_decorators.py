@@ -54,7 +54,7 @@ class DecoratorsTests(TestCase):
 
     def setUp(self):
         super(DecoratorsTests, self).setUp()
-        self.owner_id, self.app_id = create_client()
+        self.owner_id, self.app_id, _ = create_client()
         _, self.user_id = create_user()
 
     def _create_access_code(self, scope):

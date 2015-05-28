@@ -553,10 +553,8 @@ class IdentityProviderViewTests(TestCase):
                                          email='john@example.com',
                                          email_verified=True)
         app1 = Application(name='Test Application',
-                           client_id='app1',
                            callback_url='https://example.com/callback/1')
         app2 = Application(name='Test Application',
-                           client_id='app2',
                            callback_url='https://example.com/callback/2')
         admin = User(screen_name='Alice doe',
                      first_name='Alice',
@@ -607,13 +605,10 @@ class IdentityProviderViewTests(TestCase):
                                provider='google',
                                external_id='google1')
         app1 = Application(name='Test Application',
-                           client_id='app1',
                            callback_url='https://example.com/callback/1')
         app2 = Application(name='Test Application',
-                           client_id='app2',
                            callback_url='https://example.com/callback/2')
         app3 = Application(name='Test Application',
-                           client_id='app3',
                            callback_url='https://example.com/callback/3')
         admin = User(screen_name='Alice doe',
                      first_name='Alice',
@@ -700,13 +695,10 @@ class IdentityProviderViewTests(TestCase):
                                provider='google',
                                external_id='google1')
         app1 = Application(name='Test Application',
-                           client_id='app1',
                            callback_url='https://example.com/callback/1')
         app2 = Application(name='Test Application',
-                           client_id='app2',
                            callback_url='https://example.com/callback/2')
         app3 = Application(name='Test Application',
-                           client_id='app3',
                            callback_url='https://example.com/callback/3')
         admin = User(screen_name='Alice doe',
                      first_name='Alice',
@@ -761,6 +753,9 @@ class IdentityProviderViewTests(TestCase):
             Session.add(password1)
             Session.add(password2)
             Session.flush()
+            app1_id = app1.id
+            app2_id = app2.id
+            app3_id = app3.id
 
         # let's merge them
         res = self.testapp.post('/identity-providers', {
@@ -782,8 +777,8 @@ class IdentityProviderViewTests(TestCase):
         auths = Session.query(AuthorizedApplication).filter(
             AuthorizedApplication.user==user1_refreshed,
         )
-        client_ids = [auth_app.application.client_id for auth_app in auths]
-        self.assertEqual(set(client_ids), set(['app1', 'app2', 'app3']))
+        client_ids = [auth_app.application.id for auth_app in auths]
+        self.assertEqual(set(client_ids), set([app1_id, app2_id, app3_id]))
 
         try:
             user2_refreshed = Session.query(User).filter(User.id==user2_id).one()
@@ -837,7 +832,7 @@ class RESTViewTests(TestCase):
         self.user_id = create_user(email='john@example.com',
                                    email_verified=True,
                                    allow_google_analytics=True)
-        app = Application(name='test-app', client_id='clienb1')
+        app = Application(name='test-app')
         admin = User(screen_name='Alice doe',
                      first_name='Alice',
                      last_name='Doe',

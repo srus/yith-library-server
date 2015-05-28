@@ -95,7 +95,6 @@ def developer_application_new(request):
             image_url=appstruct['image_url'],
             description=appstruct['description'],
         )
-        application.create_client_id_and_secret()
         request.user.applications.append(application)
 
         request.session.flash(
@@ -186,8 +185,8 @@ def developer_application_edit(request):
             'production_ready': app.production_ready,
             'image_url': app.image_url,
             'description': app.description,
-            'client_id': app.client_id,
-            'client_secret': app.client_secret,
+            'client_id': app.id,
+            'client_secret': app.secret,
         }),
         'app': app,
     }
@@ -307,7 +306,7 @@ class AuthorizationEndpoint(object):
                 )
 
                 app = Session.query(Application).filter(
-                    Application.client_id==credentials['client_id'],
+                    Application.id==credentials['client_id'],
                 ).one()
 
                 try:

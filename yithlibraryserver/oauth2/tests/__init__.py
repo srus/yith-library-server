@@ -33,8 +33,6 @@ def create_client():
                 email='alice@example.com')
 
     app = Application(user=user,
-                      client_id='123456',
-                      client_secret='s3cr3t',
                       name='Example',
                       main_url='https://example.com',
                       callback_url='https://example.com/callback',
@@ -47,8 +45,9 @@ def create_client():
         Session.flush()
         owner_id = user.id
         app_id = app.id
+        app_secret = app.secret
 
-    return owner_id, app_id
+    return owner_id, app_id, app_secret
 
 
 def create_user():

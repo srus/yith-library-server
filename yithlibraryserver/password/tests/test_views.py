@@ -40,7 +40,7 @@ class ViewTests(TestCase):
     def setUp(self):
         super(ViewTests, self).setUp()
 
-        self.owner_id, self.app_id = create_client()
+        self.owner_id, self.app_id, _ = create_client()
         self.user, self.user_id = create_user()
         self.access_code = '1234'
         self.auth_header = {'Authorization': 'Bearer %s' % self.access_code}

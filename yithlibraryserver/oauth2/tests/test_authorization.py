@@ -1,7 +1,7 @@
 # Yith Library Server is a password storage server.
 # Copyright (C) 2012-2014 Yaco Sistemas
 # Copyright (C) 2012-2014 Alejandro Blanco Escudero <alejandro.b.e@gmail.com>
-# Copyright (C) 2012-2014 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
+# Copyright (C) 2012-2015 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com>
 #
 # This file is part of Yith Library Server.
 #
@@ -50,7 +50,7 @@ class VerifyRequestTests(TestCase):
 
     @freeze_time('2014-02-23 08:00:00')
     def test_invalid_scope(self):
-        user_id, app_id = create_client()
+        user_id, app_id, _ = create_client()
         expiration = datetime.datetime(2014, 2, 23, 9, 0)
         access_code = AccessCode(
             code='1234',
@@ -69,7 +69,7 @@ class VerifyRequestTests(TestCase):
 
     @freeze_time('2014-02-23 08:00:00')
     def test_expired_token(self):
-        user_id, app_id = create_client()
+        user_id, app_id, _ = create_client()
         expiration = datetime.datetime(2014, 2, 23, 7, 0)
         access_code = AccessCode(
             code='1234',
@@ -88,7 +88,7 @@ class VerifyRequestTests(TestCase):
 
     @freeze_time('2014-02-23 08:00:00')
     def test_valid_user(self):
-        user_id, app_id = create_client()
+        user_id, app_id, _ = create_client()
         expiration = datetime.datetime(2014, 2, 23, 9, 0)
         access_code = AccessCode(
             code='1234',
