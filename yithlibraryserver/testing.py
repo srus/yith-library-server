@@ -19,8 +19,6 @@
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
 import collections
-import platform
-import sys
 import unittest
 
 import mock
@@ -42,13 +40,6 @@ from sqlalchemy import create_engine
 import transaction
 
 from yithlibraryserver import main
-
-# On Travis-CI tests are executed in paralllel for every Python
-# version we support. We should not share the test database on
-# each of this test executions
-PY_VERSION = '%d%d' % (sys.version_info[0], sys.version_info[1])
-PY_IMPLEMENTATION = platform.python_implementation().lower()
-DB_NAME = 'test_yithlibrary_%s_%s' % (PY_IMPLEMENTATION, PY_VERSION)
 
 
 class FakeRequest(DummyRequest):
@@ -92,7 +83,7 @@ def sqlalchemy_teardown(context):
 
 
 def get_test_db_uri():
-    return 'postgresql://postgres@localhost:5432/%s' % DB_NAME
+    return 'postgresql://postgres@localhost:5432/test_yithlibrary'
 
 
 class TestCase(unittest.TestCase):

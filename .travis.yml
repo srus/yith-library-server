@@ -18,15 +18,10 @@ install:
   - pip install coveralls
 before_script:
   - psql template1 -c 'CREATE EXTENSION "uuid-ossp";' -U postgres
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then psql -c 'CREATE DATABASE test_yithlibrary_cpython_26;' -U postgres; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then psql -c 'CREATE DATABASE test_yithlibrary_cpython_27;' -U postgres; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == '3.3' ]]; then psql -c 'CREATE DATABASE test_yithlibrary_cpython_33;' -U postgres; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == '3.4' ]]; then psql -c 'CREATE DATABASE test_yithlibrary_cpython_34;' -U postgres; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 'pypy' ]]; then psql -c 'CREATE DATABASE test_yithlibrary_pypy_27;' -U postgres; fi
+  - psql -c 'CREATE DATABASE test_yithlibrary;' -U postgres
 script:
   - coverage run --source=yithlibraryserver setup.py test
 after_success:
   - coveralls
 services:
-  - mongodb
   - postgresql
