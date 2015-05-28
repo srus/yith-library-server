@@ -18,8 +18,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
-import datetime
-
 from deform import Button, Form, ValidationFailure
 
 from pyramid.httpexceptions import HTTPBadRequest, HTTPFound
@@ -99,15 +97,12 @@ def register_new_user(request):
         else:
             email_verified = False
 
-        now = datetime.datetime.utcnow()
-
         user_attrs = {
             'screen_name': appstruct['screen_name'],
             'first_name': appstruct['first_name'],
             'last_name': appstruct['last_name'],
             'email': email,
             'email_verified': email_verified,
-            'last_login': now,
         }
 
         if request.google_analytics.is_in_session():
