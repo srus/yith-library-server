@@ -16,12 +16,28 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Yith Library Server.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
+import os.path
+
 from newrelic import agent
 agent.initialize()
 
 from paste.deploy import loadapp
+from pyramid.paster import setup_logging
 from raven.middleware import Sentry
+from waitress import serve
 
-application = loadapp('config:production.ini',
-                      relative_to='yithlibraryserver/config-templates')
+basedir= os.path.dirname(os.path.realpath(__file__))
+conf_file = os.path.join(
+    basedir,
+    'yithlibraryserver', 'config-templates', 'production.ini'
+)
+
+application = loadapp('config:%s' % conf_file)
 application = agent.WSGIApplicationWrapper(Sentry(application))
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    scheme = os.environ.get("SCHEME", "https")
+    setup_logging(conf_file)
+    serve(application, host='0.0.0.0', port=port, url_scheme=scheme)
