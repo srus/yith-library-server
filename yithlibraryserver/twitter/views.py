@@ -89,12 +89,12 @@ def twitter_callback(request):
 
     params = (
         ('oauth_token', oauth_token),
+        ('oauth_verifier', oauth_verifier),
     )
 
     auth = auth_header('POST', access_token_url, params, settings, oauth_token)
 
     response = requests.post(access_token_url,
-                             data='oauth_verifier=%s' % oauth_verifier,
                              headers={'Authorization': auth})
 
     if response.status_code != 200:
