@@ -80,8 +80,9 @@ class MergeAccountsTests(BaseMergeTests):
         Session.add(user)
         Session.flush()
 
+        fake_id = '00000000-0000-0000-0000-000000000000'
         self.assertEqual(1, Session.query(User).count())
-        self.assertEqual(0, merge_accounts(user, [user.id + 1]))
+        self.assertEqual(0, merge_accounts(user, [fake_id]))
         self.assertEqual(1, Session.query(User).count())
 
     def test_merge_valid_users(self):

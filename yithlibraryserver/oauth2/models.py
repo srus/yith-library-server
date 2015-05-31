@@ -20,7 +20,7 @@ from datetime import datetime
 
 from pyramid_sqlalchemy import BaseObject
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
+from sqlalchemy import Boolean, Column, DateTime, String, Text
 from sqlalchemy import ForeignKey, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.orm import relationship, backref
@@ -48,7 +48,7 @@ class Application(BaseObject):
 
     production_ready = Column(Boolean, nullable=False, default=False)
 
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_id = Column(UUID, ForeignKey('users.id'), nullable=False)
     user = relationship('User', backref=backref('applications'))
 
 
@@ -72,7 +72,7 @@ class AuthorizedApplication(BaseObject):
     )
 
     user_id = Column(
-        Integer,
+        UUID,
         ForeignKey('users.id'),
         nullable=False,
     )
@@ -108,7 +108,7 @@ class AuthorizationCode(BaseObject):
     )
 
     user_id = Column(
-        Integer,
+        UUID,
         ForeignKey('users.id'),
         nullable=False,
     )
@@ -142,7 +142,7 @@ class AccessCode(BaseObject):
     )
 
     user_id = Column(
-        Integer,
+        UUID,
         ForeignKey('users.id'),
         nullable=False,
     )

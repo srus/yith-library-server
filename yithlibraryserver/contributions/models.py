@@ -51,7 +51,7 @@ class Donation(BaseObject):
     amount = Column(Integer, nullable=False)
     send_sticker = Column(Boolean, nullable=False, default=True)
 
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
     user = relationship('User', backref=backref('donations'))
 
     def should_include_sticker(self):

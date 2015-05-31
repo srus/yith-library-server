@@ -47,7 +47,7 @@ class Password(BaseObject):
     service = Column(String, nullable=False, default='')
     expiration = Column(Integer, nullable=True)
 
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_id = Column(UUID, ForeignKey('users.id'), nullable=False)
     user = relationship(
         'User',
         backref=backref('passwords', cascade='all, delete-orphan'),

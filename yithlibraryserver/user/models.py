@@ -20,8 +20,9 @@ from datetime import datetime
 
 from pyramid_sqlalchemy import BaseObject, Session
 
-from sqlalchemy import Boolean, Column, Enum, DateTime, Integer, String
-from sqlalchemy import ForeignKey
+from sqlalchemy import Boolean, Column, Enum, DateTime, String
+from sqlalchemy import ForeignKey, func
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, backref
 
@@ -31,7 +32,7 @@ from yithlibraryserver.compat import text_type
 class User(BaseObject):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(UUID, primary_key=True, default=func.uuid_generate_v4())
     first_name = Column(String, nullable=False, default='')
     last_name = Column(String, nullable=False, default='')
     screen_name = Column(String, nullable=False, default='')
@@ -144,11 +145,11 @@ class ExternalIdentity(BaseObject):
 
     PROVIDERS = ('facebook', 'google', 'twitter', 'persona', 'liveconnect')
 
-    id = Column(Integer, primary_key=True)
+    id = Column(UUID, primary_key=True, default=func.uuid_generate_v4())
     provider = Column(Enum(*PROVIDERS, name='providers'), nullable=False)
     external_id = Column(String, nullable=False)
 
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_id = Column(UUID, ForeignKey('users.id'), nullable=False)
     user = relationship(
         'User',
         backref=backref('identities', cascade='all, delete-orphan'),

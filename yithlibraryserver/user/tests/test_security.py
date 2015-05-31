@@ -59,7 +59,8 @@ class GetUserTests(unittest.TestCase):
 
     def test_get_user_no_user(self):
         request = testing.DummyRequest()
-        self.config.testing_securitypolicy(userid=123)
+        user_id = '00000000-0000-0000-0000-000000000000'
+        self.config.testing_securitypolicy(userid=user_id)
         self.assertEqual(None, get_user(request))
 
     def test_get_user_existing_user(self):
@@ -91,7 +92,8 @@ class AssertAuthenticatedUserIsRegisteredTests(unittest.TestCase):
         sqlalchemy_teardown(self.db_context)
 
     def test_assert_authenticated_user_is_registered_no_user(self):
-        self.config.testing_securitypolicy(userid=1)
+        user_id = '00000000-0000-0000-0000-000000000000'
+        self.config.testing_securitypolicy(userid=user_id)
 
         request = testing.DummyRequest()
 

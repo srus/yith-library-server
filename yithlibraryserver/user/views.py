@@ -323,7 +323,7 @@ def identity_providers(request):
                     return a['is_verified']
             return False
 
-        accounts_to_merge = [int(account.replace('account-', ''))
+        accounts_to_merge = [account.replace('account-', '')
                              for account in request.POST.keys()
                              if account != 'submit']
         accounts_to_merge = [account
