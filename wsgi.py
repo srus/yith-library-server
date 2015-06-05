@@ -36,8 +36,9 @@ conf_file = os.path.join(
 application = loadapp('config:%s' % conf_file)
 application = agent.WSGIApplicationWrapper(Sentry(application))
 
+setup_logging(conf_file)
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     scheme = os.environ.get("SCHEME", "https")
-    setup_logging(conf_file)
     serve(application, host='0.0.0.0', port=port, url_scheme=scheme)
