@@ -428,7 +428,7 @@ class ApplicationViewTests(TestCase):
         self.assertEqual(res.status, '200 OK')
         res.mustcontain('Log in')
 
-    def test_applications_list_apps(self):
+    def test_applications_list_apps_empty(self):
         create_and_login_user(self.testapp)
 
         res = self.testapp.get('/oauth2/applications')
@@ -438,7 +438,35 @@ class ApplicationViewTests(TestCase):
         res.mustcontain('Developer Applications')
         res.mustcontain('Register new application')
 
-        # TODO: test creating apps and make sure they appear in the output
+    def test_applications_list_apps_one_app(self):
+        user = User(screen_name='John Doe',
+                    first_name='John',
+                    last_name='Doe',
+                    email='john@example.com')
+
+        app = Application(name='Test Application',
+                          main_url='https://example.com',
+                          callback_url='https://example.com/callback',
+                          production_ready=False)
+        user.applications.append(app)
+
+        with transaction.manager:
+            Session.add(user)
+            Session.flush()
+            app_id = app.id
+            user_id = user.id
+
+        self.testapp.get('/__login/' + str(user_id))
+
+        res = self.testapp.get('/oauth2/applications')
+        self.assertEqual(res.status, '200 OK')
+        res.mustcontain('John')
+        res.mustcontain('Log out')
+        res.mustcontain('Developer Applications')
+        res.mustcontain('Register new application')
+        res.mustcontain(app_id)
+        res.mustcontain('Test Application')
+        res.mustcontain('https://example.com')
 
     def test_application_new_requires_authentication(self):
         res = self.testapp.get('/oauth2/applications/new')
