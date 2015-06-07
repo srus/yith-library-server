@@ -23,16 +23,28 @@ import os
 from newrelic import agent
 agent.initialize()
 
+from webob.dec import wsgify
+from webob.exc import HTTPMovedPermanently
+
 from paste.deploy import loadapp
 from pyramid.paster import setup_logging
 from raven.middleware import Sentry
 from waitress import serve
+
+
+@wsgify.middleware
+def ForceTLSMiddleware(req, app):
+    if 'X-Forwarded-Proto' in req.headers and req.headers['X-Forwarded-Proto'] != 'https':
+        https_url = req.url.replace('http://', 'https://')
+        return HTTPMovedPermanently(location=https_url)
+    return req.get_response(app)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     scheme = os.environ.get("SCHEME", "https")
     setup_logging('yithlibraryserver/config-templates/production.ini')
     app = loadapp('config:production.ini', relative_to='yithlibraryserver/config-templates')
+    app = ForceTLSMiddleware(app)
     app = Sentry(app)
     app = agent.WSGIApplicationWrapper(app)
     serve(app, host='0.0.0.0', port=port, url_scheme=scheme)
