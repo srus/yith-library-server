@@ -31,11 +31,15 @@ from pyramid.paster import setup_logging
 from raven.middleware import Sentry
 from waitress import serve
 
+from yithlibraryserver.compat import urlparse
+
 
 @wsgify.middleware
 def ForceTLSMiddleware(req, app):
     if 'X-Forwarded-Proto' in req.headers and req.headers['X-Forwarded-Proto'] != 'https':
-        https_url = req.url.replace('http://', 'https://')
+        url = list(urlparse.urlparse(req.url))
+        url[0] = 'https'
+        https_url = urlparse.urlunparse(url)
         return HTTPMovedPermanently(location=https_url)
     return req.get_response(app)
 
