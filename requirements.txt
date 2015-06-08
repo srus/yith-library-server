@@ -28,6 +28,7 @@ pymongo==2.7.2
 pyramid==1.5.4
 pyramid_beaker==0.8
 pyramid_chameleon==0.3
+pyramid-debugtoolbar==2.4
 pyramid_mailer==0.13
 pyramid_tm==0.7
 pyramid_sna==0.3.1
